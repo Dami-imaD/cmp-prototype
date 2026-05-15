@@ -1,0 +1,3268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HK BOS - Compliance Monitoring Platform</title>
+<style>
+:root {
+  --accent: #FFC107;
+  --accent-hover: #e6ad00;
+  --bg: #ffffff;
+  --text: #1d2129;
+  --text-secondary: #4e5969;
+  --border: #e5e6eb;
+  --header-bg: #f7f8fa;
+  --row-hover: #fafbfc;
+  --success: #00b42a;
+  --warning: #ff7d00;
+  --info: #165dff;
+  --gray: #86909c;
+  --sidebar-bg: #f7f8fa;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  min-width: 1400px;
+}
+
+/* Top Navigation */
+.top-nav {
+  height: 48px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-logo {
+  font-weight: 700;
+  font-size: 14px;
+  margin-right: 24px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.nav-items {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.nav-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--text);
+  position: relative;
+}
+
+.nav-item:hover {
+  background: var(--header-bg);
+}
+
+.nav-item.active {
+  background: var(--accent);
+  color: #000;
+  font-weight: 500;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.nav-right .search-icon,
+.nav-right .download-icon {
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nav-user {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 160px;
+  z-index: 200;
+  display: none;
+  padding: 4px 0;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.dropdown-item:hover {
+  background: var(--header-bg);
+}
+
+.dropdown-item.new-badge::after {
+  content: 'NEW';
+  margin-left: 8px;
+  background: var(--accent);
+  color: #000;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Tab Bar */
+.tab-bar {
+  height: 36px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 16px;
+  gap: 2px;
+}
+
+.tab-item {
+  padding: 6px 16px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab-item.active {
+  background: #fff;
+  border-bottom: 2px solid #fff;
+  margin-bottom: -1px;
+  font-weight: 500;
+}
+
+.tab-close {
+  font-size: 14px;
+  color: var(--gray);
+  cursor: pointer;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 12px 24px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.breadcrumb span {
+  margin: 0 4px;
+}
+
+/* Page Container */
+.page-container {
+  padding: 20px 24px;
+  display: none;
+}
+
+.page-container.active {
+  display: block;
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-bar .right-actions {
+  margin-left: auto;
+}
+
+/* Form Controls */
+select, input[type="text"], input[type="date"] {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+}
+
+select:focus, input[type="text"]:focus {
+  border-color: var(--accent);
+}
+
+input[type="text"] {
+  width: 240px;
+}
+
+.btn {
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  background: #fff;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-link {
+  border: none;
+  background: none;
+  color: var(--info);
+  padding: 0 4px;
+  height: auto;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-link:hover {
+  color: #4080ff;
+}
+
+/* Tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  table-layout: fixed;
+}
+
+.data-table th {
+  background: var(--header-bg);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: middle;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-table td:hover {
+  white-space: normal;
+  overflow: visible;
+}
+
+.data-table tr:hover td {
+  background: var(--row-hover);
+}
+
+/* Group Header */
+.group-header {
+  background: var(--header-bg);
+  padding: 8px 12px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.group-header .arrow {
+  transition: transform 0.2s;
+}
+
+.group-header.collapsed .arrow {
+  transform: rotate(-90deg);
+}
+
+.group-header .badge {
+  background: var(--accent);
+  color: #000;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Status Tags */
+.status-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.status-active { background: #e8ffea; color: #00b42a; }
+.status-draft { background: #fff7e8; color: #ff7d00; }
+.status-offline { background: #f2f3f5; color: #86909c; }
+.status-testing { background: #e8f3ff; color: #165dff; }
+.status-enabled { background: #e8ffea; color: #00b42a; }
+.status-disabled { background: #f2f3f5; color: #86909c; }
+.status-finished { background: #e8ffea; color: #00b42a; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.modal-close {
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--gray);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.5;
+  height: 38px;
+  background: #fff;
+  color: var(--text);
+}
+
+.form-group input[type="text"]:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {
+  background: #f5f5f5;
+  color: #86909c;
+  cursor: not-allowed;
+  border-color: #e5e6eb;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+  height: auto;
+}
+
+/* Detail mode: all fields look clearly read-only */
+.modal-detail .form-group input[type="text"],
+.modal-detail .form-group select,
+.modal-detail .form-group textarea {
+  background: #fafafa;
+  border: 1px solid #ebebeb;
+  color: var(--text);
+  cursor: default;
+}
+
+/* Domain Tabs */
+.domain-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+.domain-tab {
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.domain-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.domain-tab:hover:not(.active) {
+  color: var(--text);
+}
+
+/* Rule Testing Layout */
+.rule-testing-layout {
+  display: flex;
+  gap: 0;
+  height: calc(100vh - 180px);
+}
+
+.sidebar {
+  width: 300px;
+  min-width: 300px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  background: var(--sidebar-bg);
+  padding: 12px 0;
+}
+
+.sidebar-tree-item {
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-tree-item:hover {
+  background: #eee;
+}
+
+.sidebar-tree-item.active {
+  background: var(--accent);
+  font-weight: 500;
+}
+
+.sidebar-tree-item.level-0 {
+  font-weight: 500;
+  padding-left: 12px;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.sidebar-tree-item.level-1 {
+  padding-left: 28px;
+  color: var(--text-secondary);
+}
+
+.sidebar-tree-item.level-2 {
+  padding-left: 44px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.sidebar-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.dot-active { background: var(--success); }
+.dot-draft { background: var(--warning); }
+
+.rule-testing-content {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+/* Sub-tabs */
+.sub-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.sub-tab {
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.sub-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+/* Add Test Page */
+.add-test-container {
+  max-width: 900px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--text);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 20px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 12px;
+}
+
+.info-row .label {
+  color: var(--text-secondary);
+  min-width: 140px;
+  font-size: 13px;
+}
+
+.info-row .value {
+  font-size: 13px;
+}
+
+.hint-box {
+  background: #e8f7ff;
+  border: 1px solid #b3e0ff;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #0077cc;
+  margin: 8px 0;
+}
+
+.period-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.period-row .period-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 60px;
+}
+
+.add-period-btn {
+  border: 1px dashed var(--border);
+  background: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13px;
+  width: 100%;
+  text-align: center;
+}
+
+.add-period-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.remove-btn {
+  color: #f53f3f;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background: none;
+  padding: 2px 6px;
+}
+
+/* Page header with title */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.page-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Pagination placeholder */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 0;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.pagination span {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.pagination span.current {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<div class="top-nav">
+  <div class="nav-logo">HK BOS &#9660;</div>
+  <div class="nav-items">
+    <div class="nav-item" id="nav-policy" onclick="toggleDropdown('policy-dropdown')">
+      Policy &#9660;
+      <div class="dropdown-menu" id="policy-dropdown">
+        <div class="dropdown-item new-badge" onclick="showPage('ruletype')">Rule Type <span style="font-size:10px;background:#FFC107;color:#000;padding:1px 4px;border-radius:2px;margin-left:4px;">NEW</span></div>
+        <div class="dropdown-item" onclick="showPage('feature')">Feature</div>
+        <div class="dropdown-item" onclick="showPage('rule')">Running Rule</div>
+      </div>
+    </div>
+    <div class="nav-item">Data Analysis &#9660;</div>
+    <div class="nav-item">Compliance Monitoring &#9660;</div>
+    <div class="nav-item">Accounts &#9660;</div>
+    <div class="nav-item">Employee Track &#9660;</div>
+    <div class="nav-item" id="nav-ruletesting" onclick="showPage('ruletesting')">Rule Testing</div>
+    <div class="nav-item">更多</div>
+  </div>
+  <div class="nav-right">
+    <span class="search-icon">&#128269;</span>
+    <span class="download-icon">&#8681;</span>
+    <span class="nav-user">zhouyan BJT:CST</span>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <div class="tab-item active" id="tab-current">
+    <span class="tab-label">Rule Type</span>
+    <span class="tab-close">&times;</span>
+  </div>
+</div>
+
+<!-- ==================== PAGE 1: Rule Type Configuration ==================== -->
+<div class="page-container active" id="page-ruletype">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Policy <span>&gt;</span> Rule Type</div>
+  <div style="padding: 20px 24px;">
+    <!-- Domain Tabs -->
+    <div class="domain-tabs" style="margin-bottom: 16px;">
+      <span class="domain-tab active" id="rt-tab-TS" onclick="switchRtDomain('TS')">TS</span>
+      <span class="domain-tab" id="rt-tab-TM" onclick="switchRtDomain('TM')">TM</span>
+    </div>
+    <div class="filter-bar">
+      <input type="text" id="rt-search-input" placeholder="Search by code or name..." style="width: 260px;" oninput="filterRuleTypes()">
+      <button class="btn" onclick="filterRuleTypes()">查询</button>
+      <button class="btn" onclick="document.getElementById('rt-search-input').value='';filterRuleTypes()">重置</button>
+      <div class="right-actions">
+        <button class="btn btn-primary" onclick="openRuleTypeModal('create')">+ Create</button>
+      </div>
+    </div>
+
+    <div style="border: 1px solid var(--border); border-radius: 4px;">
+      <!-- Table Header -->
+      <table class="data-table rt-table" style="border: none;">
+        <colgroup>
+          <col style="width:110px"><col style="width:190px"><col style="width:230px"><col style="width:230px"><col style="width:70px"><col style="width:95px"><col style="width:110px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Rule Type Code</th>
+            <th>Rule Type Name</th>
+            <th>Description-EN</th>
+            <th>Description-CN</th>
+            <th title="当前rule type下关联的"使用中"状态feature数量">Features <span style="cursor:help;color:#86909c;font-weight:normal;">&#9432;</span></th>
+            <th title="当前rule type下关联的"使用中"状态rule数量">Running Rules <span style="cursor:help;color:#86909c;font-weight:normal;">&#9432;</span></th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+
+      <!-- Group A -->
+      <div class="group-header" onclick="toggleGroup(this)">
+        <span class="arrow">&#9660;</span>
+        A - 交叉交易/Wash Trade
+        <span class="badge" id="badge-A">2</span>
+      </div>
+      <table class="data-table group-table rt-table" style="border: none; border-top: none;">
+        <colgroup>
+          <col style="width:110px"><col style="width:190px"><col style="width:230px"><col style="width:230px"><col style="width:70px"><col style="width:95px"><col style="width:110px">
+        </colgroup>
+        <tbody id="rt-group-A">
+          <tr data-rt='{"code":"TS_A001","domain":"TS","cat":"A","num":"001","name":"Possible Wash Trade (A to B)","descEn":"Identifies possible cross trading records for two accounts","descCn":"识别两个账户之间发生的潜在交叉交易记录","active":"Y","logs":["2025-03-20 14:00 admin Created","2025-07-10 09:30 zhouyan Updated name"]}'>
+            <td>TS_A001</td>
+            <td>Possible Wash Trade (A to B)</td>
+            <td>Identifies possible cross trading records for two accounts</td>
+            <td>识别两个账户之间发生的潜在交叉交易记录</td>
+
+            <td>1</td>
+            <td>1</td>
+            <td>
+              <button class="btn-link" onclick="openRuleTypeModal('edit', this.closest('tr'))">Edit</button>
+              <button class="btn-link" onclick="openRuleTypeModal('detail', this.closest('tr'))">Detail</button>
+            </td>
+          </tr>
+          <tr data-rt='{"code":"TS_A006","domain":"TS","cat":"A","num":"006","name":"Pre-arranged Trading (with external parties)","descEn":"Identifies pattern where a single account may be cross-trading with other traders","descCn":"识别单个账户可能与市场上其他券商发生交叉交易的情形","active":"Y","logs":["2025-01-15 10:00 admin Created"]}'>
+            <td>TS_A006</td>
+            <td>Pre-arranged Trading (with external parties)</td>
+            <td>Identifies pattern where a single account may be cross-trading with other traders</td>
+            <td>识别单个账户可能与市场上其他券商发生交叉交易的情形</td>
+
+            <td>1</td>
+            <td>2</td>
+            <td>
+              <button class="btn-link" onclick="openRuleTypeModal('edit', this.closest('tr'))">Edit</button>
+              <button class="btn-link" onclick="openRuleTypeModal('detail', this.closest('tr'))">Detail</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Group B -->
+      <div class="group-header" onclick="toggleGroup(this)">
+        <span class="arrow">&#9660;</span>
+        B - 价格操纵/Price Driver
+        <span class="badge" id="badge-B">2</span>
+      </div>
+      <table class="data-table group-table rt-table" style="border: none; border-top: none;">
+        <colgroup>
+          <col style="width:110px"><col style="width:190px"><col style="width:230px"><col style="width:230px"><col style="width:70px"><col style="width:95px"><col style="width:110px">
+        </colgroup>
+        <tbody id="rt-group-B">
+          <tr data-rt='{"code":"TS_B001","domain":"TS","cat":"B","num":"001","name":"Pump and Dump","descEn":"Identifies pump and dump manipulation patterns","descCn":"识别拉高抛售操纵行为","active":"Y","logs":["2024-11-20 09:00 admin Created"]}'>
+            <td>TS_B001</td>
+            <td>Pump and Dump</td>
+            <td>Identifies pump and dump manipulation patterns</td>
+            <td>识别拉高抛售操纵行为</td>
+
+            <td>1</td>
+            <td>1</td>
+            <td>
+              <button class="btn-link" onclick="openRuleTypeModal('edit', this.closest('tr'))">Edit</button>
+              <button class="btn-link" onclick="openRuleTypeModal('detail', this.closest('tr'))">Detail</button>
+            </td>
+          </tr>
+          <tr data-rt='{"code":"TS_B002","domain":"TS","cat":"B","num":"002","name":"Trash and Cash","descEn":"Identifies short selling followed by low-price buying manipulation","descCn":"识别做空后低价买入操纵行为","active":"Y","logs":["2024-11-20 09:05 admin Created"]}'>
+            <td>TS_B002</td>
+            <td>Trash and Cash</td>
+            <td>Identifies short selling followed by low-price buying manipulation</td>
+            <td>识别做空后低价买入操纵行为</td>
+
+            <td>1</td>
+            <td>1</td>
+            <td>
+              <button class="btn-link" onclick="openRuleTypeModal('edit', this.closest('tr'))">Edit</button>
+              <button class="btn-link" onclick="openRuleTypeModal('detail', this.closest('tr'))">Detail</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Group C -->
+      <div class="group-header" onclick="toggleGroup(this)">
+        <span class="arrow">&#9660;</span>
+        C - 开盘尾盘/Marking Open Close
+        <span class="badge" id="badge-C">1</span>
+      </div>
+      <table class="data-table group-table rt-table" style="border: none; border-top: none;">
+        <colgroup>
+          <col style="width:110px"><col style="width:190px"><col style="width:230px"><col style="width:230px"><col style="width:70px"><col style="width:95px"><col style="width:110px">
+        </colgroup>
+        <tbody id="rt-group-C">
+          <tr data-rt='{"code":"TS_C001","domain":"TS","cat":"C","num":"001","name":"Market Dominance at Open/Close","descEn":"Identifies market dominance behavior during open or close periods","descCn":"识别开盘或收盘时段的市场主导行为","active":"Y","logs":["2024-08-10 15:00 admin Created"]}'>
+            <td>TS_C001</td>
+            <td>Market Dominance at Open/Close</td>
+            <td>Identifies market dominance behavior during open or close periods</td>
+            <td>识别开盘或收盘时段的市场主导行为</td>
+
+            <td>1</td>
+            <td>2</td>
+            <td>
+              <button class="btn-link" onclick="openRuleTypeModal('edit', this.closest('tr'))">Edit</button>
+              <button class="btn-link" onclick="openRuleTypeModal('detail', this.closest('tr'))">Detail</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 2: Feature List ==================== -->
+<div class="page-container" id="page-feature">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Policy <span>&gt;</span> Feature</div>
+  <div style="padding: 20px 24px;">
+    <!-- Domain Tabs: separate TS (new system) from legacy -->
+    <div class="domain-tabs" style="margin-bottom: 16px;">
+      <span class="domain-tab active" id="feat-tab-TS" onclick="switchFeatDomain('TS')">TS</span>
+      <span class="domain-tab" id="feat-tab-OTHER" onclick="switchFeatDomain('OTHER')">Other (Legacy)</span>
+    </div>
+
+    <!-- TS tab: new version-managed features -->
+    <div id="feat-panel-TS">
+      <div class="filter-bar">
+        <select id="feat-filter-ruletype" style="width:160px;">
+          <option value="">Rule Type: All</option>
+          <option value="TS_A001">TS_A001</option>
+          <option value="TS_A006">TS_A006</option>
+          <option value="TS_B001">TS_B001</option>
+          <option value="TS_B002">TS_B002</option>
+          <option value="TS_C001">TS_C001</option>
+        </select>
+        <input type="text" id="feat-search-input" placeholder="Search by feature code or name..." style="width: 260px;" oninput="filterFeatures()">
+        <button class="btn" onclick="filterFeatures()">查询</button>
+        <button class="btn" onclick="document.getElementById('feat-search-input').value='';document.getElementById('feat-filter-ruletype').value='';filterFeatures()">重置</button>
+        <div class="right-actions">
+          <button class="btn btn-primary" onclick="openFeatureModal('create')">+ Create</button>
+        </div>
+      </div>
+
+    <table class="data-table">
+      <colgroup>
+        <col style="width:125px"><col style="width:250px"><col style="width:85px"><col style="width:90px"><col style="width:85px"><col style="width:105px"><col style="width:105px"><col style="width:80px"><col style="width:100px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Feature Code</th>
+          <th>Feature Name</th>
+          <th>Rule Type</th>
+          <th>Feature Version</th>
+          <th>Feature Status</th>
+          <th>Create Time</th>
+          <th>Update Time</th>
+          <th>Operator</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-feat='{"code":"TS_A001_V6.6","ruleType":"TS_A001","name":"Possible Wash Trade (A to B) - enhanced","version":"V6.6","status":"草稿","expression":"SELECT t.account_id, t.symbol\\nFROM transactions t\\nWHERE t.cross_flag = 1\\n  AND t.trade_interval < {intervalMinute}\\n  AND t.volume > {minVolume}","desc":"识别两个账户间的交叉交易记录(增强版，增加成交量参数)","params":[{"n":"intervalMinute","v":"5","d":"交易间隔分钟"},{"n":"crossTimesThreshold","v":"3","d":"交叉次数阈值"},{"n":"minVolume","v":"1000","d":"最小成交量"}],"category":"K002_SAM","template":"","logs":["2025-09-01 shuhan Created"]}'>
+          <td>TS_A001_V6.6</td>
+          <td>Possible Wash Trade (A to B) - enhanced</td>
+          <td>TS_A001</td>
+          <td>V6.6</td>
+          <td><span class="status-tag status-draft">Draft</span></td>
+          <td>2025-09-01</td>
+          <td>2025-09-01</td>
+          <td>shuhan</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+            <button class="btn-link" style="color:#ff7d00;" onclick="publishFeature(this.closest('tr'))">Publish</button>
+          </td>
+        </tr>
+        <tr data-feat='{"code":"TS_A001_V6.5","ruleType":"TS_A001","name":"Possible Wash Trade (A to B)","version":"V6.5","status":"使用中","expression":"SELECT t.account_id, t.symbol\\nFROM transactions t\\nWHERE t.cross_flag = 1\\n  AND t.trade_interval < {intervalMinute}","desc":"识别两个账户间的交叉交易记录","params":[{"n":"intervalMinute","v":"5","d":"交易间隔分钟"},{"n":"crossTimesThreshold","v":"3","d":"交叉次数阈值"}],"category":"K002_SAM","template":"","logs":["2025-07-23 admin Created","2025-07-23 shuhan Updated SQL"]}'>
+          <td>TS_A001_V6.5</td>
+          <td>Possible Wash Trade (A to B)</td>
+          <td>TS_A001</td>
+          <td>V6.5</td>
+          <td><span class="status-tag status-active">In Use</span></td>
+          <td>2025-07-20</td>
+          <td>2025-07-23</td>
+          <td>shuhan</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+          </td>
+        </tr>
+        <tr data-feat='{"code":"TS_A001_V6.4","ruleType":"TS_A001","name":"Possible Wash Trade (A to B)","version":"V6.4","status":"已下线","expression":"SELECT t.account_id\\nFROM transactions t\\nWHERE t.cross_flag = 1","desc":"识别两个账户间的交叉交易记录(旧版)","params":[{"n":"intervalMinute","v":"5","d":"交易间隔分钟"}],"category":"K002_SAM","template":"","logs":["2025-03-18 admin Created"]}'>
+          <td>TS_A001_V6.4</td>
+          <td>Possible Wash Trade (A to B)</td>
+          <td>TS_A001</td>
+          <td>V6.4</td>
+          <td><span class="status-tag status-offline">Offline</span></td>
+          <td>2025-03-18</td>
+          <td>2025-07-20</td>
+          <td>admin</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+          </td>
+        </tr>
+        <tr data-feat='{"code":"TS_A006_V6.1","ruleType":"TS_A006","name":"Pre-arranged Trading","version":"V6.1","status":"使用中","expression":"SELECT t.account_id, t.symbol\\nFROM cross_trades t\\nWHERE t.external_party = 1","desc":"识别与外部券商的预谋交易","params":[{"n":"priceDiffRatio","v":"0.05","d":"价差比例"},{"n":"tradePairTimes","v":"3","d":"交易对次数"}],"category":"K002_SAM","template":"","logs":["2025-06-15 admin Created"]}'>
+          <td>TS_A006_V6.1</td>
+          <td>Pre-arranged Trading</td>
+          <td>TS_A006</td>
+          <td>V6.1</td>
+          <td><span class="status-tag status-active">In Use</span></td>
+          <td>2025-06-10</td>
+          <td>2025-06-15</td>
+          <td>admin</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+          </td>
+        </tr>
+        <tr data-feat='{"code":"TS_B001_V6.3","ruleType":"TS_B001","name":"Pump and Dump","version":"V6.3","status":"使用中","expression":"SELECT account_id\\nFROM market_data\\nWHERE price_spike > {spikeThreshold}","desc":"识别拉高抛售操纵","params":[{"n":"spikeThreshold","v":"0.1","d":"价格飙升阈值"}],"category":"K002_SAM","template":"","logs":["2025-05-20 admin Created"]}'>
+          <td>TS_B001_V6.3</td>
+          <td>Pump and Dump</td>
+          <td>TS_B001</td>
+          <td>V6.3</td>
+          <td><span class="status-tag status-active">In Use</span></td>
+          <td>2025-05-15</td>
+          <td>2025-05-20</td>
+          <td>admin</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+          </td>
+        </tr>
+        <tr data-feat='{"code":"TS_B002_V6.3","ruleType":"TS_B002","name":"Trash and Cash","version":"V6.3","status":"使用中","expression":"SELECT account_id\\nFROM short_sells\\nWHERE rebuy_price < {rebuyThreshold}","desc":"识别做空后低价买入","params":[{"n":"rebuyThreshold","v":"0.08","d":"回购价格阈值"}],"category":"K002_SAM","template":"","logs":["2025-05-20 admin Created"]}'>
+          <td>TS_B002_V6.3</td>
+          <td>Trash and Cash</td>
+          <td>TS_B002</td>
+          <td>V6.3</td>
+          <td><span class="status-tag status-active">In Use</span></td>
+          <td>2025-05-15</td>
+          <td>2025-05-20</td>
+          <td>admin</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+          </td>
+        </tr>
+        <tr data-feat='{"code":"TS_C001_V5.9","ruleType":"TS_C001","name":"Market Dominance at Open/Close - no tick data","version":"V5.9","status":"使用中","expression":"SELECT account_id\\nFROM agg_data\\nWHERE dominance_ratio > {ratio}","desc":"识别开盘/收盘时段市场主导(非逐笔)","params":[{"n":"ratio","v":"0.25","d":"市场占比阈值"}],"category":"K002_SAM","template":"","logs":["2025-08-01 admin Created","2025-08-05 admin Published"]}'>
+          <td>TS_C001_V5.9</td>
+          <td>Market Dominance at Open/Close - no tick data</td>
+          <td>TS_C001</td>
+          <td>V5.9</td>
+          <td><span class="status-tag status-active">In Use</span></td>
+          <td>2025-08-01</td>
+          <td>2025-08-05</td>
+          <td>shuhan</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+          </td>
+        </tr>
+        <tr data-feat='{"code":"TS_C001_V5.8","ruleType":"TS_C001","name":"Market Dominance at Open/Close - tick data","version":"V5.8","status":"测试中","expression":"SELECT account_id\\nFROM tick_data\\nWHERE dominance_ratio > {ratio}","desc":"识别开盘/收盘时段市场主导(逐笔)","params":[{"n":"ratio","v":"0.3","d":"市场占比阈值"}],"category":"K002_SAM","template":"","logs":["2025-04-10 admin Created","2025-04-18 admin Published to testing"]}'>
+          <td>TS_C001_V5.8</td>
+          <td>Market Dominance at Open/Close - tick data</td>
+          <td>TS_C001</td>
+          <td>V5.8</td>
+          <td><span class="status-tag status-testing">Testing</span></td>
+          <td>2025-04-10</td>
+          <td>2025-04-18</td>
+          <td>admin</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+          </td>
+        </tr>
+        <tr data-feat='{"code":"TS_C001_V5.7","ruleType":"TS_C001","name":"Market Dominance at Open/Close - tick data","version":"V5.7","status":"使用中","expression":"SELECT account_id\\nFROM tick_data\\nWHERE dominance > {ratio}","desc":"识别开盘/收盘时段市场主导(逐笔-旧版)","params":[{"n":"ratio","v":"0.3","d":"市场占比阈值"}],"category":"K002_SAM","template":"","logs":["2025-02-15 admin Created"]}'>
+          <td>TS_C001_V5.7</td>
+          <td>Market Dominance at Open/Close - tick data</td>
+          <td>TS_C001</td>
+          <td>V5.7</td>
+          <td><span class="status-tag status-active">In Use</span></td>
+          <td>2025-02-15</td>
+          <td>2025-03-01</td>
+          <td>shuhan</td>
+          <td>
+            <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <span>&#8249;</span>
+      <span class="current">1</span>
+      <span>2</span>
+      <span>&#8250;</span>
+      <span style="border: none; margin-left: 8px;">Total 8 items</span>
+    </div>
+    </div><!-- end feat-panel-TS -->
+
+    <!-- OTHER tab: legacy features (TM, AML, general rule, etc.) -->
+    <div id="feat-panel-OTHER" style="display:none;">
+      <div style="padding:20px 0;">
+        <div style="background:#fff8e6; border:1px solid #ffcf70; border-radius:4px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:#8b6914;">
+          ⚠️ 以下为旧版Feature（TM / AML / General Rule等），不在本次版本管理改造范围内，仅保留原有查看和编辑功能。
+        </div>
+        <table class="data-table">
+          <colgroup>
+            <col style="width:50px"><col style="width:250px"><col style="width:200px"><col style="width:180px"><col style="width:100px">
+          </colgroup>
+          <thead>
+            <tr><th>ID</th><th>Code</th><th>Name</th><th>Update Time</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>30</td><td>(del)No deposits or withdrawals-001</td><td>无出入金记录</td><td>2022-04-29 10:28</td><td><button class="btn-link">Detail</button> <button class="btn-link">Edit</button></td></tr>
+            <tr><td>37</td><td>(del)No Trade - 001</td><td>入金X天后无操作</td><td>2022-04-29 10:27</td><td><button class="btn-link">Detail</button> <button class="btn-link">Edit</button></td></tr>
+            <tr><td>38</td><td>(del)No Trade - 002</td><td>入金X月后没操作</td><td>2022-04-29 10:27</td><td><button class="btn-link">Detail</button> <button class="btn-link">Edit</button></td></tr>
+            <tr><td>31</td><td>Deposit-001</td><td>Deposit-001</td><td>2022-08-22 17:22</td><td><button class="btn-link">Detail</button> <button class="btn-link">Edit</button></td></tr>
+            <tr><td>133</td><td>aaatest</td><td>aaatest</td><td>2024-02-01 18:37</td><td><button class="btn-link">Detail</button> <button class="btn-link">Edit</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 3: Rule Testing ==================== -->
+<div class="page-container" id="page-ruletesting">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Rule Testing</div>
+  <div style="padding: 20px 24px;">
+    <div class="sub-tabs">
+      <div class="sub-tab active">TS</div>
+      <div class="sub-tab">TM</div>
+    </div>
+
+    <div class="rule-testing-layout">
+      <!-- Left Sidebar Tree -->
+      <div class="sidebar">
+        <!-- Active Section -->
+        <div style="padding:6px 12px; font-size:11px; color:#86909c; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); margin-bottom:4px;">Active</div>
+
+        <!-- TS_A001 -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_A001 Possible Wash Trade (A to B)</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1 active" onclick="selectSidebarItem(this, 'ts_a001_v65')">V6.5 Possible Wash Trade (A to B) <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+        </div>
+
+        <!-- TS_A006 -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_A006 Pre-arranged Trading</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'ts_a006_v61')">V6.1 Pre-arranged Trading <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+        </div>
+
+        <!-- TS_B001 -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_B001 Pump and Dump</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'ts_b001_v63')">V6.3 Pump and Dump <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+        </div>
+
+        <!-- TS_B002 -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_B002 Trash and Cash</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'ts_b002_v63')">V6.3 Trash and Cash <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+        </div>
+
+        <!-- TS_C001: multiple features -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_C001 Market Dominance Open/Close</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'ts_c001_v59')">V5.9 Market Dominance - no tick data <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'ts_c001_v58')">V5.8 Market Dominance - tick data <span style="color:var(--info);font-size:11px;">(Testing)</span></div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'ts_c001_v57')">V5.7 Market Dominance - tick data <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+        </div>
+
+        <!-- History Section: properly versioned but offline -->
+        <div style="padding:6px 12px; font-size:11px; color:#86909c; text-transform:uppercase; letter-spacing:0.5px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-top:12px; margin-bottom:4px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleHistorySection(this)">
+          <span>History (Offline)</span>
+          <span style="font-size:10px;">▶</span>
+        </div>
+        <div class="history-section" style="display:none;">
+          <div class="sidebar-tree-item level-0" onclick="selectSidebarItem(this, 'ts_a001_hist')">TS_A001 Possible Wash Trade (A to B)</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'ts_a001_v64')">V6.4 Possible Wash Trade (A to B) <span style="color:var(--gray);font-size:11px;">(Offline)</span></div>
+        </div>
+
+        <!-- Legacy Section: pre-system historical data -->
+        <div style="padding:6px 12px; font-size:11px; color:#86909c; text-transform:uppercase; letter-spacing:0.5px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-top:8px; margin-bottom:4px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleHistorySection(this)">
+          <span>Legacy (Pre-system)</span>
+          <span style="font-size:10px;">▶</span>
+        </div>
+        <div class="history-section" style="display:none;">
+          <div style="padding:6px 12px; font-size:11px; color:#8b6914; background:#fff8e6; border-radius:3px; margin:4px 8px;">Historical test data before new system, view only</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_1')" style="color:#86909c;">aaatest</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_2')" style="color:#86909c;">significant volume in op...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_3')" style="color:#86909c;">trade during significant ...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_4')" style="color:#86909c;">insider trading before ne...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_5')" style="color:#86909c;">possible wash trade A t...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_6')" style="color:#86909c;">Domination Volume Thr...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_7')" style="color:#86909c;">possible wash trade A t...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_8')" style="color:#86909c;">high rate of cancelled or...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_9')" style="color:#86909c;">Possible Spoofing</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_10')" style="color:#86909c;">possible spoofing (dele...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_11')" style="color:#86909c;">possible spoofing (multi...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_12')" style="color:#86909c;">layering</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_13')" style="color:#86909c;">increased participation</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_14')" style="color:#86909c;">multiple order cancellati...</div>
+          <div class="sidebar-tree-item level-1" onclick="selectSidebarItem(this, 'legacy_15')" style="color:#86909c;">Possible Ramping (with...</div>
+        </div>
+      </div>
+
+      <!-- Right Content -->
+      <div class="rule-testing-content">
+        <div class="page-header">
+          <h2>Test Groups - TS_A001 V6.5</h2>
+          <button class="btn btn-primary" onclick="addTestClean()">+ Add</button>
+        </div>
+
+        <!-- Test Group 1: P1 - In Use -->
+        <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+          <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+            <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+              <span style="font-size:10px; color:#86909c;">▼</span>
+              <strong style="font-size:13px; white-space:nowrap;">P1</strong>
+              <span style="font-size:12px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">intervalMinute:5, crossTimesThreshold:3</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; white-space:nowrap;">
+              <span class="status-tag status-active">In Use</span>
+              <button class="btn-link" onclick="event.stopPropagation();copyTestToAdd('P1')">Copy</button>
+            </div>
+          </div>
+          <div class="test-group-body" style="padding:0;">
+            <!-- Run group header -->
+            <div style="padding:6px 14px; background:#fafbfc; border-bottom:1px solid var(--border); font-size:12px; color:#4e5969; font-weight:500;">Run R2 — submitted 2025-08-05</div>
+            <table class="data-table" style="border:none; margin:0;">
+              <colgroup>
+                <col style="width:130px"><col style="width:185px"><col style="width:170px"><col style="width:130px"><col style="width:55px"><col style="width:80px"><col style="width:50px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Condition</th>
+                  <th>Test Period</th>
+                  <th>Test Time</th>
+                  <th>Alerts</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>P1-R2-01</td>
+                  <td>Security Type in (STK) | HKEX</td>
+                  <td>2025-07-01 ~ 2025-07-31</td>
+                  <td>2025-08-05 09:12</td>
+                  <td>—</td>
+                  <td><span class="status-tag" style="background:#e8f3ff; color:#165dff;">RUNNING</span></td>
+                  <td><button class="btn-link" style="color:#86909c;">Detail</button></td>
+                </tr>
+                <tr>
+                  <td>P1-R2-02</td>
+                  <td>Security Type in (STK) | SGX</td>
+                  <td>2025-07-01 ~ 2025-07-31</td>
+                  <td>2025-08-05 09:12</td>
+                  <td>—</td>
+                  <td><span class="status-tag" style="background:#fff3e5; color:#ff7d00;">PENDING</span></td>
+                  <td><button class="btn-link" style="color:#86909c;">Detail</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Run R1 -->
+            <div style="padding:6px 14px; background:#fafbfc; border-top:1px solid var(--border); border-bottom:1px solid var(--border); font-size:12px; color:#4e5969; font-weight:500;">Run R1 — submitted 2025-07-23</div>
+            <table class="data-table" style="border:none; margin:0;">
+              <colgroup>
+                <col style="width:130px"><col style="width:185px"><col style="width:170px"><col style="width:130px"><col style="width:55px"><col style="width:80px"><col style="width:50px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Condition</th>
+                  <th>Test Period</th>
+                  <th>Test Time</th>
+                  <th>Alerts</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>P1-R1-01</td>
+                  <td>Security Type in (STK) | HKEX</td>
+                  <td>2025-05-01 ~ 2025-05-31</td>
+                  <td>2025-07-23 14:29</td>
+                  <td>12</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="showTestDetailPage('P1-R1-01')">Detail</button></td>
+                </tr>
+                <tr>
+                  <td>P1-R1-02</td>
+                  <td>Security Type in (STK) | HKEX</td>
+                  <td>2025-06-01 ~ 2025-06-30</td>
+                  <td>2025-07-23 14:45</td>
+                  <td>15</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="showTestDetailPage('P1-R1-02')">Detail</button></td>
+                </tr>
+                <tr>
+                  <td>P1-R1-03</td>
+                  <td>Security Type in (STK) | SGX</td>
+                  <td>2025-05-01 ~ 2025-05-31</td>
+                  <td>2025-07-23 15:02</td>
+                  <td>8</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="showTestDetailPage('P1-R1-03')">Detail</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Test Group 2: P2 - In Use (different params, also in use) -->
+        <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+          <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+            <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+              <span style="font-size:10px; color:#86909c;">▶</span>
+              <strong style="font-size:13px; white-space:nowrap;">P2</strong>
+              <span style="font-size:12px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">intervalMinute:5, crossTimesThreshold:3, minVolume:10000</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; white-space:nowrap;">
+              <span class="status-tag status-active">In Use</span>
+              <button class="btn-link" onclick="event.stopPropagation();copyTestToAdd('P2')">Copy</button>
+            </div>
+          </div>
+          <div class="test-group-body" style="padding:0; display:none;">
+            <div style="padding:6px 14px; background:#fafbfc; border-bottom:1px solid var(--border); font-size:12px; color:#4e5969; font-weight:500;">Run R1 — submitted 2025-07-25</div>
+            <table class="data-table" style="border:none; margin:0;">
+              <colgroup>
+                <col style="width:130px"><col style="width:185px"><col style="width:170px"><col style="width:130px"><col style="width:55px"><col style="width:80px"><col style="width:50px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Condition</th>
+                  <th>Test Period</th>
+                  <th>Test Time</th>
+                  <th>Alerts</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>P2-R1-01</td>
+                  <td>Security Type in (OPT) | HKEX</td>
+                  <td>2025-05-01 ~ 2025-05-31</td>
+                  <td>2025-07-25 10:00</td>
+                  <td>6</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="showTestDetailPage('P2-R1-01')">Detail</button></td>
+                </tr>
+                <tr>
+                  <td>P2-R1-02</td>
+                  <td>Security Type in (OPT) | HKEX</td>
+                  <td>2025-06-01 ~ 2025-06-30</td>
+                  <td>2025-07-25 10:20</td>
+                  <td>9</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="showTestDetailPage('P2-R1-02')">Detail</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Test Group 3: P3 - Unused -->
+        <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+          <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+            <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+              <span style="font-size:10px; color:#86909c;">▶</span>
+              <strong style="font-size:13px; white-space:nowrap;">P3</strong>
+              <span style="font-size:12px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">intervalMinute:3, crossTimesThreshold:5</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; white-space:nowrap;">
+              <span class="status-tag" style="background:#f0f0f0; color:#86909c;">Unused</span>
+              <button class="btn-link" onclick="event.stopPropagation();copyTestToAdd('P2')">Copy</button>
+            </div>
+          </div>
+          <div class="test-group-body" style="padding:0; display:none;">
+            <div style="padding:6px 14px; background:#fafbfc; border-bottom:1px solid var(--border); font-size:12px; color:#4e5969; font-weight:500;">Run R1 — submitted 2025-07-21</div>
+            <table class="data-table" style="border:none; margin:0;">
+              <colgroup>
+                <col style="width:130px"><col style="width:185px"><col style="width:170px"><col style="width:130px"><col style="width:55px"><col style="width:80px"><col style="width:50px">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td>P2-R1-01</td>
+                  <td>Security Type in (STK) | HKEX</td>
+                  <td>2025-06-01 ~ 2025-06-30</td>
+                  <td>2025-07-21 20:34</td>
+                  <td>10</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="alert('Detail:\nID: P2-R1-01\nCondition: Security Type in (STK) | HKEX\nPeriod: 2025-06-01 ~ 2025-06-30\nAlerts: 10')">Detail</button></td>
+                </tr>
+                <tr>
+                  <td>P2-R1-02</td>
+                  <td>Security Type in (STK) | HKEX</td>
+                  <td>2025-07-01 ~ 2025-07-31</td>
+                  <td>2025-07-21 21:10</td>
+                  <td>12</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="alert('Detail:\nID: P2-R1-02\nCondition: Security Type in (STK) | HKEX\nPeriod: 2025-07-01 ~ 2025-07-31\nAlerts: 12')">Detail</button></td>
+                </tr>
+                <tr>
+                  <td>P2-R1-03</td>
+                  <td>Security Type in (STK) | SGX</td>
+                  <td>2025-06-01 ~ 2025-06-30</td>
+                  <td>2025-07-21 22:00</td>
+                  <td>—</td>
+                  <td><span class="status-tag" style="background:#ffeae9; color:#f54a45;">FAILED</span></td>
+                  <td><button class="btn-link" style="color:#86909c;">Detail</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Test Group 4: P4 - Offline -->
+        <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+          <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+            <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+              <span style="font-size:10px; color:#86909c;">▶</span>
+              <strong style="font-size:13px; white-space:nowrap;">P4</strong>
+              <span style="font-size:12px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">intervalMinute:5, crossTimesThreshold:2</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; white-space:nowrap;">
+              <span class="status-tag status-offline">Offline</span>
+              <button class="btn-link" onclick="event.stopPropagation();copyTestToAdd('P3')">Copy</button>
+            </div>
+          </div>
+          <div class="test-group-body" style="padding:0; display:none;">
+            <div style="padding:6px 14px; background:#fafbfc; border-bottom:1px solid var(--border); font-size:12px; color:#4e5969; font-weight:500;">Run R1 — submitted 2025-05-10</div>
+            <table class="data-table" style="border:none; margin:0;">
+              <colgroup>
+                <col style="width:130px"><col style="width:185px"><col style="width:170px"><col style="width:130px"><col style="width:55px"><col style="width:80px"><col style="width:50px">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td>P3-R1-01</td>
+                  <td>Security Type in (STK) | HKEX</td>
+                  <td>2025-04-01 ~ 2025-04-30</td>
+                  <td>2025-05-10 09:00</td>
+                  <td>18</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="alert('Detail:\nID: P3-R1-01\nCondition: Security Type in (STK) | HKEX\nPeriod: 2025-04-01 ~ 2025-04-30\nAlerts: 18')">Detail</button></td>
+                </tr>
+                <tr>
+                  <td>P3-R1-02</td>
+                  <td>Security Type in (STK) | HKEX</td>
+                  <td>2025-03-01 ~ 2025-03-31</td>
+                  <td>2025-05-10 09:30</td>
+                  <td>14</td>
+                  <td><span class="status-tag status-finished">FINISHED</span></td>
+                  <td><button class="btn-link" onclick="alert('Detail:\nID: P3-R1-02\nCondition: Security Type in (STK) | HKEX\nPeriod: 2025-03-01 ~ 2025-03-31\nAlerts: 14')">Detail</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 3b: Add Test ==================== -->
+<div class="page-container" id="page-addtest">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Rule Testing <span>&gt;</span> Add Test</div>
+  <div style="padding: 20px 24px;">
+    <a class="back-link" onclick="showPage('ruletesting')">Back</a>
+
+    <div class="add-test-container">
+      <div class="section-title">Feature Information</div>
+      <div class="info-row">
+        <span class="label">Feature Name:</span>
+        <span class="value">Possible Wash Trade (A to B)</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Logic Description:</span>
+        <span class="value">Identifies accounts with cross-trading patterns between two related accounts when reverse trades occur within a short time interval.</span>
+      </div>
+
+      <div class="section-title">Parameters</div>
+      <table class="data-table" style="margin-top: 8px;">
+        <thead>
+          <tr>
+            <th>Parameter Key</th>
+            <th>Description</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>intervalMinute</td>
+            <td>Maximum time interval between two trades (in minutes)</td>
+            <td><input type="text" value="5" style="width: 120px;"></td>
+          </tr>
+          <tr>
+            <td>crossTimesThreshold</td>
+            <td>Minimum number of cross trades to trigger alert</td>
+            <td><input type="text" value="3" style="width: 120px;"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-title">Conditions</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Condition Type</th>
+            <th>Configuration</th>
+            <th>Included</th>
+            <th>Description</th>
+            <th>Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Security Type</td>
+            <td>STK, ETF</td>
+            <td>Yes</td>
+            <td>证券类型筛选</td>
+            <td>
+              <button class="btn-link">Edit</button>
+              <button class="btn-link" style="color: #f53f3f;">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" style="margin-top: 8px;">+ Add Condition</button>
+
+      <div class="section-title">Testing Periods</div>
+      <div class="period-row">
+        <span class="period-label">Period #1:</span>
+        <input type="date" value="2025-05-01">
+        <span>~</span>
+        <input type="date" value="2025-05-31">
+        <button class="remove-btn">&times; Remove</button>
+      </div>
+      <div class="period-row">
+        <span class="period-label">Period #2:</span>
+        <input type="date" value="2025-06-01">
+        <span>~</span>
+        <input type="date" value="2025-06-30">
+        <button class="remove-btn">&times; Remove</button>
+      </div>
+      <button class="add-period-btn">+ Add Period</button>
+
+      <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+        <button class="btn" onclick="showPage('ruletesting')">Cancel</button>
+        <button class="btn btn-primary">Run Test</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 3c: Test Detail ==================== -->
+<div class="page-container" id="page-testdetail">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Rule Testing <span>&gt;</span> Test Detail</div>
+  <div style="padding: 20px 24px;">
+    <a class="back-link" onclick="showPage('ruletesting')">Back</a>
+
+    <div class="add-test-container">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="section-title">Feature Information</div>
+        <span style="font-size:12px; color:#86909c;" id="detail-sub-id">P1-R1-01</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Feature Name:</span>
+        <span class="value">Possible Wash Trade (A to B)</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Logic Description:</span>
+        <span class="value">Identifies accounts with cross-trading patterns between two related accounts when reverse trades occur within a short time interval.</span>
+      </div>
+
+      <div class="section-title">Parameters</div>
+      <table class="data-table" style="margin-top: 8px;">
+        <thead>
+          <tr>
+            <th>Parameter Key</th>
+            <th>Description</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>intervalMinute</td>
+            <td>Maximum time interval between two trades (in minutes)</td>
+            <td style="font-weight:500;">5</td>
+          </tr>
+          <tr>
+            <td>crossTimesThreshold</td>
+            <td>Minimum number of cross trades to trigger alert</td>
+            <td style="font-weight:500;">3</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-title">Conditions</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Condition Type</th>
+            <th>Configuration</th>
+            <th>Included</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Security Type</td>
+            <td>STK</td>
+            <td>Yes</td>
+            <td>证券类型筛选</td>
+          </tr>
+          <tr>
+            <td>Market</td>
+            <td>HKEX</td>
+            <td>Yes</td>
+            <td>市场筛选</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-title">Testing Period</div>
+      <div class="info-row">
+        <span class="label">Period:</span>
+        <span class="value">2025-05-01 ~ 2025-05-31</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Test Time:</span>
+        <span class="value">2025-07-23 14:29 GMT+8</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Status:</span>
+        <span class="value"><span class="status-tag status-finished">FINISHED</span></span>
+      </div>
+
+      <!-- Results Statistics -->
+      <div class="section-title" style="margin-top:24px; padding-top:16px; border-top:1px solid var(--border);">Results Statistics</div>
+      <table class="data-table" style="margin-top:8px;">
+        <thead>
+          <tr>
+            <th>Total number of alerts</th>
+            <th>Total number of orders</th>
+            <th>Hit number of orders</th>
+            <th>Hit number of symbol</th>
+            <th>Hit number of account</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>12</strong></td>
+            <td>--</td>
+            <td>156</td>
+            <td>8</td>
+            <td>5</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Hit orders detail -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+        <div class="section-title" style="margin:0;">Hit Orders Detail</div>
+        <button class="btn btn-primary" style="font-size:12px; padding:4px 12px;">Export</button>
+      </div>
+      <table class="data-table" style="margin-top:8px;">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Account</th>
+            <th>Trade Amount</th>
+            <th>Trade Times</th>
+            <th>Cross Volume</th>
+            <th>Operation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0700.HK</td>
+            <td>62479190</td>
+            <td>$520,000</td>
+            <td>5</td>
+            <td>12,000</td>
+            <td><button class="btn-link">Detail</button></td>
+          </tr>
+          <tr>
+            <td>9988.HK</td>
+            <td>62554873</td>
+            <td>$380,000</td>
+            <td>3</td>
+            <td>8,500</td>
+            <td><button class="btn-link">Detail</button></td>
+          </tr>
+          <tr>
+            <td>1810.HK</td>
+            <td>63973778</td>
+            <td>$890,000</td>
+            <td>7</td>
+            <td>25,000</td>
+            <td><button class="btn-link">Detail</button></td>
+          </tr>
+          <tr>
+            <td>2318.HK</td>
+            <td>62045221</td>
+            <td>$1,200,000</td>
+            <td>6</td>
+            <td>18,000</td>
+            <td><button class="btn-link">Detail</button></td>
+          </tr>
+          <tr>
+            <td>0005.HK</td>
+            <td>62479190</td>
+            <td>$650,000</td>
+            <td>4</td>
+            <td>9,200</td>
+            <td><button class="btn-link">Detail</button></td>
+          </tr>
+          <tr>
+            <td>3690.HK</td>
+            <td>63973778</td>
+            <td>$420,000</td>
+            <td>3</td>
+            <td>6,800</td>
+            <td><button class="btn-link">Detail</button></td>
+          </tr>
+          <tr>
+            <td>0388.HK</td>
+            <td>62045221</td>
+            <td>$750,000</td>
+            <td>5</td>
+            <td>11,500</td>
+            <td><button class="btn-link">Detail</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align:center; padding:8px; font-size:12px; color:#86909c;">Showing 7 of 12 alerts | <a href="#" style="color:#165dff;">View All</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 4: Rule (Running Rule) ==================== -->
+<div class="page-container" id="page-rule">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Policy <span>&gt;</span> Running Rule</div>
+  <div style="padding: 20px 24px;">
+    <!-- Domain Tabs -->
+    <div class="domain-tabs" style="margin-bottom: 16px;">
+      <span class="domain-tab active">TS</span>
+      <span class="domain-tab">Other (Legacy)</span>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" placeholder="Search rule code or name..." style="width: 220px;">
+      <select style="width: 120px;">
+        <option selected>Enabled</option>
+        <option>Disabled</option>
+        <option>All</option>
+      </select>
+      <select style="width: 140px;">
+        <option value="">Rule Type: All</option>
+        <option>TS_A001</option>
+        <option>TS_A006</option>
+        <option>TS_B001</option>
+        <option>TS_B002</option>
+        <option>TS_C001</option>
+      </select>
+      <button class="btn">查询</button>
+      <button class="btn">Reset</button>
+      <div class="right-actions">
+        <button class="btn btn-primary" onclick="showModal('modal-running-rule')">+ Create</button>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <colgroup>
+        <col style="width:125px"><col style="width:195px"><col style="width:80px"><col style="width:110px"><col style="width:65px"><col style="width:80px"><col style="width:88px"><col style="width:88px"><col style="width:65px"><col style="width:150px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Running Rule Code</th>
+          <th>Running Rule Name</th>
+          <th>Rule Type</th>
+          <th>Feature</th>
+          <th>Param IDs</th>
+          <th>Status</th>
+          <th>Create Time</th>
+          <th>Update Time</th>
+          <th>Operator</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>R_TS_A006_R1</td>
+          <td>Pre-arranged Trading - Profit</td>
+          <td>TS_A006</td>
+          <td>TS_A006_V6.1</td>
+          <td>P1, P2</td>
+          <td><span class="status-tag status-enabled">Enabled</span></td>
+          <td>2025-12-20</td>
+          <td>2026-01-14</td>
+          <td>admin</td>
+          <td>
+            <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
+            <button class="btn-link" onclick="showRRLog(this.closest('tr').children[1].textContent)">Log</button>
+            <button class="btn-link" style="color:#f53f3f;" onclick="toggleRRStatus(this.closest('tr'))">Disable</button>
+          </td>
+        </tr>
+        <tr>
+          <td>R_TS_A006_R2</td>
+          <td>Pre-arranged Trading - Loss</td>
+          <td>TS_A006</td>
+          <td>TS_A006_V6.1</td>
+          <td>P1, P2</td>
+          <td><span class="status-tag status-enabled">Enabled</span></td>
+          <td>2025-12-20</td>
+          <td>2026-01-14</td>
+          <td>admin</td>
+          <td>
+            <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
+            <button class="btn-link" onclick="showRRLog('R_TS_A006_R2')">Log</button>
+          </td>
+        </tr>
+        <tr>
+          <td>R_TS_A001_R1</td>
+          <td>Possible Wash Trade (A to B)</td>
+          <td>TS_A001</td>
+          <td>TS_A001_V6.5</td>
+          <td>P1</td>
+          <td><span class="status-tag status-enabled">Enabled</span></td>
+          <td>2026-03-10</td>
+          <td>2026-05-13</td>
+          <td>shuhan</td>
+          <td>
+            <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
+            <button class="btn-link" onclick="showRRLog('R_TS_A001_R1')">Log</button>
+          </td>
+        </tr>
+        <tr>
+          <td>R_TS_C001_R1</td>
+          <td>Market Dominance - Open STK</td>
+          <td>TS_C001</td>
+          <td>TS_C001_V5.9</td>
+          <td>P1</td>
+          <td><span class="status-tag" style="background:#fff3e5; color:#ff7d00;">Pending</span></td>
+          <td>2026-05-10</td>
+          <td>2026-05-10</td>
+          <td>shuhan</td>
+          <td>
+            <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
+            <button class="btn-link" onclick="showRRLog(this.closest('tr').children[0].textContent)">Log</button>
+            <button class="btn-link" style="color:#f53f3f;" onclick="toggleRRStatus(this.closest('tr'))">Disable</button>
+          </td>
+        </tr>
+        <tr>
+          <td>R_TS_B001_R1</td>
+          <td>Pump and Dump - HKEX</td>
+          <td>TS_B001</td>
+          <td>TS_B001_V6.3</td>
+          <td>P1</td>
+          <td><span class="status-tag" style="background:#f0f0f0; color:#86909c;">Disabled</span></td>
+          <td>2025-05-15</td>
+          <td>2026-04-01</td>
+          <td>admin</td>
+          <td>
+            <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
+            <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
+            <button class="btn-link" onclick="showRRLog(this.closest('tr').children[1].textContent)">Log</button>
+            <button class="btn-link" style="color:#00b42a;" onclick="toggleRRStatus(this.closest('tr'))">Enable</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <span>&#8249;</span>
+      <span class="current">1</span>
+      <span>2</span>
+      <span>3</span>
+      <span>&#8250;</span>
+      <span style="border: none; margin-left: 8px;">Total 3 items</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: Create Rule Type ==================== -->
+<!-- Rule Type CRUD Modal -->
+<div class="modal-overlay" id="modal-ruletype">
+  <div class="modal" style="width: 680px;">
+    <div class="modal-header">
+      <span id="rt-modal-title">Create Rule Type</span>
+      <span class="modal-close" onclick="hideModal('modal-ruletype')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="rt-form-section">
+        <div class="form-group">
+          <label>Domain <span style="color:red">*</span></label>
+          <select id="rt-domain"><option selected>TS</option><option>TM</option></select>
+        </div>
+        <div class="form-group">
+          <label>Rule Category <span style="color:red">*</span></label>
+          <select id="rt-category">
+            <option value="A">A - 交叉交易/Wash Trade</option>
+            <option value="B">B - 价格操纵/Price Driver</option>
+            <option value="C">C - 开盘尾盘/Marking Open Close</option>
+            <option value="D">D - 订单操纵/Order Manipulation</option>
+            <option value="E">E - 内幕交易/Insider Trading</option>
+            <option value="F">F - 跨产品操纵/Cross-products</option>
+            <option value="G">G - 交易量异常/Unusual Volume</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Rule Type Number <span style="color:red">*</span></label>
+          <input type="text" id="rt-number" placeholder="e.g. 007" style="width: 120px;">
+        </div>
+        <div class="form-group">
+          <label>Auto-generated Code</label>
+          <input type="text" id="rt-code-preview" disabled style="background:#f5f5f5; color:#86909c;">
+        </div>
+        <div class="form-group">
+          <label>Rule Type Name <span style="color:red">*</span></label>
+          <input type="text" id="rt-name" placeholder="Enter rule type name">
+        </div>
+        <div class="form-group">
+          <label>Description (EN) <span style="color:red">*</span></label>
+          <textarea id="rt-desc-en" placeholder="English description..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Description (CN) <span style="color:red">*</span></label>
+          <textarea id="rt-desc-cn" placeholder="中文描述..."></textarea>
+        </div>
+      </div>
+      <!-- Operation Log -->
+      <div id="rt-log-section" style="display:none; margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
+        <label style="font-weight:600; font-size:13px; margin-bottom:8px; display:block;">Operation Log</label>
+        <div id="rt-log-list" style="max-height:150px; overflow-y:auto; font-size:12px; color:var(--text-secondary);"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-ruletype')">Cancel</button>
+      <button class="btn btn-primary" id="rt-submit-btn" onclick="submitRuleType()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: Create Feature ==================== -->
+<!-- Feature CRUD Modal -->
+<div class="modal-overlay" id="modal-feature">
+  <div class="modal" style="width: 700px;">
+    <div class="modal-header">
+      <span id="feat-modal-title">Create Feature</span>
+      <span class="modal-close" onclick="hideModal('modal-feature')">&times;</span>
+    </div>
+    <div class="modal-body" id="feat-modal-body">
+      <div class="form-group">
+        <label>Rule Type <span style="color:red">*</span></label>
+        <select id="feat-ruletype">
+          <option value="TS_A001">TS_A001 - Possible Wash Trade (A to B)</option>
+          <option value="TS_A006">TS_A006 - Pre-arranged Trading</option>
+          <option value="TS_B001">TS_B001 - Pump and Dump</option>
+          <option value="TS_B002">TS_B002 - Trash and Cash</option>
+          <option value="TS_C001">TS_C001 - Market Dominance at Open/Close</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Feature Name <span style="color:red">*</span></label>
+        <input type="text" id="feat-name" placeholder="Enter feature name">
+      </div>
+      <!-- Version Control Section -->
+      <div class="form-group" id="feat-version-group">
+        <label>Feature Version <span style="color:red">*</span></label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span style="font-size:13px; color:#86909c;">V</span>
+          <input type="number" id="feat-version-major" min="1" max="99" style="width:60px; text-align:center;" value="6">
+          <span style="font-size:13px; color:#86909c;">.</span>
+          <input type="number" id="feat-version-minor" min="0" max="99" style="width:60px; text-align:center; background:#f5f5f5; color:#86909c;" disabled value="3">
+          <span style="font-size:12px; color:#86909c; margin-left:8px;" id="feat-version-hint">小版本自动递增，大版本可手动调整</span>
+        </div>
+        <div style="margin-top:6px; font-size:11px; color:#86909c; background:#f7f8fa; padding:6px 10px; border-radius:4px;" id="feat-version-info">
+          当前该Rule Type下最新版本：V6.2 → 本次将创建 <strong id="feat-version-preview" style="color:var(--text);">V6.3</strong>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Feature Code (Auto-generated)</label>
+        <input type="text" id="feat-code" disabled style="background: #f5f5f5; color: #86909c;">
+      </div>
+      <div class="form-group">
+        <label>Feature Status</label>
+        <input type="text" id="feat-status" disabled style="background: #f5f5f5; color: #86909c;">
+      </div>
+      <div class="form-group">
+        <label>Logic (SQL) <span style="color:red">*</span></label>
+        <textarea id="feat-expression" style="min-height: 120px; font-family: 'SF Mono', Consolas, monospace; font-size: 12px;" placeholder="SELECT account_id, trade_date, ...&#10;FROM transactions&#10;WHERE ..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Logic Description <span style="color:red">*</span> <span title="Please describe what this logic detects in plain language, to help compliance and other team members understand the purpose of this feature." style="cursor:help; color:#86909c;">&#9432;</span></label>
+        <textarea id="feat-desc" placeholder="Describe what this logic detects in plain language. E.g.: Identifies accounts that traded heavily before a price-sensitive announcement and profited significantly."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Configurable Parameters <span title="Parameters extracted by developer. These will be configured by compliance in Rule Testing before going online." style="cursor:help; color:#86909c;">&#9432;</span></label>
+        <table class="data-table" style="font-size: 12px;">
+          <thead>
+            <tr>
+              <th style="width:150px;">Parameter Key</th>
+              <th>Description</th>
+              <th style="width: 40px;" id="feat-param-action-col"></th>
+            </tr>
+          </thead>
+          <tbody id="feat-params-body">
+            <tr>
+              <td><input type="text" style="width:100%" placeholder="e.g. intervalMinute"></td>
+              <td><input type="text" style="width:100%" placeholder="Explain what this parameter controls, its unit and expected format"></td>
+              <td><button class="remove-btn" onclick="this.closest('tr').remove()">&times;</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="btn" id="feat-add-param-btn" style="margin-top: 6px; font-size: 12px;" onclick="addFeatureParam()">+ Add Param</button>
+      </div>
+      <div class="form-group">
+        <label>Detail Template</label>
+        <textarea id="feat-template" placeholder="Alert detail template..."></textarea>
+      </div>
+      <!-- Operation Log -->
+      <div id="feat-log-section" style="display:none; margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
+        <label style="font-weight:600; font-size:13px; margin-bottom:8px; display:block;">Operation Log</label>
+        <div id="feat-log-list" style="max-height:120px; overflow-y:auto; font-size:12px; color:var(--text-secondary);"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-feature')">Cancel</button>
+      <button class="btn btn-primary" id="feat-submit-btn" onclick="hideModal('modal-feature')">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: Running Rule Create ==================== -->
+<div class="modal-overlay" id="modal-running-rule">
+  <div class="modal" style="width: 800px;">
+    <div class="modal-header">
+      Create Running Rule
+      <span class="modal-close" onclick="hideModal('modal-running-rule')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <!-- Step 1: Select Rule Type -->
+      <div class="form-group">
+        <label>Rule Type <span style="color:red">*</span></label>
+        <select id="rr-ruletype" onchange="updateRRFeatureOptions()" style="width:100%; font-size:13px;">
+          <option value="">Please select Rule Type</option>
+          <option value="TS_A001">TS_A001 - Possible Wash Trade (A to B)</option>
+          <option value="TS_A006">TS_A006 - Pre-arranged Trading</option>
+          <option value="TS_B001">TS_B001 - Pump and Dump</option>
+          <option value="TS_B002">TS_B002 - Trash and Cash</option>
+          <option value="TS_C001">TS_C001 - Market Dominance Open/Close</option>
+        </select>
+      </div>
+
+      <!-- Step 2: Select Feature (filtered by Rule Type) -->
+      <div class="form-group">
+        <label>Feature Version <span style="color:red">*</span></label>
+        <select id="rr-feature" onchange="updateRRTestingOptions()" style="width:100%; font-size:13px;">
+          <option value="">Please select Rule Type first</option>
+        </select>
+      </div>
+
+      <!-- Step 3: Select Parameter Sets (multiple) -->
+      <div class="form-group">
+        <label>Parameter Set (Testing ID) <span style="color:red">*</span> <span title="Select one or more tested parameter sets. Each can be assigned a different condition for different markets/products." style="cursor:help; color:#86909c;">&#9432;</span></label>
+        <select id="rr-paramset" style="width:100%; font-size:13px;" onchange="addRRParamEntry()">
+          <option value="">Please select Feature first</option>
+        </select>
+      </div>
+
+      <!-- Applied Parameters (shows only after selecting) -->
+      <div id="rr-applied-params" style="display:none;">
+        <div id="rr-applied-list"></div>
+      </div>
+
+      <!-- Add Condition Sub-modal -->
+      <div id="rr-condition-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.3); z-index:200; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:8px; width:480px; padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <strong style="font-size:14px;">Add Condition</strong>
+            <span style="cursor:pointer; font-size:18px;" onclick="hideAddConditionModal()">&times;</span>
+          </div>
+          <div class="form-group">
+            <label>Condition Type <span style="color:red">*</span></label>
+            <select id="rr-cond-type" style="width:100%; font-size:13px;">
+              <option value="">Please select</option>
+              <option>Security Type</option>
+              <option>Market</option>
+              <option>Account Type</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Condition Value <span style="color:red">*</span></label>
+            <input type="text" id="rr-cond-value" placeholder="e.g. STK, OPT, BOND">
+          </div>
+          <div class="form-group">
+            <label>Included <span style="color:red">*</span></label>
+            <select id="rr-cond-included" style="width:100%; font-size:13px;">
+              <option value="Yes">Yes (Include)</option>
+              <option value="No">No (Exclude)</option>
+            </select>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+            <button class="btn" onclick="hideAddConditionModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="confirmAddCondition()">Confirm</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border); margin:16px 0; padding-top:16px;"></div>
+
+      <!-- Running Rule specific fields -->
+      <div class="form-group">
+        <label>Running Rule Code</label>
+        <input type="text" id="rr-code" value="" placeholder="Auto-generated based on Rule Type, editable">
+      </div>
+
+      <div class="form-group">
+        <label>Running Rule Name <span style="color:red">*</span> <span title="The prefix is auto-generated from Rule Type Name and cannot be modified. The suffix after '-' is customizable by compliance, and will be displayed in Alert." style="cursor:help; color:#86909c;">&#9432;</span></label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span id="rr-name-prefix" style="font-size:13px; color:#86909c; white-space:nowrap;">—</span>
+          <span style="color:#86909c;">-</span>
+          <input type="text" id="rr-name-suffix" placeholder="e.g. Profit / Loss / STK / OPT" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Weight <span style="color:red">*</span></label>
+        <input type="text" placeholder="Please input weight (0 ~ 1)" value="0">
+      </div>
+
+      <div class="form-group">
+        <label>Score</label>
+        <input type="text" placeholder="Please input score">
+      </div>
+
+      <div class="form-group">
+        <label>Labels</label>
+        <input type="text" placeholder="Please search labels">
+      </div>
+
+      <div class="form-group">
+        <label>Alert Category</label>
+        <select>
+          <option value="">Please select</option>
+          <option>Dynamic</option>
+          <option>Stable</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Trigger</label>
+        <input type="text" placeholder="Optional trigger condition">
+      </div>
+
+      <div class="form-group">
+        <label>Alert Frequency <span style="color:red">*</span></label>
+        <select>
+          <option>Please select Alert Frequency</option>
+          <option>Daily</option>
+          <option>Weekly</option>
+          <option>Real-time</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Effective Time <span title="Optional. Rule will automatically take effect after this time. Leave empty to take effect immediately upon confirm." style="cursor:help; color:#86909c;">&#9432;</span></label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" style="width:140px;" placeholder="YYYY-MM-DD">
+          <input type="text" style="width:80px;" placeholder="HH:MM">
+          <span style="font-size:12px; color:#86909c;">GMT+8 (Optional, leave empty for immediate effect)</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-running-rule')">Cancel</button>
+      <button class="btn" onclick="hideModal('modal-running-rule')">Reset</button>
+      <button class="btn btn-primary" onclick="hideModal('modal-running-rule')">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Page navigation
+function showPage(pageId) {
+  // Hide all pages
+  document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+  // Show target page
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+
+  // Update tab bar
+  const tabLabel = document.querySelector('.tab-label');
+  const names = {
+    ruletype: 'Rule Type',
+    feature: 'Feature',
+    ruletesting: 'Rule Testing',
+    addtest: 'Add Test',
+    testdetail: 'Test Detail',
+    rule: 'Running Rule'
+  };
+  if (tabLabel) tabLabel.textContent = names[pageId] || pageId;
+
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (pageId === 'ruletesting' || pageId === 'addtest' || pageId === 'testdetail') {
+    document.getElementById('nav-ruletesting').classList.add('active');
+  }
+
+  // Close any open dropdowns
+  document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
+}
+
+// Dropdown toggle
+function toggleDropdown(id) {
+  event.stopPropagation();
+  const menu = document.getElementById(id);
+  const isOpen = menu.classList.contains('show');
+  document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
+  if (!isOpen) menu.classList.add('show');
+}
+
+// Close dropdowns on click outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.nav-item')) {
+    document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
+  }
+});
+
+// Group collapse/expand
+function toggleGroup(header) {
+  header.classList.toggle('collapsed');
+  const table = header.nextElementSibling;
+  if (table && table.classList.contains('group-table')) {
+    table.style.display = header.classList.contains('collapsed') ? 'none' : '';
+  }
+}
+
+// Sidebar selection - updates right content
+function selectSidebarItem(el, id) {
+  document.querySelectorAll('.sidebar-tree-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  updateTestingContent(id);
+}
+
+// Test content data for different sidebar items
+const testingContentData = {
+  'ts_a001_v65': { title: 'Test Groups - TS_A001 V6.5', groups: [
+    { id:'PSI-001', params:'intervalMinute:5, crossTimesThreshold:3', status:'In Use', subs:[
+      {id:'PSI-001-01',condition:'Security Type in (STK) | HKEX',period:'2025-05-01 ~ 2025-05-31',time:'2025-07-23 14:29',alerts:12,status:'FINISHED'},
+      {id:'PSI-001-02',condition:'Security Type in (STK) | HKEX',period:'2025-06-01 ~ 2025-06-30',time:'2025-07-23 14:45',alerts:15,status:'FINISHED'},
+      {id:'PSI-001-03',condition:'Security Type in (STK) | SGX',period:'2025-05-01 ~ 2025-05-31',time:'2025-07-23 15:02',alerts:8,status:'FINISHED'}
+    ]},
+    { id:'PSI-002', params:'intervalMinute:3, crossTimesThreshold:5', status:'Unused', subs:[
+      {id:'PSI-002-01',condition:'Security Type in (STK) | HKEX',period:'2025-06-01 ~ 2025-06-30',time:'2025-07-21 20:34',alerts:10,status:'FINISHED'},
+      {id:'PSI-002-02',condition:'Security Type in (STK) | HKEX',period:'2025-07-01 ~ 2025-07-31',time:'2025-07-21 21:10',alerts:12,status:'FINISHED'}
+    ]},
+    { id:'PSI-003', params:'intervalMinute:5, crossTimesThreshold:2', status:'Offline', subs:[
+      {id:'PSI-003-01',condition:'Security Type in (STK) | HKEX',period:'2025-04-01 ~ 2025-04-30',time:'2025-05-10 09:00',alerts:18,status:'FINISHED'}
+    ]}
+  ]},
+  'ts_a006_v61': { title: 'Test Groups - TS_A006 V6.1', groups: [
+    { id:'PSI-010', params:'priceDiffRatio:0.05, tradePairTimes:3, isProfit:true', status:'In Use', subs:[
+      {id:'PSI-010-01',condition:'Security Type in (STK) | HKEX',period:'2025-04-01 ~ 2025-04-30',time:'2025-06-10 09:00',alerts:10,status:'FINISHED'},
+      {id:'PSI-010-02',condition:'Security Type in (STK) | SGX',period:'2025-04-01 ~ 2025-04-30',time:'2025-06-10 09:30',alerts:8,status:'FINISHED'}
+    ]},
+    { id:'PSI-011', params:'priceDiffRatio:0.05, tradePairTimes:3, isProfit:false', status:'In Use', subs:[
+      {id:'PSI-011-01',condition:'Security Type in (STK) | HKEX',period:'2025-04-01 ~ 2025-04-30',time:'2025-06-10 10:00',alerts:9,status:'FINISHED'},
+      {id:'PSI-011-02',condition:'Security Type in (STK) | SGX',period:'2025-04-01 ~ 2025-04-30',time:'2025-06-10 10:30',alerts:5,status:'FINISHED'}
+    ]}
+  ]},
+  'ts_b001_v63': { title: 'Test Groups - TS_B001 V6.3', groups: [
+    { id:'PSI-020', params:'spikeThreshold:0.1, volumeRatio:3', status:'In Use', subs:[
+      {id:'PSI-020-01',condition:'Market in (HKEX) | STK',period:'2025-03-01 ~ 2025-03-31',time:'2025-05-15 11:00',alerts:7,status:'FINISHED'},
+      {id:'PSI-020-02',condition:'Market in (HKEX) | STK',period:'2025-04-01 ~ 2025-04-30',time:'2025-05-15 11:30',alerts:5,status:'FINISHED'}
+    ]}
+  ]},
+  'ts_b002_v63': { title: 'Test Groups - TS_B002 V6.3', groups: [
+    { id:'PSI-025', params:'rebuyThreshold:0.08, timeWindow:5', status:'In Use', subs:[
+      {id:'PSI-025-01',condition:'Market in (HKEX) | STK',period:'2025-03-01 ~ 2025-03-31',time:'2025-05-15 14:00',alerts:6,status:'FINISHED'}
+    ]}
+  ]},
+  'ts_c001_v59': { title: 'Test Groups - TS_C001 V5.9 (no tick data)', groups: [
+    { id:'PSI-030', params:'dominanceRatio:0.25, minVolume:50000', status:'In Use', subs:[
+      {id:'PSI-030-01',condition:'Market in (HKEX) | STK',period:'2025-07-01 ~ 2025-07-31',time:'2025-08-01 09:00',alerts:12,status:'FINISHED'},
+      {id:'PSI-030-02',condition:'Market in (SGX) | STK',period:'2025-07-01 ~ 2025-07-31',time:'2025-08-01 09:30',alerts:8,status:'FINISHED'}
+    ]}
+  ]},
+  'ts_c001_v58': { title: 'Test Groups - TS_C001 V5.8 (tick data) - Testing', groups: [
+    { id:'PSI-035', params:'dominanceRatio:0.3, tickInterval:100', status:'Unused', subs:[
+      {id:'PSI-035-01',condition:'Market in (HKEX) | STK',period:'2025-03-01 ~ 2025-03-31',time:'2025-04-12 16:00',alerts:9,status:'FINISHED'},
+      {id:'PSI-035-02',condition:'Market in (HKEX) | STK',period:'2025-04-01 ~ 2025-04-30',time:'2025-04-12 16:30',alerts:6,status:'FINISHED'}
+    ]}
+  ]},
+  'ts_c001_v57': { title: 'Test Groups - TS_C001 V5.7 (tick data)', groups: [
+    { id:'PSI-028', params:'dominanceRatio:0.3, tickInterval:80', status:'In Use', subs:[
+      {id:'PSI-028-01',condition:'Market in (HKEX) | STK',period:'2025-01-01 ~ 2025-01-31',time:'2025-02-10 10:00',alerts:15,status:'FINISHED'},
+      {id:'PSI-028-02',condition:'Market in (SGX) | STK',period:'2025-01-01 ~ 2025-01-31',time:'2025-02-10 10:30',alerts:10,status:'FINISHED'}
+    ]}
+  ]},
+  'ts_a001_v64': { title: 'Test Groups - TS_A001 V6.4 (Offline)', groups: [
+    { id:'PSI-040', params:'intervalMinute:5, crossTimesThreshold:2', status:'Offline', subs:[
+      {id:'PSI-040-01',condition:'Security Type in (STK) | HKEX',period:'2025-01-01 ~ 2025-01-31',time:'2025-03-10 09:00',alerts:25,status:'FINISHED'},
+      {id:'PSI-040-02',condition:'Security Type in (STK) | HKEX',period:'2025-02-01 ~ 2025-02-28',time:'2025-03-10 09:30',alerts:20,status:'FINISHED'}
+    ]}
+  ]}
+};
+
+function updateTestingContent(id) {
+  const data = testingContentData[id];
+  const container = document.querySelector('.rule-testing-content');
+  if (!data) {
+    // Legacy or unknown - show simple message
+    container.innerHTML = '<div style="padding:40px; text-align:center; color:#86909c;">Select a feature version to view test groups</div>';
+    return;
+  }
+
+  let html = '<div class="page-header"><h2>' + data.title + '</h2><button class="btn btn-primary" onclick="showPage(\'addtest\')">+ Add</button></div>';
+
+  data.groups.forEach((g, gi) => {
+    const statusClass = g.status === 'In Use' ? 'status-active' : (g.status === 'Unused' ? '' : 'status-offline');
+    const statusStyle = g.status === 'Unused' ? 'style="background:#f0f0f0; color:#86909c;"' : '';
+    const expanded = gi === 0;
+    html += '<div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">';
+    html += '<div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">';
+    html += '<div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">';
+    html += '<span style="font-size:10px; color:#86909c;">' + (expanded ? '▼' : '▶') + '</span>';
+    html += '<strong style="font-size:13px; white-space:nowrap;">' + g.id + '</strong>';
+    html += '<span style="font-size:12px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + g.params + '</span>';
+    html += '</div>';
+    html += '<div style="display:flex; align-items:center; gap:10px; white-space:nowrap;">';
+    html += '<span class="status-tag ' + statusClass + '" ' + statusStyle + '>' + g.status + '</span>';
+    html += '<button class="btn-link" onclick="event.stopPropagation();copyTestToAdd(\'' + g.id + '\')">Copy</button>';
+    html += '</div></div>';
+    html += '<div class="test-group-body" style="padding:0;' + (expanded ? '' : 'display:none;') + '">';
+    html += '<table class="data-table" style="border:none; margin:0;"><colgroup><col style="width:100px"><col style="width:190px"><col style="width:175px"><col style="width:135px"><col style="width:60px"><col style="width:85px"><col style="width:55px"></colgroup><thead><tr>';
+    html += '<th>Sub ID</th><th>Condition</th><th>Test Period</th><th>Test Time</th><th>Alerts</th><th>Status</th><th></th>';
+    html += '</tr></thead><tbody>';
+    g.subs.forEach(s => {
+      html += '<tr><td>' + s.id + '</td><td>' + (s.condition || s.market) + '</td><td>' + s.period + '</td><td>' + s.time + '</td><td>' + s.alerts + '</td><td><span class="status-tag status-finished">' + s.status + '</span></td><td><button class="btn-link" onclick="alert(\'Detail: ' + s.id + '\\nCondition: ' + (s.condition||s.market) + '\\nPeriod: ' + s.period + '\\nAlerts: ' + s.alerts + '\')">Detail</button></td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+// Modal
+function showModal(id) {
+  event.stopPropagation();
+  document.getElementById(id).classList.add('show');
+}
+
+function hideModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('show');
+    }
+  });
+});
+
+// ==================== Rule Type Fuzzy Search ====================
+function filterRuleTypes() {
+  const query = document.getElementById('rt-search-input').value.toLowerCase().trim();
+  const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+  groups.forEach(g => {
+    const tbody = document.getElementById('rt-group-' + g);
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr[data-rt]');
+    let visibleCount = 0;
+    rows.forEach(row => {
+      const data = JSON.parse(row.getAttribute('data-rt'));
+      const match = !query ||
+        data.code.toLowerCase().includes(query) ||
+        data.name.toLowerCase().includes(query) ||
+        data.descEn.toLowerCase().includes(query) ||
+        data.descCn.includes(query);
+      row.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    });
+    const badge = document.getElementById('badge-' + g);
+    if (badge) badge.textContent = visibleCount;
+    // Hide entire group if no visible rows
+    const groupHeader = tbody.closest('table').previousElementSibling;
+    const groupTable = tbody.closest('table');
+    if (groupHeader && groupTable) {
+      const shouldHide = visibleCount === 0 && query;
+      groupHeader.style.display = shouldHide ? 'none' : '';
+      groupTable.style.display = shouldHide ? 'none' : '';
+    }
+  });
+}
+
+// ==================== Rule Testing Interactions ====================
+function toggleTestGroup(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('span:first-child');
+  if (body.style.display === 'none') {
+    body.style.display = '';
+    arrow.textContent = '▼';
+  } else {
+    body.style.display = 'none';
+    arrow.textContent = '▶';
+  }
+}
+
+function toggleSidebarGroup(el) {
+  const group = el.nextElementSibling;
+  const arrow = el.querySelector('span');
+  if (group && group.classList.contains('sidebar-group')) {
+    if (group.style.display === 'none') {
+      group.style.display = '';
+      arrow.textContent = '▼';
+    } else {
+      group.style.display = 'none';
+      arrow.textContent = '▶';
+    }
+  }
+}
+
+function toggleHistorySection(header) {
+  const section = header.nextElementSibling;
+  const arrow = header.querySelector('span:last-child');
+  if (section.style.display === 'none') {
+    section.style.display = '';
+    arrow.textContent = '▼';
+  } else {
+    section.style.display = 'none';
+    arrow.textContent = '▶';
+  }
+}
+
+function showTestDetailPage(subId) {
+  showPage('testdetail');
+  document.getElementById('detail-sub-id').textContent = subId;
+}
+
+// ==================== Running Rule Cascade Dropdowns ====================
+const rrFeaturesByType = {
+  'TS_A001': [
+    { value: 'TS_A001_V6.5', label: 'TS_A001_V6.5 - Possible Wash Trade (A to B) [In Use]' },
+    { value: 'TS_A001_V6.4', label: 'TS_A001_V6.4 - Possible Wash Trade (A to B) [Offline]' }
+  ],
+  'TS_A006': [
+    { value: 'TS_A006_V6.1', label: 'TS_A006_V6.1 - Pre-arranged Trading [In Use]' }
+  ],
+  'TS_B001': [
+    { value: 'TS_B001_V6.3', label: 'TS_B001_V6.3 - Pump and Dump [In Use]' }
+  ],
+  'TS_B002': [
+    { value: 'TS_B002_V6.3', label: 'TS_B002_V6.3 - Trash and Cash [In Use]' }
+  ],
+  'TS_C001': [
+    { value: 'TS_C001_V5.9', label: 'TS_C001_V5.9 - Market Dominance no tick data [In Use]' },
+    { value: 'TS_C001_V5.7', label: 'TS_C001_V5.7 - Market Dominance tick data [In Use]' }
+  ]
+};
+
+const rrParamsByFeature = {
+  'TS_A001_V6.5': [
+    { value: 'P1', label: 'P1 — intervalMinute:5, crossTimesThreshold:3 [In Use]' },
+    { value: 'P2', label: 'P2 — intervalMinute:5, crossTimesThreshold:3, minVolume:10000 [In Use]' },
+    { value: 'P3', label: 'P3 — intervalMinute:3, crossTimesThreshold:5 [Unused]' }
+  ],
+  'TS_A001_V6.4': [
+    { value: 'P4', label: 'P4 — intervalMinute:5, crossTimesThreshold:2 [Offline]' }
+  ],
+  'TS_A006_V6.1': [
+    { value: 'PSI-010', label: 'P1 — priceDiffRatio:0.05, tradePairTimes:3, isProfit:true [In Use]' },
+    { value: 'PSI-011', label: 'P2 — priceDiffRatio:0.05, tradePairTimes:3, isProfit:false [In Use]' }
+  ],
+  'TS_B001_V6.3': [
+    { value: 'PSI-020', label: 'P1 — spikeThreshold:0.1, volumeRatio:3 [In Use]' }
+  ],
+  'TS_B002_V6.3': [
+    { value: 'PSI-025', label: 'P1 — rebuyThreshold:0.08, timeWindow:5 [In Use]' }
+  ],
+  'TS_C001_V5.9': [
+    { value: 'PSI-030', label: 'P1 — dominanceRatio:0.25, minVolume:50000 [In Use]' }
+  ],
+  'TS_C001_V5.7': [
+    { value: 'PSI-028', label: 'P1 — dominanceRatio:0.3, tickInterval:80 [In Use]' }
+  ]
+};
+
+const rrTypeNames = {
+  'TS_A001': 'Possible Wash Trade (A to B)',
+  'TS_A006': 'Pre-arranged Trading',
+  'TS_B001': 'Pump and Dump',
+  'TS_B002': 'Trash and Cash',
+  'TS_C001': 'Market Dominance Open/Close'
+};
+
+function updateRRFeatureOptions() {
+  const ruleType = document.getElementById('rr-ruletype').value;
+  const featSelect = document.getElementById('rr-feature');
+  const paramSelect = document.getElementById('rr-paramset');
+  const namePrefix = document.getElementById('rr-name-prefix');
+
+  featSelect.innerHTML = '<option value="">Please select Feature</option>';
+  paramSelect.innerHTML = '<option value="">Please select Feature first</option>';
+
+  if (ruleType && rrFeaturesByType[ruleType]) {
+    rrFeaturesByType[ruleType].forEach(f => {
+      featSelect.innerHTML += '<option value="' + f.value + '">' + f.label + '</option>';
+    });
+    namePrefix.textContent = rrTypeNames[ruleType] || '—';
+    document.getElementById('rr-code').value = ruleType + '_R' + (Math.floor(Math.random()*5)+1);
+  } else {
+    namePrefix.textContent = '—';
+    document.getElementById('rr-code').value = '(Auto: based on Rule Type + sequence)';
+  }
+}
+
+function updateRRTestingOptions() {
+  const feature = document.getElementById('rr-feature').value;
+  const paramSelect = document.getElementById('rr-paramset');
+  paramSelect.innerHTML = '<option value="">+ Select Parameter Set to add</option>';
+  if (feature && rrParamsByFeature[feature]) {
+    rrParamsByFeature[feature].forEach(p => {
+      paramSelect.innerHTML += '<option value="' + p.value + '">' + p.label + '</option>';
+    });
+  }
+  // Clear applied params
+  document.getElementById('rr-applied-list').innerHTML = '';
+  document.getElementById('rr-applied-params').style.display = 'none';
+}
+
+let currentConditionTarget = null;
+
+// ==================== Running Rule Detail/Edit ====================
+const rrData = {
+  'R_TS_A006_R1': { code:'R_TS_A006_R1', name:'Pre-arranged Trading - Profit', ruleType:'TS_A006', feature:'TS_A006_V6.1', params:[
+    {id:'P1', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:5, isProfit:true, orderTimes:5', condition:'Security Type in (STK)'},
+    {id:'P2', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:1, isProfit:true, orderTimes:3', condition:'Security Type in (BOND,OPT,WAR,FUT)'}
+  ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'', labels:'cross-trading', effectiveTime:''},
+  'R_TS_A006_R2': { code:'R_TS_A006_R2', name:'Pre-arranged Trading - Loss', ruleType:'TS_A006', feature:'TS_A006_V6.1', params:[
+    {id:'P1', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:5, isProfit:false, orderTimes:5', condition:'Security Type in (STK)'},
+    {id:'P2', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:1, isProfit:false, orderTimes:3', condition:'Security Type in (BOND,OPT,WAR,FUT)'}
+  ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'', labels:'cross-trading', effectiveTime:''},
+  'R_TS_A001_R1': { code:'R_TS_A001_R1', name:'Possible Wash Trade (A to B)', ruleType:'TS_A001', feature:'TS_A001_V6.5', params:[
+    {id:'P1', params:'intervalMinute:5, crossTimesThreshold:3', condition:'Security Type in (STK) | HKEX, SGX'}
+  ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'interval > 0', labels:'wash-trade', effectiveTime:''},
+  'R_TS_C001_R1': { code:'R_TS_C001_R1', name:'Market Dominance - Open STK', ruleType:'TS_C001', feature:'TS_C001_V5.9', params:[
+    {id:'P1', params:'dominanceRatio:0.25, minVolume:50000', condition:'Market in (HKEX, SGX)'}
+  ], weight:'0', score:'--', frequency:'Daily', category:'Stable', trigger:'', labels:'market-dominance', effectiveTime:'2026-06-01 00:00'},
+  'R_TS_B001_R1': { code:'R_TS_B001_R1', name:'Pump and Dump - HKEX', ruleType:'TS_B001', feature:'TS_B001_V6.3', params:[
+    {id:'P1', params:'spikeThreshold:0.1, volumeRatio:3', condition:'Market in (HKEX)'}
+  ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'', labels:'price-manipulation', effectiveTime:''}
+};
+
+function openRRDetail(row) {
+  const code = row.children[0].textContent;
+  const data = rrData[code];
+  if (!data) { alert('Detail: ' + code); return; }
+
+  let paramHtml = data.params.map(p => `
+    <div style="padding:8px 12px; background:#f7f8fa; border:1px solid var(--border); border-radius:4px; margin-bottom:8px;">
+      <div style="font-size:12px;"><strong>${p.id}</strong> — ${p.params}</div>
+      <div style="font-size:11px; color:#4e5969; margin-top:4px;">Condition: ${p.condition}</div>
+    </div>`).join('');
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:200;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = function(e) { if (e.target === this) this.remove(); };
+  overlay.innerHTML = `<div style="background:#fff; border-radius:8px; width:700px; max-height:80vh; overflow-y:auto; padding:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <strong style="font-size:15px;">Detail - ${data.code}</strong>
+      <span style="cursor:pointer; font-size:20px;" onclick="this.closest('[style]').parentElement.remove()">&times;</span>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+      <div><span style="font-size:12px; color:#86909c;">Running Rule Code</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.code}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Running Rule Name</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.name}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Rule Type</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.ruleType}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Feature</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.feature}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Weight</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.weight}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Score</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.score}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Alert Frequency</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.frequency}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Alert Category</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.category}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Trigger</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.trigger || '--'}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Labels</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.labels || '--'}</div></div>
+      <div><span style="font-size:12px; color:#86909c;">Effective Time</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.effectiveTime || 'Immediate'}</div></div>
+    </div>
+    <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
+      <span style="font-size:13px; font-weight:600;">Param Group</span>
+      <div style="margin-top:8px;">${paramHtml}</div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function openRREdit(row) {
+  const code = row.children[0].textContent;
+  const data = rrData[code];
+  if (!data) { alert('Edit: ' + code); return; }
+
+  let paramHtml = data.params.map(p => `
+    <div style="border:1px solid var(--border); border-radius:6px; margin-bottom:10px; overflow:hidden;">
+      <div style="background:#f7f8fa; padding:8px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border);">
+        <div><strong style="font-size:13px;">${p.id}</strong> <span style="font-size:12px; color:#86909c; margin-left:8px;">Parameters: ${p.params}</span></div>
+        <button class="btn-link" style="color:#f53f3f; font-size:12px;">Remove</button>
+      </div>
+      <div style="padding:10px 14px;">
+        <div style="font-size:12px; color:#4e5969; margin-bottom:6px;">Conditions:</div>
+        <span style="display:inline-block; background:#e8f3ff; color:#165dff; padding:2px 8px; border-radius:3px; font-size:11px; margin-right:6px;">${p.condition} <span style="cursor:pointer; margin-left:4px;">&times;</span></span>
+        <button class="btn" style="font-size:11px; padding:3px 10px; margin-top:6px; display:block;">+ Add Condition</button>
+      </div>
+    </div>`).join('');
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:200;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = function(e) { if (e.target === this) this.remove(); };
+  overlay.innerHTML = `<div style="background:#fff; border-radius:8px; width:700px; max-height:80vh; overflow-y:auto; padding:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <strong style="font-size:15px;">Edit - ${data.code}</strong>
+      <span style="cursor:pointer; font-size:20px;" onclick="this.closest('[style]').parentElement.remove()">&times;</span>
+    </div>
+    <div class="form-group"><label>Rule Type</label><input type="text" value="${data.ruleType}" disabled style="background:#f5f5f5; color:#86909c;"></div>
+    <div class="form-group"><label>Feature Version</label><select style="width:100%; font-size:13px;"><option selected>${data.feature}</option><option>${data.ruleType}_V6.2</option><option>${data.ruleType}_V5.9</option></select></div>
+    <div class="form-group"><label>Running Rule Code</label><input type="text" value="${data.code}"></div>
+    <div class="form-group"><label>Running Rule Name</label><input type="text" value="${data.name}"></div>
+    <div style="border-top:1px solid var(--border); margin:16px 0; padding-top:12px;">
+      <div class="form-group">
+        <label>Parameter Set <span style="font-size:11px; color:#86909c; font-weight:normal;">(Select to add more parameter groups)</span></label>
+        <select style="width:100%; font-size:13px;"><option value="">+ Select Parameter Set to add</option><option>P1</option><option>P2</option><option>P3</option></select>
+      </div>
+      <div style="margin-top:8px;">${paramHtml}</div>
+    </div>
+    <div class="form-group"><label>Weight</label><input type="text" value="${data.weight}"></div>
+    <div class="form-group"><label>Score</label><input type="text" value="${data.score}"></div>
+    <div class="form-group"><label>Labels</label><input type="text" value="${data.labels || ''}" placeholder="Please search labels"></div>
+    <div class="form-group"><label>Alert Category</label><select><option ${data.category==='Dynamic'?'selected':''}>Dynamic</option><option ${data.category==='Stable'?'selected':''}>Stable</option></select></div>
+    <div class="form-group"><label>Trigger</label><input type="text" value="${data.trigger || ''}" placeholder="Optional trigger condition"></div>
+    <div class="form-group"><label>Alert Frequency</label><select><option ${data.frequency==='Daily'?'selected':''}>Daily</option><option ${data.frequency==='Weekly'?'selected':''}>Weekly</option><option ${data.frequency==='Real-time'?'selected':''}>Real-time</option></select></div>
+    <div class="form-group"><label>Effective Time</label><div style="display:flex; gap:8px;"><input type="text" value="${data.effectiveTime ? data.effectiveTime.split(' ')[0] : ''}" placeholder="YYYY-MM-DD" style="width:140px;"><input type="text" value="${data.effectiveTime ? data.effectiveTime.split(' ')[1] || '' : ''}" placeholder="HH:MM" style="width:80px;"><span style="font-size:12px; color:#86909c; align-self:center;">GMT+8</span></div></div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+      <button class="btn" onclick="this.closest('[style]').parentElement.remove()">Cancel</button>
+      <button class="btn btn-primary" onclick="this.closest('[style]').parentElement.remove()">Save</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+// ==================== Running Rule Enable/Disable ====================
+function toggleRRStatus(row) {
+  const statusTd = row.querySelector('.status-tag');
+  const actionTd = row.querySelector('td:last-child');
+  const isEnabled = statusTd.textContent.trim() === 'Enabled';
+  const ruleCode = row.children[0].textContent;
+
+  if (isEnabled) {
+    if (!confirm('Confirm disable "' + ruleCode + '"?\n\nThis will:\n- Set this Running Rule to Disabled\n- Update associated Parameter Set status to Offline\n- Update Feature status if no other Running Rule references it\n- Update Rule Type running rules count')) return;
+    statusTd.textContent = 'Disabled';
+    statusTd.className = 'status-tag';
+    statusTd.style.cssText = 'background:#f0f0f0; color:#86909c;';
+    // Update button: replace Disable with Enable
+    const disableBtn = actionTd.querySelector('button:last-child');
+    disableBtn.textContent = 'Enable';
+    disableBtn.style.color = '#00b42a';
+  } else {
+    if (!confirm('Confirm enable "' + ruleCode + '"?\n\nThis will:\n- Set this Running Rule to Enabled\n- Update associated Parameter Set status to In Use\n- Update Feature status to In Use\n- Update Rule Type running rules count')) return;
+    statusTd.textContent = 'Enabled';
+    statusTd.className = 'status-tag status-enabled';
+    statusTd.style.cssText = '';
+    // Update button: replace Enable with Disable
+    const enableBtn = actionTd.querySelector('button:last-child');
+    enableBtn.textContent = 'Disable';
+    enableBtn.style.color = '#f53f3f';
+  }
+}
+
+// ==================== Running Rule Log ====================
+function showRRLog(ruleCode) {
+  const logs = {
+    'R_TS_A006_R1': [
+      { time: '2026-01-14 15:30', user: 'admin', action: 'Parameter updated', detail: 'Param Set changed: P1 → P1, P2 (added Derivative group with condition Security Type in (BOND,OPT,WAR,FUT))' },
+      { time: '2025-12-28 10:00', user: 'admin', action: 'Feature updated', detail: 'Feature changed: TS_A006_V5.9 → TS_A006_V6.1' },
+      { time: '2025-12-20 09:00', user: 'admin', action: 'Created', detail: 'Initial creation. Rule Type: TS_A006, Feature: TS_A006_V5.9, Param: P1, Status: Enabled' }
+    ],
+    'R_TS_A006_R2': [
+      { time: '2026-01-14 15:35', user: 'admin', action: 'Parameter updated', detail: 'Param Set changed: P1 → P1, P2 (added Derivative group)' },
+      { time: '2025-12-20 09:05', user: 'admin', action: 'Created', detail: 'Initial creation. Rule Type: TS_A006, Feature: TS_A006_V6.1, Param: P1, Status: Enabled' }
+    ],
+    'R_TS_A001_R1': [
+      { time: '2026-05-13 11:00', user: 'shuhan', action: 'Parameter updated', detail: 'Param Set changed: P3 (crossTimesThreshold:2) → P1 (crossTimesThreshold:3)' },
+      { time: '2026-04-20 14:00', user: 'shuhan', action: 'Feature updated', detail: 'Feature changed: TS_A001_V6.4 → TS_A001_V6.5' },
+      { time: '2026-03-10 10:00', user: 'admin', action: 'Created', detail: 'Initial creation. Rule Type: TS_A001, Feature: TS_A001_V6.4, Param: P3, Status: Enabled' }
+    ],
+    'R_TS_B001_R1': [
+      { time: '2026-04-01 09:00', user: 'admin', action: 'Status changed', detail: 'Status changed: Enabled → Disabled' },
+      { time: '2025-05-15 16:00', user: 'admin', action: 'Created', detail: 'Initial creation. Rule Type: TS_B001, Feature: TS_B001_V6.3, Param: P1, Status: Enabled' }
+    ]
+  };
+
+  const entries = logs[ruleCode] || [];
+  let html = '<div style="max-height:400px; overflow-y:auto;">';
+  entries.forEach(e => {
+    html += `<div style="padding:10px 0; border-bottom:1px solid #f0f0f0;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+        <strong style="font-size:12px;">${e.action}</strong>
+        <span style="font-size:11px; color:#86909c;">${e.time} by ${e.user}</span>
+      </div>
+      <div style="font-size:12px; color:#4e5969;">${e.detail}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  // Show in a simple modal
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:200;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = function(e) { if (e.target === this) this.remove(); };
+  overlay.innerHTML = `<div style="background:#fff; border-radius:8px; width:600px; padding:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <strong style="font-size:15px;">Change Log - ${ruleCode}</strong>
+      <span style="cursor:pointer; font-size:20px;" onclick="this.closest('[style]').parentElement.remove()">&times;</span>
+    </div>
+    ${html}
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function addRRParamEntry() {
+  const paramSelect = document.getElementById('rr-paramset');
+  const paramId = paramSelect.value;
+  if (!paramId) return;
+
+  const params = rrParamDetails[paramId] || 'N/A';
+  const container = document.getElementById('rr-applied-list');
+  const wrapper = document.getElementById('rr-applied-params');
+  wrapper.style.display = '';
+
+  const card = document.createElement('div');
+  card.style.cssText = 'border:1px solid var(--border); border-radius:6px; margin-bottom:10px; overflow:hidden;';
+  card.setAttribute('data-param-id', paramId);
+  card.innerHTML = `
+    <div style="background:#f7f8fa; padding:8px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border);">
+      <div><strong style="font-size:13px;">${paramId}</strong> <span style="font-size:12px; color:#86909c; margin-left:8px;">Parameters: ${params.replace(/\n/g, ', ')}</span></div>
+      <button class="btn-link" style="color:#f53f3f; font-size:12px;" onclick="this.closest('[data-param-id]').remove(); checkAppliedEmpty();">Remove</button>
+    </div>
+    <div style="padding:10px 14px;">
+      <div style="font-size:12px; color:#4e5969; margin-bottom:6px;">Conditions:</div>
+      <div class="rr-cond-list" style="font-size:12px; color:#86909c;">No condition set (applies to all)</div>
+      <button class="btn" style="margin-top:6px; font-size:11px; padding:3px 10px;" onclick="openConditionFor(this.closest('[data-param-id]'))">+ Add Condition</button>
+    </div>`;
+  container.appendChild(card);
+  paramSelect.value = '';
+}
+
+function checkAppliedEmpty() {
+  const container = document.getElementById('rr-applied-list');
+  if (!container.children.length) {
+    document.getElementById('rr-applied-params').style.display = 'none';
+  }
+}
+
+function openConditionFor(card) {
+  currentConditionTarget = card;
+  document.getElementById('rr-condition-modal').style.display = 'flex';
+}
+
+function showAddConditionModal() {
+  document.getElementById('rr-condition-modal').style.display = 'flex';
+}
+
+function hideAddConditionModal() {
+  document.getElementById('rr-condition-modal').style.display = 'none';
+  currentConditionTarget = null;
+}
+
+function confirmAddCondition() {
+  const condType = document.getElementById('rr-cond-type').value;
+  const condValue = document.getElementById('rr-cond-value').value;
+  const included = document.getElementById('rr-cond-included').value;
+
+  if (!condType || !condValue) {
+    alert('Please fill in Condition Type and Value.');
+    return;
+  }
+
+  const condText = condType + (included === 'Yes' ? ' in' : ' not in') + ' (' + condValue + ')';
+
+  if (currentConditionTarget) {
+    const condList = currentConditionTarget.querySelector('.rr-cond-list');
+    if (condList.textContent === 'No condition set (applies to all)') {
+      condList.innerHTML = '';
+    }
+    const tag = document.createElement('span');
+    tag.style.cssText = 'display:inline-block; background:#e8f3ff; color:#165dff; padding:2px 8px; border-radius:3px; margin-right:6px; margin-bottom:4px; font-size:11px;';
+    tag.innerHTML = condText + ' <span style="cursor:pointer; margin-left:4px;" onclick="this.parentElement.remove();">&times;</span>';
+    condList.appendChild(tag);
+  }
+
+  document.getElementById('rr-cond-type').value = '';
+  document.getElementById('rr-cond-value').value = '';
+  hideAddConditionModal();
+}
+
+const rrParamDetails = {
+  'P1': 'intervalMinute:5\ncrossTimesThreshold:3',
+  'P2': 'intervalMinute:5\ncrossTimesThreshold:3\nminVolume:10000',
+  'P3': 'intervalMinute:3\ncrossTimesThreshold:5',
+  'P4': 'intervalMinute:5\ncrossTimesThreshold:2',
+  'PSI-010': 'priceDiffRatio:0.05\ntradePairTimes:3\nisProfit:true',
+  'PSI-011': 'priceDiffRatio:0.05\ntradePairTimes:3\nisProfit:false',
+  'PSI-020': 'spikeThreshold:0.1\nvolumeRatio:3',
+  'PSI-025': 'rebuyThreshold:0.08\ntimeWindow:5',
+  'PSI-028': 'dominanceRatio:0.3\ntickInterval:80',
+  'PSI-030': 'dominanceRatio:0.25\nminVolume:50000'
+};
+
+function addTestClean() {
+  showPage('addtest');
+  // Clear all: parameters, conditions, periods
+  const paramInputs = document.querySelectorAll('#page-addtest .add-test-container table:first-of-type tbody input[type="text"]');
+  paramInputs.forEach(input => { input.value = ''; });
+  const condTbody = document.querySelector('#page-addtest .add-test-container table:nth-of-type(2) tbody');
+  if (condTbody) condTbody.innerHTML = '';
+  document.querySelectorAll('#page-addtest input[type="date"]').forEach(d => { d.value = ''; });
+}
+
+function copyTestToAdd(psiId) {
+  // Navigate to Add Test page with only parameters pre-filled (no condition, no time)
+  showPage('addtest');
+  const paramValues = {
+    'P1': { intervalMinute: '5', crossTimesThreshold: '3' },
+    'P2': { intervalMinute: '3', crossTimesThreshold: '5' },
+    'P3': { intervalMinute: '5', crossTimesThreshold: '2' },
+    'PSI-001': { intervalMinute: '5', crossTimesThreshold: '3' },
+    'PSI-002': { intervalMinute: '3', crossTimesThreshold: '5' },
+    'PSI-003': { intervalMinute: '5', crossTimesThreshold: '2' },
+    'PSI-010': { priceDiffRatio: '0.05', tradePairTimes: '3' },
+    'PSI-011': { priceDiffRatio: '0.05', tradePairTimes: '3' },
+    'PSI-020': { spikeThreshold: '0.1', volumeRatio: '3' },
+    'PSI-025': { rebuyThreshold: '0.08', timeWindow: '5' },
+    'PSI-028': { dominanceRatio: '0.3', tickInterval: '80' },
+    'PSI-030': { dominanceRatio: '0.25', minVolume: '50000' },
+    'PSI-035': { dominanceRatio: '0.3', tickInterval: '100' },
+    'PSI-040': { intervalMinute: '5', crossTimesThreshold: '2' }
+  };
+  const vals = paramValues[psiId] || paramValues['PSI-001'];
+  // Fill parameter values only
+  const paramInputs = document.querySelectorAll('#page-addtest .add-test-container table:first-of-type tbody input[type="text"]');
+  const valArr = Object.values(vals);
+  paramInputs.forEach((input, i) => { input.value = valArr[i] || ''; });
+  // Clear condition table rows (keep header only)
+  const condTbody = document.querySelector('#page-addtest .add-test-container table:nth-of-type(2) tbody');
+  if (condTbody) condTbody.innerHTML = '';
+  // Clear date inputs (periods)
+  document.querySelectorAll('#page-addtest input[type="date"]').forEach(d => { d.value = ''; });
+}
+
+// ==================== Rule Type Domain Tab ====================
+let currentRtDomain = 'TS';
+
+function switchRtDomain(domain) {
+  currentRtDomain = domain;
+  document.querySelectorAll('.domain-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('rt-tab-' + domain).classList.add('active');
+  // Could filter table by domain here if needed
+}
+
+// ==================== Rule Type CRUD ====================
+let rtMode = 'create'; // create | edit | detail
+let rtEditingRow = null;
+
+function openRuleTypeModal(mode, row) {
+  rtMode = mode;
+  rtEditingRow = row;
+  const modal = document.getElementById('modal-ruletype');
+  const modalInner = modal.querySelector('.modal');
+  const title = document.getElementById('rt-modal-title');
+  const submitBtn = document.getElementById('rt-submit-btn');
+  const logSection = document.getElementById('rt-log-section');
+  const logList = document.getElementById('rt-log-list');
+
+  // Remove detail class
+  modalInner.classList.remove('modal-detail');
+
+  // Reset form
+  const fields = ['rt-domain','rt-category','rt-number','rt-name','rt-desc-en','rt-desc-cn'];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.disabled = false;
+  });
+  document.getElementById('rt-domain').value = 'TS';
+  document.getElementById('rt-category').value = 'A';
+  document.getElementById('rt-code-preview').value = '';
+
+  // Domain is ALWAYS auto-filled from current tab and disabled
+  document.getElementById('rt-domain').value = currentRtDomain;
+  document.getElementById('rt-domain').disabled = true;
+
+  if (mode === 'create') {
+    title.textContent = 'Create Rule Type';
+    submitBtn.textContent = 'Create';
+    submitBtn.style.display = '';
+    logSection.style.display = 'none';
+  } else {
+    const data = JSON.parse(row.getAttribute('data-rt'));
+    document.getElementById('rt-domain').value = data.domain;
+    document.getElementById('rt-category').value = data.cat;
+    document.getElementById('rt-number').value = data.num;
+    document.getElementById('rt-code-preview').value = data.code;
+    document.getElementById('rt-name').value = data.name;
+    document.getElementById('rt-desc-en').value = data.descEn;
+    document.getElementById('rt-desc-cn').value = data.descCn;
+
+    // Domain, Category, Number are NEVER editable once created
+    document.getElementById('rt-domain').disabled = true;
+    document.getElementById('rt-category').disabled = true;
+    document.getElementById('rt-number').disabled = true;
+
+    // Show logs
+    logSection.style.display = '';
+    logList.innerHTML = '<div style="font-size:12px; color:#86909c; margin-bottom:6px;">Latest changes:</div>' +
+      (data.logs || []).reverse().map(l =>
+        '<div style="padding:5px 8px; margin-bottom:4px; background:#f7f8fa; border-radius:3px; font-size:12px;">' + l + '</div>'
+      ).join('');
+
+    if (mode === 'edit') {
+      title.textContent = 'Edit Rule Type - ' + data.code;
+      submitBtn.textContent = 'Save';
+      submitBtn.style.display = '';
+      // Name and descriptions are editable (white bg)
+      document.getElementById('rt-name').disabled = false;
+      document.getElementById('rt-desc-en').disabled = false;
+      document.getElementById('rt-desc-cn').disabled = false;
+    } else {
+      // Detail mode - everything read-only with distinct styling
+      title.textContent = 'Detail - ' + data.code;
+      submitBtn.style.display = 'none';
+      modalInner.classList.add('modal-detail');
+      fields.forEach(id => document.getElementById(id).disabled = true);
+    }
+  }
+
+  modal.classList.add('show');
+  updateRtCodePreview();
+}
+
+function updateRtCodePreview() {
+  const domain = document.getElementById('rt-domain').value;
+  const cat = document.getElementById('rt-category').value;
+  const num = document.getElementById('rt-number').value;
+  if (domain && cat && num) {
+    document.getElementById('rt-code-preview').value = domain + '_' + cat + num.padStart(3, '0');
+  } else {
+    document.getElementById('rt-code-preview').value = '';
+  }
+}
+
+// Live preview of code
+document.getElementById('rt-domain').addEventListener('change', updateRtCodePreview);
+document.getElementById('rt-category').addEventListener('change', updateRtCodePreview);
+document.getElementById('rt-number').addEventListener('input', updateRtCodePreview);
+
+// ==================== Feature Domain Tab ====================
+function switchFeatDomain(domain) {
+  document.querySelectorAll('#page-feature .domain-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('feat-tab-' + domain).classList.add('active');
+  document.getElementById('feat-panel-TS').style.display = domain === 'TS' ? '' : 'none';
+  document.getElementById('feat-panel-OTHER').style.display = domain === 'OTHER' ? '' : 'none';
+}
+
+// ==================== Feature CRUD ====================
+function openFeatureModal(mode, row) {
+  const modal = document.getElementById('modal-feature');
+  const modalInner = modal.querySelector('.modal');
+  const title = document.getElementById('feat-modal-title');
+  const submitBtn = document.getElementById('feat-submit-btn');
+  const logSection = document.getElementById('feat-log-section');
+  const logList = document.getElementById('feat-log-list');
+  const addParamBtn = document.getElementById('feat-add-param-btn');
+  const paramActionCol = document.getElementById('feat-param-action-col');
+
+  modalInner.classList.remove('modal-detail');
+
+  // Reset
+  document.getElementById('feat-code').value = '';
+  document.getElementById('feat-ruletype').value = 'TS_A001';
+  document.getElementById('feat-ruletype').disabled = false;
+  document.getElementById('feat-name').value = '';
+  document.getElementById('feat-name').disabled = false;
+  document.getElementById('feat-version-major').value = 6;
+  document.getElementById('feat-version-minor').value = '';
+  document.getElementById('feat-version-major').disabled = false;
+  document.getElementById('feat-status').value = '';
+  document.getElementById('feat-expression').value = '';
+  document.getElementById('feat-expression').disabled = false;
+  document.getElementById('feat-desc').value = '';
+  document.getElementById('feat-desc').disabled = false;
+  document.getElementById('feat-template').value = '';
+  document.getElementById('feat-template').disabled = false;
+  document.getElementById('feat-params-body').innerHTML = '';
+  addParamBtn.style.display = '';
+  paramActionCol.style.display = '';
+  logSection.style.display = 'none';
+
+  if (mode === 'create') {
+    title.textContent = 'Create Feature';
+    submitBtn.textContent = 'Create';
+    submitBtn.style.display = '';
+    document.getElementById('feat-status').value = 'Draft (default)';
+    // Version: show editable major, auto minor
+    document.getElementById('feat-version-group').style.display = '';
+    document.getElementById('feat-version-major').disabled = false;
+    // Set default major to the highest existing major for selected rule type
+    const ruleType = document.getElementById('feat-ruletype').value;
+    const history = featVersionHistory[ruleType] || {};
+    const defaultMajor = Math.max(...Object.keys(history).map(Number), 1);
+    document.getElementById('feat-version-major').value = defaultMajor;
+    document.getElementById('feat-version-hint').style.display = '';
+    document.getElementById('feat-version-info').style.display = '';
+    updateFeatVersionPreview();
+    addFeatureParam(); // add one empty row
+  } else {
+    const data = JSON.parse(row.getAttribute('data-feat'));
+    document.getElementById('feat-code').value = data.code;
+    document.getElementById('feat-ruletype').value = data.ruleType;
+    document.getElementById('feat-name').value = data.name;
+    document.getElementById('feat-status').value = data.status;
+    // Parse version
+    const vMatch = (data.version || '').match(/V(\d+)\.(\d+)/);
+    if (vMatch) {
+      document.getElementById('feat-version-major').value = vMatch[1];
+      document.getElementById('feat-version-minor').value = vMatch[2];
+    }
+    // In edit/detail, version is read-only
+    document.getElementById('feat-version-major').disabled = true;
+    document.getElementById('feat-version-minor').disabled = true;
+    document.getElementById('feat-version-hint').style.display = 'none';
+    document.getElementById('feat-version-info').style.display = 'none';
+    document.getElementById('feat-version-group').style.display = '';
+    document.getElementById('feat-expression').value = (data.expression || '').replace(/\\n/g, '\n');
+    document.getElementById('feat-desc').value = data.desc || '';
+    document.getElementById('feat-template').value = data.template || '';
+
+    // Fill params
+    (data.params || []).forEach(p => {
+      addFeatureParam(p.n, p.v, p.d);
+    });
+
+    // Logs
+    logSection.style.display = '';
+    logList.innerHTML = '<div style="font-size:12px; color:#86909c; margin-bottom:6px;">Latest changes:</div>' +
+      (data.logs || []).slice().reverse().map(l =>
+        '<div style="padding:5px 8px; margin-bottom:4px; background:#f7f8fa; border-radius:3px; font-size:12px;">' + l + '</div>'
+      ).join('');
+
+    if (mode === 'edit') {
+      // Only Draft/Testing status can be edited
+      if (data.status === 'In Use' || data.status === '使用中' || data.status === 'Offline' || data.status === '已下线') {
+        alert('This feature is currently "' + data.status + '" and cannot be edited. Please create a new version if changes are needed.');
+        return;
+      }
+      title.textContent = 'Edit Feature - ' + data.code;
+      submitBtn.textContent = 'Save';
+      submitBtn.style.display = '';
+      // Code, Rule Type, Version, Status always not editable
+      document.getElementById('feat-ruletype').disabled = true;
+
+      if (data.status === 'Draft' || data.status === '草稿') {
+        // Draft: everything editable except Code/RuleType/Version/Status
+        document.getElementById('feat-expression').disabled = false;
+        addParamBtn.style.display = '';
+        paramActionCol.style.display = '';
+      } else {
+        // Testing: Logic(SQL) locked, Parameter Key locked, but descriptions editable
+        document.getElementById('feat-expression').disabled = true;
+        addParamBtn.style.display = 'none';
+        paramActionCol.style.display = 'none';
+        // Lock parameter key inputs, keep description inputs editable
+        document.querySelectorAll('#feat-params-body tr').forEach(tr => {
+          const inputs = tr.querySelectorAll('input');
+          if (inputs[0]) inputs[0].disabled = true;  // Parameter Key - locked
+          if (inputs[1]) inputs[1].disabled = false; // Description - editable
+        });
+      }
+    } else {
+      // Detail mode - everything read-only
+      title.textContent = 'Detail - ' + data.code;
+      submitBtn.style.display = 'none';
+      modalInner.classList.add('modal-detail');
+      document.getElementById('feat-ruletype').disabled = true;
+      document.getElementById('feat-name').disabled = true;
+      document.getElementById('feat-expression').disabled = true;
+      document.getElementById('feat-desc').disabled = true;
+      document.getElementById('feat-template').disabled = true;
+      addParamBtn.style.display = 'none';
+      paramActionCol.style.display = 'none';
+      // Disable all param inputs
+      document.querySelectorAll('#feat-params-body input').forEach(i => i.disabled = true);
+    }
+  }
+
+  modal.classList.add('show');
+}
+
+// Feature version preview logic
+// Simulated existing versions per major for current Rule Type
+const featVersionHistory = {
+  'TS_A001': { 6: 5, 5: 3 },       // V6最高到6.5, V5最高到5.3
+  'TS_A006': { 6: 1 },              // V6最高到6.1
+  'TS_B001': { 6: 3 },              // V6最高到6.3
+  'TS_B002': { 6: 3 },
+  'TS_C001': { 5: 9, 4: 2 },       // V5最高到5.9, V4最高到4.2
+};
+
+function getNextMinor(ruleType, major) {
+  const history = featVersionHistory[ruleType] || {};
+  const currentMax = history[major] || 0;
+  return currentMax + 1;
+}
+
+function updateFeatVersionPreview() {
+  const major = parseInt(document.getElementById('feat-version-major').value) || 1;
+  const ruleType = document.getElementById('feat-ruletype').value;
+  const minor = getNextMinor(ruleType, major);
+  document.getElementById('feat-version-minor').value = minor;
+
+  const preview = document.getElementById('feat-version-preview');
+  const codeField = document.getElementById('feat-code');
+  if (preview) preview.textContent = 'V' + major + '.' + minor;
+  if (codeField && ruleType) codeField.value = ruleType + '_V' + major + '.' + minor;
+
+  // Determine current default major for this rule type
+  const history = featVersionHistory[ruleType] || {};
+  const defaultMajor = Math.max(...Object.keys(history).map(Number), 1);
+
+  const info = document.getElementById('feat-version-info');
+  if (info) {
+    if (major > defaultMajor) {
+      info.innerHTML = '⬆️ 大版本升级：当前最高V' + defaultMajor + '.x → 本次创建 <strong style="color:var(--text);">V' + major + '.' + minor + '</strong> <span style="color:#ff7d00;">(新大版本，小版本从.1开始)</span>';
+    } else if (major < defaultMajor) {
+      const existingMinor = history[major] || 0;
+      info.innerHTML = '⬇️ 回退到V' + major + '版本线：已有V' + major + '.' + existingMinor + ' → 本次创建 <strong style="color:var(--text);">V' + major + '.' + minor + '</strong> <span style="color:#f54a45;">(在旧版本线继续迭代)</span>';
+    } else {
+      const existingMinor = history[major] || 0;
+      info.innerHTML = '当前该Rule Type下V' + major + '最新版本：V' + major + '.' + existingMinor + ' → 本次将创建 <strong style="color:var(--text);">V' + major + '.' + minor + '</strong>';
+    }
+  }
+}
+
+document.getElementById('feat-version-major').addEventListener('input', updateFeatVersionPreview);
+document.getElementById('feat-ruletype').addEventListener('change', updateFeatVersionPreview);
+
+function addFeatureParam(name, value, desc) {
+  const tbody = document.getElementById('feat-params-body');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" style="width:100%" value="${name || ''}" placeholder="e.g. intervalMinute"></td>
+    <td><input type="text" style="width:100%" value="${desc || value || ''}" placeholder="Explain what this parameter controls, its unit and expected format"></td>
+    <td><button class="remove-btn" onclick="this.closest('tr').remove()">&times;</button></td>`;
+  tbody.appendChild(tr);
+}
+
+// Feature publish (草稿 → 测试中)
+function publishFeature(row) {
+  if (!confirm('Confirm publish? This feature will be synced to Rule Testing module and status will change to "Testing".')) return;
+  const data = JSON.parse(row.getAttribute('data-feat'));
+  data.status = 'Testing';
+  const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
+  data.logs.push(now + ' zhouyan Published to testing');
+  row.setAttribute('data-feat', JSON.stringify(data));
+  // Update status tag
+  const statusTd = row.querySelector('.status-tag');
+  statusTd.className = 'status-tag status-testing';
+  statusTd.textContent = 'Testing';
+  // Remove publish button, keep Detail and Edit
+  const actionTd = row.querySelector('td:last-child');
+  actionTd.innerHTML = `
+    <button class="btn-link" onclick="openFeatureModal('detail', this.closest('tr'))">Detail</button>
+    <button class="btn-link" onclick="openFeatureModal('edit', this.closest('tr'))">Edit</button>`;
+}
+
+// Feature list filter
+function filterFeatures() {
+  const query = (document.getElementById('feat-search-input').value || '').toLowerCase().trim();
+  const ruleTypeFilter = document.getElementById('feat-filter-ruletype').value;
+  const rows = document.querySelectorAll('#page-feature table.data-table tbody tr[data-feat]');
+  rows.forEach(row => {
+    const data = JSON.parse(row.getAttribute('data-feat'));
+    const matchText = !query ||
+      data.code.toLowerCase().includes(query) ||
+      data.name.toLowerCase().includes(query);
+    const matchRuleType = !ruleTypeFilter || data.ruleType === ruleTypeFilter;
+    row.style.display = (matchText && matchRuleType) ? '' : 'none';
+  });
+}
+
+document.getElementById('feat-filter-ruletype').addEventListener('change', filterFeatures);
+
+function submitRuleType() {
+  const domain = document.getElementById('rt-domain').value;
+  const cat = document.getElementById('rt-category').value;
+  const num = document.getElementById('rt-number').value;
+  const name = document.getElementById('rt-name').value;
+  const descEn = document.getElementById('rt-desc-en').value;
+  const descCn = document.getElementById('rt-desc-cn').value;
+
+  if (!num || !name || !descEn || !descCn) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  const code = domain + '_' + cat + num.padStart(3, '0');
+  const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+  if (rtMode === 'create') {
+    // Build new row
+    const newData = { code, domain, cat, num: num.padStart(3,'0'), name, descEn, descCn, active: 'Y', logs: [now + ' zhouyan Created'] };
+    const tbody = document.getElementById('rt-group-' + cat);
+    if (!tbody) {
+      alert('Category group not found in page. Please add group ' + cat + ' first.');
+      hideModal('modal-ruletype');
+      return;
+    }
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-rt', JSON.stringify(newData));
+    tr.innerHTML = `
+      <td>${code}</td>
+      <td>${name}</td>
+      <td>${descEn}</td>
+      <td>${descCn}</td>
+      <td>0</td>
+      <td>0</td>
+      <td>
+        <button class="btn-link" onclick="openRuleTypeModal('edit', this.closest('tr'))">Edit</button>
+        <button class="btn-link" onclick="openRuleTypeModal('detail', this.closest('tr'))">Detail</button>
+      </td>`;
+    tbody.appendChild(tr);
+    // Update badge count
+    const badge = document.getElementById('badge-' + cat);
+    if (badge) badge.textContent = parseInt(badge.textContent) + 1;
+
+  } else if (rtMode === 'edit') {
+    // Update existing row
+    const oldData = JSON.parse(rtEditingRow.getAttribute('data-rt'));
+    oldData.name = name;
+    oldData.descEn = descEn;
+    oldData.descCn = descCn;
+    oldData.logs.push(now + ' zhouyan Updated');
+    rtEditingRow.setAttribute('data-rt', JSON.stringify(oldData));
+    // Update visible cells
+    const tds = rtEditingRow.querySelectorAll('td');
+    tds[1].textContent = name;
+    tds[2].textContent = descEn;
+    tds[3].textContent = descCn;
+  }
+
+  hideModal('modal-ruletype');
+}
+</script>
+</body>
+</html>
