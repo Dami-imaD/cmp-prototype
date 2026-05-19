@@ -3,15 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>
-(function(){
-  var pwd = prompt('Please enter password to access:');
-  if(pwd !== 'tiger2026') {
-    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#86909c;">Access Denied</div>';
-    throw new Error('Access Denied');
-  }
-})();
-</script>
 <title>HK BOS - Compliance Monitoring Platform</title>
 <style>
 :root {
@@ -2255,10 +2246,22 @@ function toggleGroup(header) {
 }
 
 // Sidebar selection - updates right content
+let defaultContentSaved = null; // saves the initial HTML content
+
 function selectSidebarItem(el, id) {
   document.querySelectorAll('.sidebar-tree-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
-  updateTestingContent(id);
+  const container = document.querySelector('.rule-testing-content');
+  // Save default HTML on first navigation away
+  if (!defaultContentSaved) {
+    defaultContentSaved = container.innerHTML;
+  }
+  if (id === 'ts_a001_v65') {
+    // Restore the original HTML content
+    container.innerHTML = defaultContentSaved;
+  } else {
+    updateTestingContent(id);
+  }
 }
 
 // Test content data for different sidebar items
