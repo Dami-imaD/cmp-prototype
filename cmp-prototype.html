@@ -1787,13 +1787,13 @@ input[type="text"] {
       </colgroup>
       <thead>
         <tr>
-          <th>Running Rule Code</th>
+          <th>ID</th>
           <th>Running Rule Name</th>
           <th>Rule Type</th>
           <th>Feature</th>
           <th>Param IDs</th>
           <th>Status</th>
-          <th>Scheduled</th>
+          <th>Queued</th>
           <th>Create Time</th>
           <th>Update Time</th>
           <th>Operator</th>
@@ -1802,25 +1802,25 @@ input[type="text"] {
       </thead>
       <tbody>
         <tr>
-          <td>R_TS_A006_R1</td>
+          <td>1011</td>
           <td>Pre-arranged Trading - Profit</td>
           <td>TS_A006</td>
           <td>TS_A006_V6.1</td>
           <td>P1, P2</td>
           <td><span class="status-tag status-enabled">Enabled</span></td>
-          <td><span style="color:#ff7d00; font-size:11px; cursor:pointer;" title="Scheduled change: Feature→V6.2, Params→P3,P4. Effective: 2026-06-01" onclick="openRRDetail(this.closest('tr'))">⏱ 2026-06-01</span></td>
+          <td><span style="color:#ff7d00; font-size:12px;">Yes</span></td>
           <td>2025-12-20</td>
           <td>2026-01-14</td>
           <td>admin</td>
           <td>
             <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
             <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
-            <button class="btn-link" onclick="showRRLog(this.closest('tr').children[1].textContent)">Log</button>
+            <button class="btn-link" onclick="showRRLog(this.closest('tr').children[0].textContent)">Log</button>
             <button class="btn-link" style="color:#f53f3f;" onclick="toggleRRStatus(this.closest('tr'))">Disable</button>
           </td>
         </tr>
         <tr>
-          <td>R_TS_A006_R2</td>
+          <td>1012</td>
           <td>Pre-arranged Trading - Loss</td>
           <td>TS_A006</td>
           <td>TS_A006_V6.1</td>
@@ -1833,11 +1833,11 @@ input[type="text"] {
           <td>
             <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
             <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
-            <button class="btn-link" onclick="showRRLog('R_TS_A006_R2')">Log</button>
+            <button class="btn-link" onclick="showRRLog('1012')">Log</button>
           </td>
         </tr>
         <tr>
-          <td>R_TS_A001_R1</td>
+          <td>1013</td>
           <td>Possible Wash Trade (A to B)</td>
           <td>TS_A001</td>
           <td>TS_A001_V6.5</td>
@@ -1850,17 +1850,17 @@ input[type="text"] {
           <td>
             <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
             <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
-            <button class="btn-link" onclick="showRRLog('R_TS_A001_R1')">Log</button>
+            <button class="btn-link" onclick="showRRLog('1013')">Log</button>
           </td>
         </tr>
         <tr>
-          <td>R_TS_C001_R1</td>
+          <td>1014</td>
           <td>Market Dominance - Open STK</td>
           <td>TS_C001</td>
           <td>TS_C001_V5.9</td>
           <td>P1</td>
           <td><span class="status-tag" style="background:#fff3e5; color:#ff7d00;">Pending</span></td>
-          <td><span style="color:#ff7d00; font-size:11px;">⏱ 2026-06-15</span></td>
+          <td style="color:#86909c; font-size:11px;">--</td>
           <td>2026-05-10</td>
           <td>2026-05-10</td>
           <td>shuhan</td>
@@ -1872,7 +1872,7 @@ input[type="text"] {
           </td>
         </tr>
         <tr>
-          <td>R_TS_B001_R1</td>
+          <td>1015</td>
           <td>Pump and Dump - HKEX</td>
           <td>TS_B001</td>
           <td>TS_B001_V6.3</td>
@@ -1885,7 +1885,7 @@ input[type="text"] {
           <td>
             <button class="btn-link" onclick="openRRDetail(this.closest('tr'))">Detail</button>
             <button class="btn-link" onclick="openRREdit(this.closest('tr'))">Edit</button>
-            <button class="btn-link" onclick="showRRLog(this.closest('tr').children[1].textContent)">Log</button>
+            <button class="btn-link" onclick="showRRLog(this.closest('tr').children[0].textContent)">Log</button>
             <button class="btn-link" style="color:#00b42a;" onclick="toggleRRStatus(this.closest('tr'))">Enable</button>
           </td>
         </tr>
@@ -2132,10 +2132,6 @@ input[type="text"] {
       <div style="border-top:1px solid var(--border); margin:16px 0; padding-top:16px;"></div>
 
       <!-- Running Rule specific fields -->
-      <div class="form-group">
-        <label>Running Rule Code</label>
-        <input type="text" id="rr-code" value="" placeholder="Auto-generated based on Rule Type, editable">
-      </div>
 
       <div class="form-group">
         <label>Running Rule Name <span style="color:red">*</span> <span title="The prefix is auto-generated from Rule Type Name and cannot be modified. The suffix after '-' is customizable by compliance, and will be displayed in Alert." style="cursor:help; color:#86909c;">&#9432;</span></label>
@@ -2197,7 +2193,7 @@ input[type="text"] {
     <div class="modal-footer">
       <button class="btn" onclick="hideModal('modal-running-rule')">Cancel</button>
       <button class="btn" onclick="hideModal('modal-running-rule')">Reset</button>
-      <button class="btn btn-primary" onclick="hideModal('modal-running-rule')">Confirm</button>
+      <button class="btn btn-primary" onclick="confirmCreateRunningRule()">Confirm</button>
     </div>
   </div>
 </div>
@@ -2532,10 +2528,10 @@ function updateRRFeatureOptions() {
       featSelect.innerHTML += '<option value="' + f.value + '">' + f.label + '</option>';
     });
     namePrefix.textContent = rrTypeNames[ruleType] || '—';
-    document.getElementById('rr-code').value = ruleType + '_R' + (Math.floor(Math.random()*5)+1);
+    // Code auto-generated by system
   } else {
     namePrefix.textContent = '—';
-    document.getElementById('rr-code').value = '(Auto: based on Rule Type + sequence)';
+    // Code auto-generated by system
   }
 }
 
@@ -2557,21 +2553,22 @@ let currentConditionTarget = null;
 
 // ==================== Running Rule Detail/Edit ====================
 const rrData = {
-  'R_TS_A006_R1': { code:'R_TS_A006_R1', name:'Pre-arranged Trading - Profit', ruleType:'TS_A006', feature:'TS_A006_V6.1', params:[
+  '1011': { code:'1011', name:'Pre-arranged Trading - Profit', ruleType:'TS_A006', feature:'TS_A006_V6.1', params:[
     {id:'P1', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:5, isProfit:true, orderTimes:5', condition:'Security Type in (STK)'},
     {id:'P2', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:1, isProfit:true, orderTimes:3', condition:'Security Type in (BOND,OPT,WAR,FUT)'}
-  ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'', labels:'cross-trading', effectiveTime:''},
-  'R_TS_A006_R2': { code:'R_TS_A006_R2', name:'Pre-arranged Trading - Loss', ruleType:'TS_A006', feature:'TS_A006_V6.1', params:[
+  ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'', labels:'cross-trading', effectiveTime:'',
+  upcoming: { feature:'TS_A006_V6.2', params:[{id:'P3', params:'priceDiffRatio:0.08, orderTradeIntervalMinute:3, isProfit:true, orderTimes:3', condition:'Security Type in (STK)'},{id:'P4', params:'priceDiffRatio:0.08, orderTradeIntervalMinute:1, isProfit:true, orderTimes:2', condition:'Security Type in (BOND,OPT,WAR,FUT)'}], effectiveDate:'2026-06-01', submittedBy:'admin', submittedAt:'2026-05-19 15:30'}},
+  '1012': { code:'1012', name:'Pre-arranged Trading - Loss', ruleType:'TS_A006', feature:'TS_A006_V6.1', params:[
     {id:'P1', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:5, isProfit:false, orderTimes:5', condition:'Security Type in (STK)'},
     {id:'P2', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:1, isProfit:false, orderTimes:3', condition:'Security Type in (BOND,OPT,WAR,FUT)'}
   ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'', labels:'cross-trading', effectiveTime:''},
-  'R_TS_A001_R1': { code:'R_TS_A001_R1', name:'Possible Wash Trade (A to B)', ruleType:'TS_A001', feature:'TS_A001_V6.5', params:[
+  '1013': { code:'1013', name:'Possible Wash Trade (A to B)', ruleType:'TS_A001', feature:'TS_A001_V6.5', params:[
     {id:'P1', params:'intervalMinute:5, crossTimesThreshold:3', condition:'Security Type in (STK) | HKEX, SGX'}
   ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'interval > 0', labels:'wash-trade', effectiveTime:''},
-  'R_TS_C001_R1': { code:'R_TS_C001_R1', name:'Market Dominance - Open STK', ruleType:'TS_C001', feature:'TS_C001_V5.9', params:[
+  '1014': { code:'1014', name:'Market Dominance - Open STK', ruleType:'TS_C001', feature:'TS_C001_V5.9', params:[
     {id:'P1', params:'dominanceRatio:0.25, minVolume:50000', condition:'Market in (HKEX, SGX)'}
   ], weight:'0', score:'--', frequency:'Daily', category:'Stable', trigger:'', labels:'market-dominance', effectiveTime:'2026-06-01 00:00'},
-  'R_TS_B001_R1': { code:'R_TS_B001_R1', name:'Pump and Dump - HKEX', ruleType:'TS_B001', feature:'TS_B001_V6.3', params:[
+  '1015': { code:'1015', name:'Pump and Dump - HKEX', ruleType:'TS_B001', feature:'TS_B001_V6.3', params:[
     {id:'P1', params:'spikeThreshold:0.1, volumeRatio:3', condition:'Market in (HKEX)'}
   ], weight:'0', score:'--', frequency:'Daily', category:'Dynamic', trigger:'', labels:'price-manipulation', effectiveTime:''}
 };
@@ -2587,33 +2584,87 @@ function openRRDetail(row) {
       <div style="font-size:11px; color:#4e5969; margin-top:4px;">Condition: ${p.condition}</div>
     </div>`).join('');
 
+  // Determine current config label based on status
+  const rowStatus = row.querySelector('.status-tag') ? row.querySelector('.status-tag').textContent.trim() : '';
+  let currentLabel = '● Current (Live)';
+  let currentLabelColor = 'var(--success)';
+  if (rowStatus === 'Pending') {
+    currentLabel = '⏱ Pending (Effective: ' + (data.effectiveTime || 'TBD') + ')';
+    currentLabelColor = '#ff7d00';
+  } else if (rowStatus === 'Disabled') {
+    currentLabel = '● Last Config (Disabled)';
+    currentLabelColor = '#86909c';
+  }
+
+  // Upcoming section
+  let upcomingHtml = '';
+  if (data.upcoming) {
+    const u = data.upcoming;
+    let upParamHtml = u.params.map(p => `
+      <div style="padding:6px 10px; background:#fff; border:1px solid #ffcf70; border-radius:4px; margin-bottom:6px;">
+        <div style="font-size:12px;"><strong>${p.id}</strong> — ${p.params}</div>
+        <div style="font-size:11px; color:#4e5969; margin-top:3px;">Condition: ${p.condition}</div>
+      </div>`).join('');
+    upcomingHtml = `
+    <div style="margin-top:20px; border:2px solid #ffcf70; border-radius:8px; padding:16px; background:#fffdf5;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span style="font-size:13px; font-weight:600; color:#ff7d00;">⏱ Upcoming (Effective: ${u.effectiveDate})</span>
+        <button class="btn" style="font-size:11px; padding:3px 10px; color:#f53f3f; border-color:#f53f3f;" onclick="event.stopPropagation();if(confirm('Confirm cancel upcoming change? The current config will continue to run.')){this.closest('[style*=fffdf5]').remove();}">Cancel Upcoming</button>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+        <div><span style="font-size:11px; color:#86909c;">Feature</span><div style="font-size:13px; margin-top:2px;">${u.feature}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Effective Date</span><div style="font-size:13px; margin-top:2px;">${u.effectiveDate}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Weight</span><div style="font-size:13px; margin-top:2px;">${data.weight}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Score</span><div style="font-size:13px; margin-top:2px;">${data.score}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Alert Frequency</span><div style="font-size:13px; margin-top:2px;">${data.frequency}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Alert Category</span><div style="font-size:13px; margin-top:2px;">${data.category}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Trigger</span><div style="font-size:13px; margin-top:2px;">${data.trigger || '--'}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Labels</span><div style="font-size:13px; margin-top:2px;">${data.labels || '--'}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Submitted by</span><div style="font-size:13px; margin-top:2px;">${u.submittedBy} at ${u.submittedAt}</div></div>
+      </div>
+      <div>
+        <span style="font-size:12px; font-weight:500;">Param Group (New)</span>
+        <div style="margin-top:6px;">${upParamHtml}</div>
+      </div>
+    </div>`;
+  }
+
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:200;display:flex;align-items:center;justify-content:center;';
   overlay.onclick = function(e) { if (e.target === this) this.remove(); };
-  overlay.innerHTML = `<div style="background:#fff; border-radius:8px; width:700px; max-height:80vh; overflow-y:auto; padding:24px;">
+  const detailModal = document.createElement('div');
+  detailModal.style.cssText = 'background:#fff; border-radius:8px; width:700px; max-height:80vh; overflow-y:auto; padding:24px;';
+  detailModal.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <strong style="font-size:15px;">Detail - ${data.code}</strong>
-      <span style="cursor:pointer; font-size:20px;" onclick="this.closest('[style]').parentElement.remove()">&times;</span>
+      <strong style="font-size:15px;">Detail - ${data.name}</strong>
+      <span style="cursor:pointer; font-size:20px; line-height:1;" id="rr-detail-close">&times;</span>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-      <div><span style="font-size:12px; color:#86909c;">Running Rule Code</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.code}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Running Rule Name</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.name}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Rule Type</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.ruleType}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Feature</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.feature}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Weight</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.weight}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Score</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.score}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Alert Frequency</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.frequency}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Alert Category</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.category}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Trigger</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.trigger || '--'}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Labels</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.labels || '--'}</div></div>
-      <div><span style="font-size:12px; color:#86909c;">Effective Time</span><div style="font-size:13px; padding:8px 12px; background:#fafafa; border:1px solid #ebebeb; border-radius:4px; margin-top:4px;">${data.effectiveTime || 'Immediate'}</div></div>
+
+    <!-- Current Config -->
+    <div style="border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:4px;">
+      <div style="font-size:13px; font-weight:600; margin-bottom:12px; color:${currentLabelColor};">${currentLabel}</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+        <div><span style="font-size:11px; color:#86909c;">Running Rule Name</span><div style="font-size:13px; margin-top:2px;">${data.name}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Rule Type</span><div style="font-size:13px; margin-top:2px;">${data.ruleType}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Feature</span><div style="font-size:13px; margin-top:2px;">${data.feature}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Weight</span><div style="font-size:13px; margin-top:2px;">${data.weight}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Score</span><div style="font-size:13px; margin-top:2px;">${data.score}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Alert Frequency</span><div style="font-size:13px; margin-top:2px;">${data.frequency}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Alert Category</span><div style="font-size:13px; margin-top:2px;">${data.category}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Trigger</span><div style="font-size:13px; margin-top:2px;">${data.trigger || '--'}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Labels</span><div style="font-size:13px; margin-top:2px;">${data.labels || '--'}</div></div>
+      </div>
+      <div>
+        <span style="font-size:12px; font-weight:500;">Param Group</span>
+        <div style="margin-top:6px;">${paramHtml}</div>
+      </div>
     </div>
-    <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
-      <span style="font-size:13px; font-weight:600;">Param Group</span>
-      <div style="margin-top:8px;">${paramHtml}</div>
-    </div>
-  </div>`;
+
+    <!-- Upcoming (if exists) -->
+    ${upcomingHtml}`;
+  overlay.appendChild(detailModal);
   document.body.appendChild(overlay);
+  document.getElementById('rr-detail-close').onclick = function() { overlay.remove(); };
 }
 
 function openRREdit(row) {
@@ -2644,7 +2695,6 @@ function openRREdit(row) {
     </div>
     <div class="form-group"><label>Rule Type</label><input type="text" value="${data.ruleType}" disabled style="background:#f5f5f5; color:#86909c;"></div>
     <div class="form-group"><label>Feature Version</label><select style="width:100%; font-size:13px;"><option selected>${data.feature}</option><option>${data.ruleType}_V6.2</option><option>${data.ruleType}_V5.9</option></select></div>
-    <div class="form-group"><label>Running Rule Code</label><input type="text" value="${data.code}"></div>
     <div class="form-group"><label>Running Rule Name</label><input type="text" value="${data.name}"></div>
     <div style="border-top:1px solid var(--border); margin:16px 0; padding-top:12px;">
       <div class="form-group">
@@ -2676,44 +2726,102 @@ function toggleRRStatus(row) {
   const ruleCode = row.children[0].textContent;
 
   if (isEnabled) {
-    if (!confirm('Confirm disable "' + ruleCode + '"?\n\nThis will:\n- Set this Running Rule to Disabled\n- Update associated Parameter Set status to Offline\n- Update Feature status if no other Running Rule references it\n- Update Rule Type running rules count')) return;
-    statusTd.textContent = 'Disabled';
-    statusTd.className = 'status-tag';
-    statusTd.style.cssText = 'background:#f0f0f0; color:#86909c;';
-    // Update button: replace Disable with Enable
-    const disableBtn = actionTd.querySelector('button:last-child');
-    disableBtn.textContent = 'Enable';
-    disableBtn.style.color = '#00b42a';
+    const hasUpcoming = rrData[ruleCode] && rrData[ruleCode].upcoming;
+    let items = '<li>Stop the current running rule</li><li>Update associated Parameter Set status to Offline</li><li>Update Feature status if no other Running Rule references it</li><li>Update Rule Type running rules count</li>';
+    if (hasUpcoming) {
+      items += '<li style="color:#f53f3f;">Cancel the upcoming change (effective ' + rrData[ruleCode].upcoming.effectiveDate + ')</li>';
+    }
+    showConfirmModal('Disable "' + ruleCode + '"', 'This will:', items, function() {
+      statusTd.textContent = 'Disabled';
+      statusTd.className = 'status-tag';
+      statusTd.style.cssText = 'background:#f0f0f0; color:#86909c;';
+      const disableBtn = actionTd.querySelector('button:last-child');
+      disableBtn.textContent = 'Enable';
+      disableBtn.style.color = '#00b42a';
+    });
   } else {
-    if (!confirm('Confirm enable "' + ruleCode + '"?\n\nThis will:\n- Set this Running Rule to Enabled\n- Update associated Parameter Set status to In Use\n- Update Feature status to In Use\n- Update Rule Type running rules count')) return;
-    statusTd.textContent = 'Enabled';
-    statusTd.className = 'status-tag status-enabled';
-    statusTd.style.cssText = '';
-    // Update button: replace Enable with Disable
-    const enableBtn = actionTd.querySelector('button:last-child');
-    enableBtn.textContent = 'Disable';
-    enableBtn.style.color = '#f53f3f';
+    let items = '<li>Set this Running Rule to Enabled</li><li>Update associated Parameter Set status to In Use</li><li>Update Feature status to In Use</li><li>Update Rule Type running rules count</li>';
+    showConfirmModal('Enable "' + ruleCode + '"', 'This will:', items, function() {
+      statusTd.textContent = 'Enabled';
+      statusTd.className = 'status-tag status-enabled';
+      statusTd.style.cssText = '';
+      const enableBtn = actionTd.querySelector('button:last-child');
+      enableBtn.textContent = 'Disable';
+      enableBtn.style.color = '#f53f3f';
+    });
   }
+}
+
+// Running Rule create confirm with conflict check
+function confirmCreateRunningRule() {
+  const ruleType = document.getElementById('rr-ruletype').value;
+  if (!ruleType) {
+    alert('Please select a Rule Type.');
+    return;
+  }
+
+  // Check if there are existing enabled running rules with the same rule type
+  const existingRules = Object.values(rrData).filter(r => r.ruleType === ruleType);
+  const enabledRules = existingRules.filter(r => !r.effectiveTime); // not pending = likely enabled
+
+  if (enabledRules.length > 0) {
+    const ruleNames = enabledRules.map(r => '• ID: ' + r.code + ' | ' + r.name).join('<br>');
+    showConfirmModal(
+      'Existing rules detected for ' + ruleType,
+      'The following running rules with the same Rule Type are currently active:',
+      '<div style="background:#f7f8fa; border:1px solid var(--border); border-radius:4px; padding:10px 12px; margin:8px 0; font-size:12px;">' + ruleNames + '</div><li>Please confirm the new rule does not conflict with existing ones</li><li>If conflict exists, consider disabling the existing rule first</li>',
+      function() {
+        hideModal('modal-running-rule');
+      }
+    );
+  } else {
+    hideModal('modal-running-rule');
+  }
+}
+
+// Custom confirm modal
+function showConfirmModal(title, subtitle, itemsHtml, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:300;display:flex;align-items:center;justify-content:center;';
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff; border-radius:8px; width:460px; padding:24px;';
+  modal.innerHTML = `
+    <div style="font-size:15px; font-weight:600; margin-bottom:12px;">${title}</div>
+    <div style="font-size:13px; color:#4e5969; margin-bottom:8px;">${subtitle}</div>
+    <ul style="font-size:12px; color:#4e5969; padding-left:20px; margin-bottom:20px; line-height:2;">${itemsHtml}</ul>
+    <div style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn" id="confirm-modal-cancel">Cancel</button>
+      <button class="btn btn-primary" id="confirm-modal-ok">Confirm</button>
+    </div>`;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  document.getElementById('confirm-modal-cancel').onclick = function() { overlay.remove(); };
+  document.getElementById('confirm-modal-ok').onclick = function() { overlay.remove(); onConfirm(); };
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 }
 
 // ==================== Running Rule Log ====================
 function showRRLog(ruleCode) {
   const logs = {
-    'R_TS_A006_R1': [
+    '1011': [
+      { time: '2026-05-19 15:30', user: 'admin', action: '⏱ Upcoming submitted', detail: 'Scheduled change: Feature V6.1→V6.2, Params P1,P2→P3,P4. Effective: 2026-06-01' },
       { time: '2026-01-14 15:30', user: 'admin', action: 'Parameter updated', detail: 'Param Set changed: P1 → P1, P2 (added Derivative group with condition Security Type in (BOND,OPT,WAR,FUT))' },
       { time: '2025-12-28 10:00', user: 'admin', action: 'Feature updated', detail: 'Feature changed: TS_A006_V5.9 → TS_A006_V6.1' },
       { time: '2025-12-20 09:00', user: 'admin', action: 'Created', detail: 'Initial creation. Rule Type: TS_A006, Feature: TS_A006_V5.9, Param: P1, Status: Enabled' }
     ],
-    'R_TS_A006_R2': [
+    '1012': [
       { time: '2026-01-14 15:35', user: 'admin', action: 'Parameter updated', detail: 'Param Set changed: P1 → P1, P2 (added Derivative group)' },
       { time: '2025-12-20 09:05', user: 'admin', action: 'Created', detail: 'Initial creation. Rule Type: TS_A006, Feature: TS_A006_V6.1, Param: P1, Status: Enabled' }
     ],
-    'R_TS_A001_R1': [
+    '1013': [
       { time: '2026-05-13 11:00', user: 'shuhan', action: 'Parameter updated', detail: 'Param Set changed: P3 (crossTimesThreshold:2) → P1 (crossTimesThreshold:3)' },
       { time: '2026-04-20 14:00', user: 'shuhan', action: 'Feature updated', detail: 'Feature changed: TS_A001_V6.4 → TS_A001_V6.5' },
       { time: '2026-03-10 10:00', user: 'admin', action: 'Created', detail: 'Initial creation. Rule Type: TS_A001, Feature: TS_A001_V6.4, Param: P3, Status: Enabled' }
     ],
-    'R_TS_B001_R1': [
+    '1014': [
+      { time: '2026-05-10 10:00', user: 'shuhan', action: 'Created', detail: 'Initial creation. Rule Type: TS_C001, Feature: TS_C001_V5.9, Param: P1, Status: Pending (effective 2026-06-15)' }
+    ],
+    '1015': [
       { time: '2026-04-01 09:00', user: 'admin', action: 'Status changed', detail: 'Status changed: Enabled → Disabled' },
       { time: '2025-05-15 16:00', user: 'admin', action: 'Created', detail: 'Initial creation. Rule Type: TS_B001, Feature: TS_B001_V6.3, Param: P1, Status: Enabled' }
     ]
@@ -2732,18 +2840,26 @@ function showRRLog(ruleCode) {
   });
   html += '</div>';
 
+  if (entries.length === 0) {
+    html = '<div style="padding:20px; text-align:center; color:#86909c;">No log records</div>';
+  }
+
   // Show in a simple modal
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:200;display:flex;align-items:center;justify-content:center;';
+  overlay.className = 'rr-log-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:300;display:flex;align-items:center;justify-content:center;';
   overlay.onclick = function(e) { if (e.target === this) this.remove(); };
-  overlay.innerHTML = `<div style="background:#fff; border-radius:8px; width:600px; padding:24px;">
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff; border-radius:8px; width:600px; padding:24px; max-height:80vh; overflow-y:auto;';
+  modal.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <strong style="font-size:15px;">Change Log - ${ruleCode}</strong>
-      <span style="cursor:pointer; font-size:20px;" onclick="this.closest('[style]').parentElement.remove()">&times;</span>
+      <strong style="font-size:15px;">Change Log - ID: ${ruleCode}</strong>
+      <span style="cursor:pointer; font-size:20px; line-height:1;" id="rr-log-close">&times;</span>
     </div>
-    ${html}
-  </div>`;
+    ${html}`;
+  overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  document.getElementById('rr-log-close').onclick = function() { overlay.remove(); };
 }
 
 function addRRParamEntry() {
