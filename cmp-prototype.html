@@ -2675,6 +2675,17 @@ function openRREdit(row) {
   const data = rrData[code];
   if (!data) { alert('Edit: ' + code); return; }
 
+  // Block edit if there's an upcoming queued change
+  if (data.upcoming) {
+    showConfirmModal(
+      'Cannot edit - Queued change exists',
+      'This rule has a pending upcoming change (effective ' + data.upcoming.effectiveDate + '). Please cancel the upcoming change first before editing.',
+      '<li>Go to Detail to cancel the upcoming change</li><li>Then return to edit the current config</li>',
+      function() { /* just close */ }
+    );
+    return;
+  }
+
   let paramHtml = data.params.map(p => `
     <div style="border:1px solid var(--border); border-radius:6px; margin-bottom:10px; overflow:hidden;">
       <div style="background:#f7f8fa; padding:8px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border);">
