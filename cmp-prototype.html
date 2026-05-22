@@ -733,16 +733,23 @@ input[type="text"] {
     <div class="nav-item" id="nav-policy" onclick="toggleDropdown('policy-dropdown')">
       Policy &#9660;
       <div class="dropdown-menu" id="policy-dropdown">
-        <div class="dropdown-item new-badge" onclick="showPage('ruletype')">Rule Type <span style="font-size:10px;background:#FFC107;color:#000;padding:1px 4px;border-radius:2px;margin-left:4px;">NEW</span></div>
-        <div class="dropdown-item" onclick="showPage('feature')">Feature</div>
-        <div class="dropdown-item" onclick="showPage('rule')">Running Rule</div>
+        <div class="dropdown-item new-badge" onclick="showPage('ruletype')">Rule Type</div>
+        <div class="dropdown-item" onclick="showPage('feature')">Rule Logic (Feature)</div>
+      </div>
+    </div>
+    <div class="nav-item" id="nav-tsrule" onclick="toggleDropdown('tsrule-dropdown')">
+      TS Rule Management &#9660;
+      <div class="dropdown-menu" id="tsrule-dropdown">
+        <div class="dropdown-item" onclick="showPage('rule')">Online Rule</div>
+        <div class="dropdown-item" style="color:#86909c;cursor:default;">Rule Management (本次不涉及)</div>
+        <div class="dropdown-item" onclick="showPage('ruletesting')">Rule Testing</div>
+        <div class="dropdown-item" onclick="showPage('ruletesting2')">Rule Testing V2</div>
       </div>
     </div>
     <div class="nav-item">Data Analysis &#9660;</div>
     <div class="nav-item">Compliance Monitoring &#9660;</div>
     <div class="nav-item">Accounts &#9660;</div>
     <div class="nav-item">Employee Track &#9660;</div>
-    <div class="nav-item" id="nav-ruletesting" onclick="showPage('ruletesting')">Rule Testing</div>
     <div class="nav-item">更多</div>
   </div>
   <div class="nav-right">
@@ -791,7 +798,7 @@ input[type="text"] {
             <th>Description-EN</th>
             <th>Description-CN</th>
             <th title="当前rule type下关联的"使用中"状态feature数量">Features <span style="cursor:help;color:#86909c;font-weight:normal;">&#9432;</span></th>
-            <th title="当前rule type下关联的"使用中"状态rule数量">Running Rules <span style="cursor:help;color:#86909c;font-weight:normal;">&#9432;</span></th>
+            <th title="当前rule type下关联的"使用中"状态rule数量">Online Rules <span style="cursor:help;color:#86909c;font-weight:normal;">&#9432;</span></th>
             <th>Action</th>
           </tr>
         </thead>
@@ -909,11 +916,12 @@ input[type="text"] {
 
 <!-- ==================== PAGE 2: Feature List ==================== -->
 <div class="page-container" id="page-feature">
-  <div class="breadcrumb">合规管理 <span>&gt;</span> Policy <span>&gt;</span> Feature</div>
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Policy <span>&gt;</span> Rule Logic</div>
   <div style="padding: 20px 24px;">
     <!-- Domain Tabs: separate TS (new system) from legacy -->
     <div class="domain-tabs" style="margin-bottom: 16px;">
       <span class="domain-tab active" id="feat-tab-TS" onclick="switchFeatDomain('TS')">TS</span>
+      <span class="domain-tab" id="feat-tab-TSV2" onclick="switchFeatDomain('TSV2')">TS V2 (SubType)</span>
       <span class="domain-tab" id="feat-tab-OTHER" onclick="switchFeatDomain('OTHER')">Other (Legacy)</span>
     </div>
 
@@ -1092,6 +1100,259 @@ input[type="text"] {
       <span style="border: none; margin-left: 8px;">Total 8 items</span>
     </div>
     </div><!-- end feat-panel-TS -->
+
+    <!-- TS V2 tab: SubType design -->
+    <div id="feat-panel-TSV2" style="display:none;">
+      <!-- Info Banner -->
+      <div style="background:#e8f7ff; border:1px solid #b3e0ff; border-radius:4px; padding:10px 14px; font-size:12px; color:#0958d9; margin-bottom:16px; line-height:1.6;">
+        <strong>Feature V2 设计说明（SubType as Variant）</strong><br>
+        1. <strong>版本号属于 Rule Type 全局</strong>，SubType 是同一版本下的"变体标签"<br>
+        2. Feature Code 格式：单逻辑 = <code>TS_A001_V1.2</code>，多变体 = <code>TS_C001_V1.1_S1</code> / <code>TS_C001_V1.1_S2</code><br>
+        3. 合并场景：两个 SubType 优化为一个后，直接升版本且不带后缀 → <code>TS_C001_V1.3</code>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <select style="width:160px;" id="v2-filter-ruletype" onchange="filterV2Table()">
+          <option value="">Rule Type: All</option>
+          <option value="TS_A001">TS_A001</option>
+          <option value="TS_A006">TS_A006</option>
+          <option value="TS_B001">TS_B001</option>
+          <option value="TS_C001">TS_C001</option>
+        </select>
+        <select style="width:180px;" id="v2-filter-subtype" onchange="filterV2Table()">
+          <option value="">SubType: All</option>
+          <option value="none">— (No SubType)</option>
+          <option value="S1">S1: Tick Data Detection</option>
+          <option value="S2">S2: Daily K Detection</option>
+        </select>
+        <input type="text" placeholder="Search code or name..." style="width:220px;" id="v2-search" oninput="filterV2Table()">
+        <button class="btn" onclick="filterV2Table()">查询</button>
+        <button class="btn" onclick="document.getElementById('v2-filter-ruletype').value='';document.getElementById('v2-filter-subtype').value='';document.getElementById('v2-search').value='';filterV2Table()">重置</button>
+        <div class="right-actions">
+          <button class="btn btn-primary" onclick="openV2CreateModal()">+ Create</button>
+        </div>
+      </div>
+
+      <!-- Feature V2 List: expandable SubType rows -->
+      <table class="data-table" id="v2-feature-table">
+        <colgroup>
+          <col style="width:160px"><col style="width:280px"><col style="width:80px"><col style="width:65px"><col style="width:80px"><col style="width:90px"><col style="width:65px"><col style="width:110px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Feature Code</th>
+            <th>Feature Name</th>
+            <th>Rule Type</th>
+            <th>Version</th>
+            <th>Status</th>
+            <th>Update Time</th>
+            <th>Operator</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- TS_A001 V6.6: single logic -->
+          <tr data-v2rt="TS_A001" data-v2st="none">
+            <td style="font-weight:500;">TS_A001_V6.6</td>
+            <td>Possible Wash Trade (A to B) - enhanced</td>
+            <td>TS_A001</td>
+            <td>V6.6</td>
+            <td><span class="status-tag status-draft">Draft</span></td>
+            <td>2025-09-01</td>
+            <td>shuhan</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button> <button class="btn-link" style="color:#ff7d00;" onclick="alert('Confirm publish?')">Publish</button></td>
+          </tr>
+          <!-- TS_A001 V6.5 -->
+          <tr data-v2rt="TS_A001" data-v2st="none">
+            <td style="font-weight:500;">TS_A001_V6.5</td>
+            <td>Possible Wash Trade (A to B)</td>
+            <td>TS_A001</td>
+            <td>V6.5</td>
+            <td><span class="status-tag status-active">In Use</span></td>
+            <td>2025-07-23</td>
+            <td>shuhan</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
+          </tr>
+          <!-- TS_A001 V6.4 offline -->
+          <tr data-v2rt="TS_A001" data-v2st="none" style="color:#86909c;">
+            <td>TS_A001_V6.4</td>
+            <td>Possible Wash Trade (A to B)</td>
+            <td>TS_A001</td>
+            <td>V6.4</td>
+            <td><span class="status-tag status-offline">Offline</span></td>
+            <td>2025-07-20</td>
+            <td>admin</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button></td>
+          </tr>
+          <!-- TS_A006 -->
+          <tr data-v2rt="TS_A006" data-v2st="none">
+            <td style="font-weight:500;">TS_A006_V6.1</td>
+            <td>Pre-arranged Trading</td>
+            <td>TS_A006</td>
+            <td>V6.1</td>
+            <td><span class="status-tag status-active">In Use</span></td>
+            <td>2025-06-15</td>
+            <td>admin</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
+          </tr>
+          <!-- TS_B001 -->
+          <tr data-v2rt="TS_B001" data-v2st="none">
+            <td style="font-weight:500;">TS_B001_V6.3</td>
+            <td>Pump and Dump</td>
+            <td>TS_B001</td>
+            <td>V6.3</td>
+            <td><span class="status-tag status-active">In Use</span></td>
+            <td>2025-05-20</td>
+            <td>admin</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
+          </tr>
+
+          <!-- TS_C001 V1.3: has SubTypes, expandable -->
+          <tr data-v2rt="TS_C001" data-v2st="parent" class="v2-parent-row" onclick="toggleV2SubRows(this)" style="cursor:pointer;">
+            <td style="font-weight:500;"><span class="v2-expand-arrow" style="display:inline-block;width:14px;font-size:10px;color:#86909c;">▼</span>TS_C001_V1.3</td>
+            <td>Market Dominance at Open/Close (enhanced)</td>
+            <td>TS_C001</td>
+            <td>V1.3</td>
+            <td><span style="font-size:11px;color:#86909c;">2 subtypes</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr data-v2rt="TS_C001" data-v2st="S1" class="v2-sub-row v2-sub-of-c001v13" style="background:#fefbff;">
+            <td style="padding-left:30px;"><span style="color:#d4b5f0;">├─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#f0e6ff;color:#7b2cbf;font-weight:500;">S1</span></td>
+            <td style="font-size:12px;">Tick Data Detection</td>
+            <td></td>
+            <td></td>
+            <td><span class="status-tag status-testing">Testing</span></td>
+            <td style="font-size:12px;">2025-09-12</td>
+            <td style="font-size:12px;">shuhan</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
+          </tr>
+          <tr data-v2rt="TS_C001" data-v2st="S2" class="v2-sub-row v2-sub-of-c001v13" style="background:#fbfffc;">
+            <td style="padding-left:30px;"><span style="color:#a3d9a3;">└─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#e6f7e6;color:#0a8a0a;font-weight:500;">S2</span></td>
+            <td style="font-size:12px;">Daily K Detection</td>
+            <td></td>
+            <td></td>
+            <td><span class="status-tag status-draft">Draft</span></td>
+            <td style="font-size:12px;">2025-09-15</td>
+            <td style="font-size:12px;">shuhan</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button> <button class="btn-link" style="color:#ff7d00;" onclick="alert('Confirm publish?')">Publish</button></td>
+          </tr>
+
+          <!-- TS_C001 V1.2: In Use, expandable -->
+          <tr data-v2rt="TS_C001" data-v2st="parent" class="v2-parent-row" onclick="toggleV2SubRows(this)" style="cursor:pointer;">
+            <td style="font-weight:500;"><span class="v2-expand-arrow" style="display:inline-block;width:14px;font-size:10px;color:#86909c;">▶</span>TS_C001_V1.2</td>
+            <td>Market Dominance at Open/Close</td>
+            <td>TS_C001</td>
+            <td>V1.2</td>
+            <td><span style="font-size:11px;color:#86909c;">2 subtypes</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr data-v2rt="TS_C001" data-v2st="S1" class="v2-sub-row v2-sub-of-c001v12" style="background:#fefbff; display:none;">
+            <td style="padding-left:30px;"><span style="color:#d4b5f0;">├─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#f0e6ff;color:#7b2cbf;font-weight:500;">S1</span></td>
+            <td style="font-size:12px;">Tick Data Detection</td>
+            <td></td>
+            <td></td>
+            <td><span class="status-tag status-active">In Use</span></td>
+            <td style="font-size:12px;">2025-06-15</td>
+            <td style="font-size:12px;">shuhan</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
+          </tr>
+          <tr data-v2rt="TS_C001" data-v2st="S2" class="v2-sub-row v2-sub-of-c001v12" style="background:#fbfffc; display:none;">
+            <td style="padding-left:30px;"><span style="color:#a3d9a3;">└─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#e6f7e6;color:#0a8a0a;font-weight:500;">S2</span></td>
+            <td style="font-size:12px;">Daily K Detection</td>
+            <td></td>
+            <td></td>
+            <td><span class="status-tag status-active">In Use</span></td>
+            <td style="font-size:12px;">2025-06-15</td>
+            <td style="font-size:12px;">shuhan</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
+          </tr>
+
+          <!-- TS_C001 V1.1: Offline, collapsed -->
+          <tr data-v2rt="TS_C001" data-v2st="parent" class="v2-parent-row" onclick="toggleV2SubRows(this)" style="cursor:pointer; color:#86909c;">
+            <td><span class="v2-expand-arrow" style="display:inline-block;width:14px;font-size:10px;color:#86909c;">▶</span>TS_C001_V1.1</td>
+            <td>Market Dominance at Open/Close (initial)</td>
+            <td>TS_C001</td>
+            <td>V1.1</td>
+            <td><span style="font-size:11px;color:#aaa;">2 subtypes</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr data-v2rt="TS_C001" data-v2st="S1" class="v2-sub-row v2-sub-of-c001v11" style="display:none; color:#86909c;">
+            <td style="padding-left:30px;"><span style="color:#ccc;">├─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#f2f3f5;color:#86909c;">S1</span></td>
+            <td style="font-size:12px;">Tick Data Detection</td>
+            <td></td><td></td>
+            <td><span class="status-tag status-offline">Offline</span></td>
+            <td style="font-size:12px;">2025-02-15</td>
+            <td style="font-size:12px;">admin</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button></td>
+          </tr>
+          <tr data-v2rt="TS_C001" data-v2st="S2" class="v2-sub-row v2-sub-of-c001v11" style="display:none; color:#86909c;">
+            <td style="padding-left:30px;"><span style="color:#ccc;">└─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#f2f3f5;color:#86909c;">S2</span></td>
+            <td style="font-size:12px;">Daily K Detection</td>
+            <td></td><td></td>
+            <td><span class="status-tag status-offline">Offline</span></td>
+            <td style="font-size:12px;">2025-02-15</td>
+            <td style="font-size:12px;">admin</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button></td>
+          </tr>
+
+          <!-- TS_C001 V2.1: single logic (no SubType) -->
+          <tr data-v2rt="TS_C001" data-v2st="none">
+            <td style="font-weight:500;">TS_C001_V2.1</td>
+            <td>Market Dominance - Unified</td>
+            <td>TS_C001</td>
+            <td>V2.1</td>
+            <td><span class="status-tag status-draft">Draft</span></td>
+            <td>2025-10-01</td>
+            <td>shuhan</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button> <button class="btn-link" style="color:#ff7d00;" onclick="alert('Confirm publish?')">Publish</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <span>&#8249;</span>
+        <span class="current">1</span>
+        <span>&#8250;</span>
+        <span style="border:none;margin-left:8px;">Total 10 items</span>
+      </div>
+
+      <!-- Comparison Panel -->
+      <div style="background:#fafbfc; border:1px solid var(--border); border-radius:6px; padding:16px; margin-top:20px;">
+        <div style="font-size:13px; font-weight:600; margin-bottom:12px;">新旧对比：TS_C001 版本设计</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div style="border:1px solid var(--border); border-radius:4px; background:#fff; padding:12px;">
+            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">❌ V1 设计（版本号混用）</div>
+            <pre style="background:#f7f8fa; padding:8px; border-radius:3px; font-size:11px; line-height:1.6; margin:0; white-space:pre-wrap;">TS_C001_V5.7  tick data     [In Use]
+TS_C001_V5.8  tick data     [Testing]
+TS_C001_V5.9  no tick data  [In Use]
+
+问题：版本号既表示迭代又表示不同逻辑
+      无法区分"升级"和"新变体"</pre>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:4px; background:#fff; padding:12px;">
+            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">✅ V2 设计（SubType 作为版本变体）</div>
+            <pre style="background:#f7f8fa; padding:8px; border-radius:3px; font-size:11px; line-height:1.6; margin:0; white-space:pre-wrap;">TS_C001_V1.1_S1  Tick Data   [Offline]
+TS_C001_V1.1_S2  Daily K     [Offline]
+TS_C001_V1.2_S1  Tick Data   [In Use]
+TS_C001_V1.2_S2  Daily K     [In Use]
+TS_C001_V1.3_S1  Tick Data   [Testing]
+TS_C001_V1.3_S2  Daily K     [Draft]
+
+✓ 同版本号的变体天然归组
+✓ 版本升级清晰（V1.1→V1.2→V1.3）
+✓ 合并后直接升版本去掉后缀：
+  TS_C001_V2.1 (unified)     [Draft]</pre>
+          </div>
+        </div>
+      </div>
+    </div><!-- end feat-panel-TSV2 -->
 
     <!-- OTHER tab: legacy features (TM, AML, general rule, etc.) -->
     <div id="feat-panel-OTHER" style="display:none;">
@@ -1463,6 +1724,663 @@ input[type="text"] {
   </div>
 </div>
 
+<!-- ==================== PAGE 3-V2: Rule Testing V2 (SubType Tab) ==================== -->
+<div class="page-container" id="page-ruletesting2">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Rule Testing <span>&gt;</span> <strong>V2 (SubType Tab)</strong></div>
+  <div style="padding: 20px 24px;">
+    <div class="sub-tabs">
+      <div class="sub-tab active">TS</div>
+      <div class="sub-tab">TM</div>
+    </div>
+
+    <div class="rule-testing-layout">
+      <!-- Left Sidebar: Rule Type → Version (no SubType in nav) -->
+      <div class="sidebar">
+        <div style="padding:6px 12px; font-size:11px; color:#86909c; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); margin-bottom:4px;">Active</div>
+
+        <!-- TS_A001: single logic -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_A001 Possible Wash Trade</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1" onclick="selectV2Testing(this,'a001_v65')">V6.5 <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+          <div class="sidebar-tree-item level-1" onclick="selectV2Testing(this,'a001_v66')">V6.6 <span style="color:var(--warning);font-size:11px;">(Draft)</span></div>
+        </div>
+
+        <!-- TS_A006 -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_A006 Pre-arranged Trading</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1" onclick="selectV2Testing(this,'a006_v61')">V6.1 <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+        </div>
+
+        <!-- TS_B001 -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_B001 Pump and Dump</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1" onclick="selectV2Testing(this,'b001_v63')">V6.3 <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+        </div>
+
+        <!-- TS_C001: has SubTypes but nav only shows version -->
+        <div class="sidebar-tree-item level-0" onclick="toggleSidebarGroup(this)"><span style="font-size:10px;margin-right:4px;">▼</span>TS_C001 Market Dominance</div>
+        <div class="sidebar-group">
+          <div class="sidebar-tree-item level-1 active" onclick="selectV2Testing(this,'c001_v13')">V1.3 <span style="color:var(--info);font-size:11px;">(Testing)</span></div>
+          <div class="sidebar-tree-item level-1" onclick="selectV2Testing(this,'c001_v12')">V1.2 <span style="color:var(--success);font-size:11px;">(In Use)</span></div>
+        </div>
+
+        <!-- History -->
+        <div style="padding:6px 12px; font-size:11px; color:#86909c; text-transform:uppercase; letter-spacing:0.5px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-top:12px; margin-bottom:4px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleHistorySection(this)">
+          <span>History (Offline)</span><span style="font-size:10px;">▶</span>
+        </div>
+        <div class="history-section" style="display:none;">
+          <div class="sidebar-tree-item level-0">TS_C001</div>
+          <div class="sidebar-tree-item level-1" style="color:#86909c;">V1.1 <span style="font-size:11px;">(Offline)</span></div>
+        </div>
+
+        <!-- Legacy -->
+        <div style="padding:6px 12px; font-size:11px; color:#86909c; text-transform:uppercase; letter-spacing:0.5px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-top:8px; margin-bottom:4px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleHistorySection(this)">
+          <span>Legacy (Pre-system)</span><span style="font-size:10px;">▶</span>
+        </div>
+        <div class="history-section" style="display:none;">
+          <div style="padding:6px 12px; font-size:11px; color:#8b6914; background:#fff8e6; border-radius:3px; margin:4px 8px;">View only</div>
+          <div class="sidebar-tree-item level-1" style="color:#86909c;">possible wash trade...</div>
+          <div class="sidebar-tree-item level-1" style="color:#86909c;">market dominance...</div>
+        </div>
+      </div>
+
+      <!-- Right Content Area -->
+      <div class="rule-testing-content" id="v2-testing-content">
+
+        <!-- TS_A001 V6.5 (no SubType, no tabs) — 2-layer: P → records -->
+        <div id="v2t-panel-a001_v65" style="display:none;">
+          <div class="page-header">
+            <h2>TS_A001_V6.5 — Possible Wash Trade (A to B)</h2>
+            <button class="btn btn-primary" onclick="showPage('addtest2')">+ Add</button>
+          </div>
+          <!-- P1 -->
+          <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+            <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+              <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>P1</strong><span style="font-size:12px;color:var(--text-secondary);">intervalMinute:5, crossTimesThreshold:3</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">4 records</span><span class="status-tag status-active">In Use</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+            </div>
+            <div class="test-group-body" style="padding:0;">
+              <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+              <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P1-01</td><td>Security Type in (STK) | HKEX</td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 09:30</td><td>15</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-02</td><td>Security Type in (STK) | HKEX</td><td>2025-05-01 ~ 05-31</td><td>2025-07-23 14:29</td><td>12</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-03</td><td>Security Type in (STK) | SGX</td><td>2025-05-01 ~ 05-31</td><td>2025-07-23 15:02</td><td>8</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-04</td><td>Security Type in (OPT) | HKEX</td><td>2025-05-01 ~ 05-31</td><td>2025-07-23 15:20</td><td>3</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+          <!-- P2 -->
+          <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+            <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+              <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▶</span><strong>P2</strong><span style="font-size:12px;color:var(--text-secondary);">intervalMinute:3, crossTimesThreshold:5</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">2 records</span><span class="status-tag" style="background:#f0f0f0;color:#86909c;">Unused</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+            </div>
+            <div class="test-group-body" style="padding:0; display:none;">
+              <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+              <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P2-01</td><td>Security Type in (STK) | HKEX</td><td>2025-06-01 ~ 06-30</td><td>2025-07-21 20:34</td><td>22</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P2-02</td><td>Security Type in (STK) | SGX</td><td>2025-06-01 ~ 06-30</td><td>2025-07-21 20:50</td><td>16</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+          <!-- P3 (Offline) -->
+          <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px; opacity:0.6;">
+            <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+              <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▶</span><strong>P3</strong><span style="font-size:12px;color:var(--text-secondary);">intervalMinute:10, crossTimesThreshold:2</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">1 record</span><span class="status-tag status-offline">Offline</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+            </div>
+            <div class="test-group-body" style="padding:0; display:none;">
+              <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+              <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P3-01</td><td>Security Type in (STK) | HKEX</td><td>2025-03-01 ~ 03-31</td><td>2025-04-10 11:00</td><td>35</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TS_C001 V1.3: HAS SubType tabs (DEFAULT) -->
+        <div id="v2t-panel-c001_v13" style="">
+          <div class="page-header">
+            <h2>TS_C001_V1.3 — Market Dominance (enhanced)</h2>
+            <button class="btn btn-primary" onclick="showPage('addtest2')">+ Add</button>
+          </div>
+
+          <!-- SubType Tabs -->
+          <div style="display:flex; gap:2px; margin-bottom:16px; border-bottom:2px solid var(--border); padding-bottom:0;">
+            <div class="v2t-subtab active" onclick="switchV2TestingTab(this,'c001v13-s1')" style="padding:8px 16px; cursor:pointer; font-size:13px; font-weight:500; border-bottom:2px solid var(--accent); margin-bottom:-2px; color:var(--text);">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7b2cbf;margin-right:6px;"></span>S1: Tick Data Detection
+            </div>
+            <div class="v2t-subtab" onclick="switchV2TestingTab(this,'c001v13-s2')" style="padding:8px 16px; cursor:pointer; font-size:13px; color:var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-2px;">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0a8a0a;margin-right:6px;"></span>S2: Daily K Detection
+            </div>
+          </div>
+
+          <!-- S1 Content: Tick Data — with Group By switcher -->
+          <div id="v2t-tab-c001v13-s1">
+            <div style="margin-bottom:12px; padding:8px 12px; background:#fefbff; border:1px solid #e8d5f5; border-radius:4px; font-size:12px; color:#7b2cbf; display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:600;">S1: Tick Data Detection</span>
+              <span style="color:var(--text-secondary);">—</span>
+              <span style="color:var(--text-secondary);">基于逐笔行情数据，检测开盘/收盘时段单一账户的市场主导行为</span>
+              <span class="status-tag status-testing" style="margin-left:auto;">Testing</span>
+            </div>
+
+            <!-- Group By + Filters -->
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; padding:8px 12px; background:#f7f8fa; border-radius:4px; flex-wrap:wrap;">
+              <span style="font-size:12px; color:#86909c; white-space:nowrap;">Group by:</span>
+              <button class="btn v2-groupby-btn active" onclick="switchV2GroupBy(this,'param')" style="height:26px;font-size:12px;padding:0 10px;background:var(--accent);border-color:var(--accent);font-weight:500;">Parameter</button>
+              <button class="btn v2-groupby-btn" onclick="switchV2GroupBy(this,'condition')" style="height:26px;font-size:12px;padding:0 10px;">Condition</button>
+              <span style="width:1px; height:20px; background:#e5e6eb; margin:0 4px;"></span>
+              <select style="height:26px; font-size:12px; padding:0 8px;" id="v2-s1-filter-param" onchange="applyV2Filters(this.closest('[id^=v2t-tab-]'))">
+                <option value="">Parameter: All</option>
+                <option value="P1">P1 (ratio:0.3)</option>
+                <option value="P2">P2 (ratio:0.2)</option>
+                <option value="P3">P3 (ratio:0.4)</option>
+              </select>
+              <select style="height:26px; font-size:12px; padding:0 8px;" id="v2-s1-filter-cond" onchange="applyV2Filters(this.closest('[id^=v2t-tab-]'))">
+                <option value="">Condition: All</option>
+                <option value="HKEX|STK">HKEX | STK</option>
+                <option value="HKEX|OPT">HKEX | OPT</option>
+                <option value="SGX|STK">SGX | STK</option>
+              </select>
+              <select style="height:26px; font-size:12px; padding:0 8px;" id="v2-s1-filter-period" onchange="applyV2Filters(this.closest('[id^=v2t-tab-]'))">
+                <option value="">Period: All</option>
+                <option value="2025-07">2025-07</option>
+                <option value="2025-08">2025-08</option>
+                <option value="2025-09">2025-09</option>
+              </select>
+            </div>
+
+            <!-- VIEW 1: Group by Parameter (default) -->
+            <div class="v2-groupby-view" id="v2-s1-view-param">
+              <!-- P1: ratio=0.3, tickInterval=100 -->
+              <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+                <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                  <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>P1</strong><span style="font-size:12px;color:var(--text-secondary);">ratio:0.3, tickInterval:100</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;"><span class="v2-record-count" style="font-size:11px;color:#86909c;">8 records</span><span class="status-tag" style="background:#f0f0f0;color:#86909c;">Unused</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+                </div>
+                <div class="test-group-body" style="padding:0;">
+                  <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                  <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    <tr data-param="P1" data-cond="HKEX|STK" data-period="2025-09"><td>P1-01</td><td>Market in (HKEX) | STK</td><td>2025-09-01 ~ 09-15</td><td>2025-09-16 09:00</td><td>21</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="HKEX|STK" data-period="2025-08"><td>P1-02</td><td>Market in (HKEX) | STK</td><td>2025-08-01 ~ 08-31</td><td>2025-09-10 14:00</td><td>18</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="HKEX|STK" data-period="2025-07"><td>P1-03</td><td>Market in (HKEX) | STK</td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 10:00</td><td>14</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="HKEX|OPT" data-period="2025-09"><td>P1-04</td><td>Market in (HKEX) | OPT</td><td>2025-09-01 ~ 09-15</td><td>2025-09-16 09:30</td><td>6</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="HKEX|OPT" data-period="2025-08"><td>P1-05</td><td>Market in (HKEX) | OPT</td><td>2025-08-01 ~ 08-31</td><td>2025-09-10 14:15</td><td>5</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="SGX|STK" data-period="2025-09"><td>P1-06</td><td>Market in (SGX) | STK</td><td>2025-09-01 ~ 09-15</td><td>2025-09-16 10:00</td><td>7</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="SGX|STK" data-period="2025-08"><td>P1-07</td><td>Market in (SGX) | STK</td><td>2025-08-01 ~ 08-31</td><td>2025-09-10 15:00</td><td>9</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="SGX|STK" data-period="2025-07"><td>P1-08</td><td>Market in (SGX) | STK</td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 11:00</td><td>4</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  </tbody></table>
+                </div>
+              </div>
+              <!-- P2: ratio=0.2, tickInterval=150 -->
+              <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+                <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                  <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>P2</strong><span style="font-size:12px;color:var(--text-secondary);">ratio:0.2, tickInterval:150</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;"><span class="v2-record-count" style="font-size:11px;color:#86909c;">6 records</span><span class="status-tag" style="background:#f0f0f0;color:#86909c;">Unused</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+                </div>
+                <div class="test-group-body" style="padding:0;">
+                  <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                  <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    <tr data-param="P2" data-cond="HKEX|STK" data-period="2025-09"><td>P2-01</td><td>Market in (HKEX) | STK</td><td>2025-09-01 ~ 09-15</td><td>2025-09-18 11:00</td><td>32</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="HKEX|STK" data-period="2025-08"><td>P2-02</td><td>Market in (HKEX) | STK</td><td>2025-08-01 ~ 08-31</td><td>2025-09-18 11:30</td><td>28</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="HKEX|OPT" data-period="2025-09"><td>P2-03</td><td>Market in (HKEX) | OPT</td><td>2025-09-01 ~ 09-15</td><td>2025-09-18 12:00</td><td>11</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="HKEX|OPT" data-period="2025-08"><td>P2-04</td><td>Market in (HKEX) | OPT</td><td>2025-08-01 ~ 08-31</td><td>2025-09-18 12:30</td><td>8</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="SGX|STK" data-period="2025-09"><td>P2-05</td><td>Market in (SGX) | STK</td><td>2025-09-01 ~ 09-15</td><td>2025-09-18 13:00</td><td>14</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="SGX|STK" data-period="2025-08"><td>P2-06</td><td>Market in (SGX) | STK</td><td>2025-08-01 ~ 08-31</td><td>2025-09-18 13:30</td><td>12</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  </tbody></table>
+                </div>
+              </div>
+              <!-- P3: ratio=0.4, tickInterval=80 -->
+              <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+                <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                  <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▶</span><strong>P3</strong><span style="font-size:12px;color:var(--text-secondary);">ratio:0.4, tickInterval:80</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;"><span class="v2-record-count" style="font-size:11px;color:#86909c;">3 records</span><span class="status-tag" style="background:#f0f0f0;color:#86909c;">Unused</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+                </div>
+                <div class="test-group-body" style="padding:0; display:none;">
+                  <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                  <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    <tr data-param="P3" data-cond="HKEX|STK" data-period="2025-09"><td>P3-01</td><td>Market in (HKEX) | STK</td><td>2025-09-01 ~ 09-15</td><td>2025-09-19 09:00</td><td>8</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P3" data-cond="HKEX|STK" data-period="2025-08"><td>P3-02</td><td>Market in (HKEX) | STK</td><td>2025-08-01 ~ 08-31</td><td>2025-09-19 09:30</td><td>6</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P3" data-cond="SGX|STK" data-period="2025-09"><td>P3-03</td><td>Market in (SGX) | STK</td><td>2025-09-01 ~ 09-15</td><td>2025-09-19 10:00</td><td>2</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  </tbody></table>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW 2: Group by Condition — same data regrouped by market/type -->
+            <div class="v2-groupby-view" id="v2-s1-view-condition" style="display:none;">
+              <!-- HKEX | STK -->
+              <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+                <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                  <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>HKEX | STK</strong><span style="font-size:11px;color:#86909c;">— 固定Condition，对比不同参数效果</span></div>
+                  <div><span class="v2-record-count" style="font-size:11px;color:#86909c;">7 records</span></div>
+                </div>
+                <div class="test-group-body" style="padding:0;">
+                  <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:200px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                  <thead><tr><th>ID</th><th>Parameters</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    <tr data-param="P1" data-cond="HKEX|STK" data-period="2025-09"><td>P1-01</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P1: ratio:0.3</span></td><td>2025-09-01 ~ 09-15</td><td>2025-09-16 09:00</td><td>21</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="HKEX|STK" data-period="2025-08"><td>P1-02</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P1: ratio:0.3</span></td><td>2025-08-01 ~ 08-31</td><td>2025-09-10 14:00</td><td>18</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="HKEX|STK" data-period="2025-07"><td>P1-03</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P1: ratio:0.3</span></td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 10:00</td><td>14</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="HKEX|STK" data-period="2025-09"><td>P2-01</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P2: ratio:0.2</span></td><td>2025-09-01 ~ 09-15</td><td>2025-09-18 11:00</td><td>32</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="HKEX|STK" data-period="2025-08"><td>P2-02</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P2: ratio:0.2</span></td><td>2025-08-01 ~ 08-31</td><td>2025-09-18 11:30</td><td>28</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P3" data-cond="HKEX|STK" data-period="2025-09"><td>P3-01</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P3: ratio:0.4</span></td><td>2025-09-01 ~ 09-15</td><td>2025-09-19 09:00</td><td>8</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P3" data-cond="HKEX|STK" data-period="2025-08"><td>P3-02</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P3: ratio:0.4</span></td><td>2025-08-01 ~ 08-31</td><td>2025-09-19 09:30</td><td>6</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  </tbody></table>
+                </div>
+              </div>
+              <!-- HKEX | OPT -->
+              <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+                <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                  <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>HKEX | OPT</strong></div>
+                  <div><span class="v2-record-count" style="font-size:11px;color:#86909c;">4 records</span></div>
+                </div>
+                <div class="test-group-body" style="padding:0;">
+                  <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:200px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                  <thead><tr><th>ID</th><th>Parameters</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    <tr data-param="P1" data-cond="HKEX|OPT" data-period="2025-09"><td>P1-04</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P1: ratio:0.3</span></td><td>2025-09-01 ~ 09-15</td><td>2025-09-16 09:30</td><td>6</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="HKEX|OPT" data-period="2025-08"><td>P1-05</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P1: ratio:0.3</span></td><td>2025-08-01 ~ 08-31</td><td>2025-09-10 14:15</td><td>5</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="HKEX|OPT" data-period="2025-09"><td>P2-03</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P2: ratio:0.2</span></td><td>2025-09-01 ~ 09-15</td><td>2025-09-18 12:00</td><td>11</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="HKEX|OPT" data-period="2025-08"><td>P2-04</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P2: ratio:0.2</span></td><td>2025-08-01 ~ 08-31</td><td>2025-09-18 12:30</td><td>8</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  </tbody></table>
+                </div>
+              </div>
+              <!-- SGX | STK -->
+              <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+                <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                  <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>SGX | STK</strong></div>
+                  <div><span class="v2-record-count" style="font-size:11px;color:#86909c;">6 records</span></div>
+                </div>
+                <div class="test-group-body" style="padding:0;">
+                  <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:200px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                  <thead><tr><th>ID</th><th>Parameters</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    <tr data-param="P1" data-cond="SGX|STK" data-period="2025-09"><td>P1-06</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P1: ratio:0.3</span></td><td>2025-09-01 ~ 09-15</td><td>2025-09-16 10:00</td><td>7</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="SGX|STK" data-period="2025-08"><td>P1-07</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P1: ratio:0.3</span></td><td>2025-08-01 ~ 08-31</td><td>2025-09-10 15:00</td><td>9</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P1" data-cond="SGX|STK" data-period="2025-07"><td>P1-08</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P1: ratio:0.3</span></td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 11:00</td><td>4</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="SGX|STK" data-period="2025-09"><td>P2-05</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P2: ratio:0.2</span></td><td>2025-09-01 ~ 09-15</td><td>2025-09-18 13:00</td><td>14</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P2" data-cond="SGX|STK" data-period="2025-08"><td>P2-06</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P2: ratio:0.2</span></td><td>2025-08-01 ~ 08-31</td><td>2025-09-18 13:30</td><td>12</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                    <tr data-param="P3" data-cond="SGX|STK" data-period="2025-09"><td>P3-03</td><td><span style="background:#f7f8fa;padding:2px 6px;border-radius:3px;font-size:11px;">P3: ratio:0.4</span></td><td>2025-09-01 ~ 09-15</td><td>2025-09-19 10:00</td><td>2</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  </tbody></table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- S2 Content: Daily K — 测试周期为2025年3-5月（历史回测跨度长） -->
+          <div id="v2t-tab-c001v13-s2" style="display:none;">
+            <div style="margin-bottom:12px; padding:8px 12px; background:#fbfffc; border:1px solid #c8e8c8; border-radius:4px; font-size:12px; color:#0a8a0a; display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:600;">S2: Daily K Detection</span>
+              <span style="color:var(--text-secondary);">—</span>
+              <span style="color:var(--text-secondary);">基于日K聚合数据，检测开盘/收盘时段市场主导行为（无逐笔行情市场）</span>
+              <span class="status-tag status-draft" style="margin-left:auto;">Draft</span>
+            </div>
+
+            <!-- P1: ratio=0.25, minVolume=50000 -->
+            <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+              <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>P1</strong><span style="font-size:12px;color:var(--text-secondary);">ratio:0.25, minVolume:50000</span></div>
+                <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">4 records</span><span class="status-tag" style="background:#f0f0f0;color:#86909c;">Unused</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+              </div>
+              <div class="test-group-body" style="padding:0;">
+                <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td>P1-01</td><td>Market in (HKEX) | STK</td><td>2025-03-01 ~ 03-31</td><td>2025-09-12 16:00</td><td>22</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P1-02</td><td>Market in (HKEX) | STK</td><td>2025-04-01 ~ 04-30</td><td>2025-09-12 16:20</td><td>19</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P1-03</td><td>Market in (HKEX) | STK</td><td>2025-05-01 ~ 05-31</td><td>2025-09-12 16:40</td><td>25</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P1-04</td><td>Market in (SGX) | STK</td><td>2025-03-01 ~ 05-31</td><td>2025-09-13 09:00</td><td>31</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                </tbody></table>
+              </div>
+            </div>
+            <!-- P2: ratio=0.15, minVolume=100000 -->
+            <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+              <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▶</span><strong>P2</strong><span style="font-size:12px;color:var(--text-secondary);">ratio:0.15, minVolume:100000</span></div>
+                <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">2 records</span><span class="status-tag" style="background:#f0f0f0;color:#86909c;">Unused</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+              </div>
+              <div class="test-group-body" style="padding:0; display:none;">
+                <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td>P2-01</td><td>Market in (HKEX) | STK</td><td>2025-03-01 ~ 05-31</td><td>2025-09-14 10:00</td><td>58</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P2-02</td><td>Market in (SGX) | STK</td><td>2025-03-01 ~ 05-31</td><td>2025-09-14 10:30</td><td>42</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                </tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TS_C001 V1.2: same structure, with tabs -->
+        <div id="v2t-panel-c001_v12" style="display:none;">
+          <div class="page-header">
+            <h2>TS_C001_V1.2 — Market Dominance</h2>
+            <button class="btn btn-primary" onclick="showPage('addtest2')">+ Add</button>
+          </div>
+          <div style="display:flex; gap:2px; margin-bottom:16px; border-bottom:2px solid var(--border); padding-bottom:0;">
+            <div class="v2t-subtab active" onclick="switchV2TestingTab(this,'c001v12-s1')" style="padding:8px 16px; cursor:pointer; font-size:13px; font-weight:500; border-bottom:2px solid var(--accent); margin-bottom:-2px; color:var(--text);">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7b2cbf;margin-right:6px;"></span>S1: Tick Data
+            </div>
+            <div class="v2t-subtab" onclick="switchV2TestingTab(this,'c001v12-s2')" style="padding:8px 16px; cursor:pointer; font-size:13px; color:var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-2px;">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0a8a0a;margin-right:6px;"></span>S2: Daily K
+            </div>
+          </div>
+          <div id="v2t-tab-c001v12-s1">
+            <div style="margin-bottom:12px; padding:8px 12px; background:#fefbff; border:1px solid #e8d5f5; border-radius:4px; font-size:12px; color:#7b2cbf; display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:600;">S1: Tick Data Detection</span><span style="color:var(--text-secondary);">— 逐笔行情检测</span>
+              <span class="status-tag status-active" style="margin-left:auto;">In Use</span>
+            </div>
+            <!-- Group By + Filter -->
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; padding:8px 12px; background:#f7f8fa; border-radius:4px;">
+              <span style="font-size:12px;color:#86909c;white-space:nowrap;">Group by:</span>
+              <button class="btn v2-groupby-btn active" style="height:26px;font-size:12px;padding:0 10px;background:var(--accent);border-color:var(--accent);font-weight:500;">Parameter</button>
+              <button class="btn v2-groupby-btn" style="height:26px;font-size:12px;padding:0 10px;">Condition</button>
+              <span style="width:1px;height:20px;background:#e5e6eb;margin:0 4px;"></span>
+              <span style="font-size:12px;color:#86909c;white-space:nowrap;">Period:</span>
+              <select style="height:26px;font-size:12px;padding:0 8px;min-width:130px;"><option value="">All</option><option>2025-04</option><option>2025-05</option><option>2025-06</option></select>
+            </div>
+            <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+              <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>P1</strong><span style="font-size:12px;color:var(--text-secondary);">ratio:0.3, tickInterval:100</span></div>
+                <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">4 records</span><span class="status-tag status-active">In Use</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+              </div>
+              <div class="test-group-body" style="padding:0;">
+                <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td>P1-01</td><td>Market in (HKEX) | STK</td><td>2025-06-01 ~ 06-30</td><td>2025-07-01 09:00</td><td>15</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P1-02</td><td>Market in (SGX) | STK</td><td>2025-06-01 ~ 06-30</td><td>2025-07-01 09:30</td><td>10</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P1-03</td><td>Market in (HKEX) | STK</td><td>2025-04-01 ~ 04-30</td><td>2025-05-15 14:00</td><td>13</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P1-04</td><td>Market in (HKEX) | STK</td><td>2025-05-01 ~ 05-31</td><td>2025-06-10 11:00</td><td>16</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                </tbody></table>
+              </div>
+            </div>
+          </div>
+          <div id="v2t-tab-c001v12-s2" style="display:none;">
+            <div style="margin-bottom:12px; padding:8px 12px; background:#fbfffc; border:1px solid #c8e8c8; border-radius:4px; font-size:12px; color:#0a8a0a; display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:600;">S2: Daily K Detection</span><span style="color:var(--text-secondary);">— 日K行情检测</span>
+              <span class="status-tag status-active" style="margin-left:auto;">In Use</span>
+            </div>
+            <!-- Group By + Filter -->
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; padding:8px 12px; background:#f7f8fa; border-radius:4px;">
+              <span style="font-size:12px;color:#86909c;white-space:nowrap;">Group by:</span>
+              <button class="btn v2-groupby-btn active" style="height:26px;font-size:12px;padding:0 10px;background:var(--accent);border-color:var(--accent);font-weight:500;">Parameter</button>
+              <button class="btn v2-groupby-btn" style="height:26px;font-size:12px;padding:0 10px;">Condition</button>
+              <span style="width:1px;height:20px;background:#e5e6eb;margin:0 4px;"></span>
+              <span style="font-size:12px;color:#86909c;white-space:nowrap;">Period:</span>
+              <select style="height:26px;font-size:12px;padding:0 8px;min-width:130px;"><option value="">All</option><option>2025-01</option><option>2025-02</option><option>2025-03</option></select>
+            </div>
+            <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+              <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+                <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>P1</strong><span style="font-size:12px;color:var(--text-secondary);">ratio:0.25, minVolume:50000</span></div>
+                <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">3 records</span><span class="status-tag status-active">In Use</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+              </div>
+              <div class="test-group-body" style="padding:0;">
+                <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+                <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td>P1-01</td><td>Market in (HKEX) | STK</td><td>2025-03-01 ~ 03-31</td><td>2025-04-10 10:00</td><td>20</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P1-02</td><td>Market in (HKEX) | STK</td><td>2025-01-01 ~ 01-31</td><td>2025-02-20 09:00</td><td>14</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                  <tr><td>P1-03</td><td>Market in (SGX) | STK</td><td>2025-02-01 ~ 02-28</td><td>2025-03-15 16:00</td><td>9</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                </tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TS_A001 V6.6: Draft, no test records yet -->
+        <div id="v2t-panel-a001_v66" style="display:none;">
+          <div class="page-header"><h2>TS_A001_V6.6 — Possible Wash Trade (enhanced)</h2><button class="btn btn-primary" onclick="showPage('addtest2')">+ Add</button></div>
+          <div style="padding:40px; text-align:center; color:#86909c; border:1px dashed var(--border); border-radius:6px;">该版本暂无测试记录，点击 "+ Add" 创建首次测试</div>
+        </div>
+
+        <!-- TS_A006 V6.1: Pre-arranged Trading -->
+        <div id="v2t-panel-a006_v61" style="display:none;">
+          <div class="page-header"><h2>TS_A006_V6.1 — Pre-arranged Trading</h2><button class="btn btn-primary" onclick="showPage('addtest2')">+ Add</button></div>
+          <!-- Group By + Filter -->
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; padding:8px 12px; background:#f7f8fa; border-radius:4px;">
+            <span style="font-size:12px; color:#86909c; white-space:nowrap;">Group by:</span>
+            <button class="btn v2-groupby-btn active" style="height:26px;font-size:12px;padding:0 10px;background:var(--accent);border-color:var(--accent);font-weight:500;">Parameter</button>
+            <button class="btn v2-groupby-btn" style="height:26px;font-size:12px;padding:0 10px;">Condition</button>
+            <span style="width:1px; height:20px; background:#e5e6eb; margin:0 4px;"></span>
+            <span style="font-size:12px; color:#86909c; white-space:nowrap;">Period:</span>
+            <select style="height:26px; font-size:12px; padding:0 8px; min-width:130px;">
+              <option value="">All</option>
+              <option value="2025-04">2025-04</option>
+              <option value="2025-06">2025-06</option>
+              <option value="2025-07">2025-07</option>
+            </select>
+          </div>
+          <!-- P1: priceDiffRatio:0.05, tradePairTimes:3 (In Use) -->
+          <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+            <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+              <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>P1</strong><span style="font-size:12px;color:var(--text-secondary);">priceDiffRatio:0.05, tradePairTimes:3, isProfit:true</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">4 records</span><span class="status-tag status-active">In Use</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+            </div>
+            <div class="test-group-body" style="padding:0;">
+              <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+              <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P1-01</td><td>Security Type in (STK) | HKEX</td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 09:00</td><td>10</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-02</td><td>Security Type in (STK) | SGX</td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 09:20</td><td>6</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-03</td><td>Security Type in (STK) | HKEX</td><td>2025-04-01 ~ 04-30</td><td>2025-06-10 09:00</td><td>8</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-04</td><td>Security Type in (STK) | SGX</td><td>2025-04-01 ~ 04-30</td><td>2025-06-10 09:30</td><td>5</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+          <!-- P2: priceDiffRatio:0.05, tradePairTimes:3, isProfit:false (In Use) -->
+          <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+            <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+              <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▶</span><strong>P2</strong><span style="font-size:12px;color:var(--text-secondary);">priceDiffRatio:0.05, tradePairTimes:3, isProfit:false</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">3 records</span><span class="status-tag status-active">In Use</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+            </div>
+            <div class="test-group-body" style="padding:0; display:none;">
+              <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+              <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P2-01</td><td>Security Type in (STK) | HKEX</td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 10:00</td><td>9</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P2-02</td><td>Security Type in (STK) | SGX</td><td>2025-07-01 ~ 07-31</td><td>2025-08-05 10:20</td><td>4</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P2-03</td><td>Security Type in (STK) | HKEX</td><td>2025-06-01 ~ 06-30</td><td>2025-07-10 14:00</td><td>7</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TS_B001 V6.3: Pump and Dump -->
+        <div id="v2t-panel-b001_v63" style="display:none;">
+          <div class="page-header"><h2>TS_B001_V6.3 — Pump and Dump</h2><button class="btn btn-primary" onclick="showPage('addtest2')">+ Add</button></div>
+          <!-- Group By + Filter -->
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; padding:8px 12px; background:#f7f8fa; border-radius:4px;">
+            <span style="font-size:12px; color:#86909c; white-space:nowrap;">Group by:</span>
+            <button class="btn v2-groupby-btn active" style="height:26px;font-size:12px;padding:0 10px;background:var(--accent);border-color:var(--accent);font-weight:500;">Parameter</button>
+            <button class="btn v2-groupby-btn" style="height:26px;font-size:12px;padding:0 10px;">Condition</button>
+            <span style="width:1px; height:20px; background:#e5e6eb; margin:0 4px;"></span>
+            <span style="font-size:12px; color:#86909c; white-space:nowrap;">Period:</span>
+            <select style="height:26px; font-size:12px; padding:0 8px; min-width:130px;">
+              <option value="">All</option>
+              <option value="2025-06">2025-06</option>
+              <option value="2025-07">2025-07</option>
+              <option value="2025-08">2025-08</option>
+            </select>
+          </div>
+          <!-- P1: spikeThreshold:0.1, volumeRatio:3 (In Use) -->
+          <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+            <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+              <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▼</span><strong>P1</strong><span style="font-size:12px;color:var(--text-secondary);">spikeThreshold:0.1, volumeRatio:3</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">5 records</span><span class="status-tag status-active">In Use</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+            </div>
+            <div class="test-group-body" style="padding:0;">
+              <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+              <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P1-01</td><td>Market in (HKEX) | STK</td><td>2025-08-01 ~ 08-31</td><td>2025-09-05 09:00</td><td>11</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-02</td><td>Market in (HKEX) | STK</td><td>2025-07-01 ~ 07-31</td><td>2025-08-10 14:00</td><td>7</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-03</td><td>Market in (SGX) | STK</td><td>2025-07-01 ~ 07-31</td><td>2025-08-10 14:30</td><td>4</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-04</td><td>Market in (HKEX) | STK</td><td>2025-06-01 ~ 06-30</td><td>2025-07-15 11:00</td><td>9</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P1-05</td><td>Market in (SGX) | STK</td><td>2025-06-01 ~ 06-30</td><td>2025-07-15 11:30</td><td>3</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+          <!-- P2: spikeThreshold:0.05, volumeRatio:5 (Unused) -->
+          <div class="test-group" style="border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+            <div class="test-group-header" style="background:var(--header-bg); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleTestGroup(this)">
+              <div style="display:flex; align-items:center; gap:10px; flex:1;"><span style="font-size:10px;color:#86909c;">▶</span><strong>P2</strong><span style="font-size:12px;color:var(--text-secondary);">spikeThreshold:0.05, volumeRatio:5</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:11px;color:#86909c;">2 records</span><span class="status-tag" style="background:#f0f0f0;color:#86909c;">Unused</span><button class="btn-link" onclick="event.stopPropagation()">Copy</button></div>
+            </div>
+            <div class="test-group-body" style="padding:0; display:none;">
+              <table class="data-table" style="border:none;"><colgroup><col style="width:70px"><col style="width:190px"><col style="width:150px"><col style="width:130px"><col style="width:55px"><col style="width:75px"><col style="width:50px"></colgroup>
+              <thead><tr><th>ID</th><th>Condition</th><th>Test Period</th><th>Submitted</th><th>Alerts</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P2-01</td><td>Market in (HKEX) | STK</td><td>2025-08-01 ~ 08-31</td><td>2025-09-06 10:00</td><td>28</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+                <tr><td>P2-02</td><td>Market in (SGX) | STK</td><td>2025-08-01 ~ 08-31</td><td>2025-09-06 10:30</td><td>19</td><td><span class="status-tag status-finished">FINISHED</span></td><td><button class="btn-link">Detail</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 3-V2b: Add Test V2 ==================== -->
+<div class="page-container" id="page-addtest2">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Rule Testing V2 <span>&gt;</span> Add Test</div>
+  <div style="padding: 20px 24px;">
+    <a class="back-link" onclick="showPage('ruletesting2')">&#8592; Back</a>
+
+    <div class="add-test-container">
+      <!-- Feature Info (read-only context) -->
+      <div class="section-title">Feature Information</div>
+      <div class="info-row">
+        <span class="label">Feature Code:</span>
+        <span class="value" id="v2add-feat-code">TS_C001_V1.3</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Feature Name:</span>
+        <span class="value" id="v2add-feat-name">Market Dominance at Open/Close (enhanced)</span>
+      </div>
+
+      <!-- SubType selection (only shown when Feature has SubTypes) -->
+      <div id="v2add-subtype-section">
+        <div class="section-title">SubType</div>
+        <div style="display:flex; gap:12px; margin-bottom:4px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:2px solid #d4b5f0;border-radius:6px;background:#fefbff;font-size:13px;" id="v2add-st-s1">
+            <input type="radio" name="v2add-subtype" value="S1" checked onchange="switchV2AddSubType()">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7b2cbf;"></span>
+            <span style="font-weight:500;">S1: Tick Data Detection</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:2px solid var(--border);border-radius:6px;background:#fff;font-size:13px;" id="v2add-st-s2">
+            <input type="radio" name="v2add-subtype" value="S2" onchange="switchV2AddSubType()">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0a8a0a;"></span>
+            <span>S2: Daily K Detection</span>
+          </label>
+        </div>
+        <div style="font-size:11px; color:#86909c; margin-bottom:8px;">选择要测试的代码逻辑分支</div>
+      </div>
+
+      <!-- Logic Description (read-only, changes with SubType) -->
+      <div class="info-row" style="margin-top:8px;">
+        <span class="label">Logic Description:</span>
+        <span class="value" id="v2add-logic-desc">基于逐笔行情数据，检测开盘/收盘时段单一账户的市场主导行为</span>
+      </div>
+
+      <!-- Parameters -->
+      <div class="section-title">Parameters</div>
+      <table class="data-table" style="margin-top: 8px;" id="v2add-params-table">
+        <thead>
+          <tr>
+            <th style="width:160px;">Parameter Key</th>
+            <th>Description</th>
+            <th style="width:120px;">Value</th>
+          </tr>
+        </thead>
+        <tbody id="v2add-params-body">
+          <tr>
+            <td>ratio</td>
+            <td>市场占比阈值，小数(0-1)</td>
+            <td><input type="text" value="0.3" style="width:100px;"></td>
+          </tr>
+          <tr>
+            <td>tickInterval</td>
+            <td>逐笔间隔阈值(ms)</td>
+            <td><input type="text" value="100" style="width:100px;"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Conditions -->
+      <div class="section-title">Conditions</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Condition Type</th>
+            <th>Configuration</th>
+            <th>Included</th>
+            <th>Description</th>
+            <th style="width:100px;">Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Security Type</td>
+            <td>STK</td>
+            <td>Yes</td>
+            <td>证券类型筛选</td>
+            <td>
+              <button class="btn-link">Edit</button>
+              <button class="btn-link" style="color:#f53f3f;">Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Market</td>
+            <td>HKEX</td>
+            <td>Yes</td>
+            <td>市场筛选</td>
+            <td>
+              <button class="btn-link">Edit</button>
+              <button class="btn-link" style="color:#f53f3f;">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn" style="margin-top: 8px;">+ Add Condition</button>
+
+      <!-- Testing Periods -->
+      <div class="section-title">Testing Periods</div>
+      <div class="period-row">
+        <span class="period-label">Period #1:</span>
+        <input type="date" value="2025-08-01">
+        <span>~</span>
+        <input type="date" value="2025-08-31">
+        <button class="remove-btn">&times; Remove</button>
+      </div>
+      <div class="period-row">
+        <span class="period-label">Period #2:</span>
+        <input type="date" value="2025-09-01">
+        <span>~</span>
+        <input type="date" value="2025-09-30">
+        <button class="remove-btn">&times; Remove</button>
+      </div>
+      <button class="add-period-btn">+ Add Period</button>
+
+      <!-- Actions -->
+      <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+        <button class="btn" onclick="showPage('ruletesting2')">Cancel</button>
+        <button class="btn btn-primary" onclick="alert('Test submitted! System will route to parameter group based on values.\n\nFeature: TS_C001_V1.3\nSubType: S1 - Tick Data Detection\nParams: ratio=0.3, tickInterval=100\nCondition: STK | HKEX\nPeriods: 2025-08 ~ 2025-09');showPage('ruletesting2')">Run Test</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== PAGE 3b: Add Test ==================== -->
 <div class="page-container" id="page-addtest">
   <div class="breadcrumb">合规管理 <span>&gt;</span> Rule Testing <span>&gt;</span> Add Test</div>
@@ -1740,16 +2658,19 @@ input[type="text"] {
   </div>
 </div>
 
-<!-- ==================== PAGE 4: Rule (Running Rule) ==================== -->
+<!-- ==================== PAGE 4: Rule (Online Rule) ==================== -->
 <div class="page-container" id="page-rule">
-  <div class="breadcrumb">合规管理 <span>&gt;</span> Policy <span>&gt;</span> Running Rule</div>
+  <div class="breadcrumb">合规管理 <span>&gt;</span> TS Rule Management <span>&gt;</span> Online Rule</div>
   <div style="padding: 20px 24px;">
     <!-- Domain Tabs -->
     <div class="domain-tabs" style="margin-bottom: 16px;">
-      <span class="domain-tab active">TS</span>
-      <span class="domain-tab">Other (Legacy)</span>
+      <span class="domain-tab active" id="rule-tab-TS" onclick="switchRuleDomain('TS')">TS</span>
+      <span class="domain-tab" id="rule-tab-TSV2" onclick="switchRuleDomain('TSV2')">TS V2</span>
+      <span class="domain-tab" id="rule-tab-OTHER" onclick="switchRuleDomain('OTHER')">Other (Legacy)</span>
     </div>
 
+    <!-- TS Panel (original) -->
+    <div id="rule-panel-TS">
     <div class="filter-bar">
       <input type="text" placeholder="Search rule code or name..." style="width: 220px;">
       <select style="width: 120px;">
@@ -1768,7 +2689,7 @@ input[type="text"] {
       <button class="btn">查询</button>
       <button class="btn">Reset</button>
       <div class="right-actions">
-        <button class="btn btn-primary" onclick="showModal('modal-running-rule')">+ Create</button>
+        <button class="btn btn-primary" onclick="showModal('modal-online-rule')">+ Create</button>
       </div>
     </div>
 
@@ -1779,7 +2700,7 @@ input[type="text"] {
       <thead>
         <tr>
           <th>ID</th>
-          <th>Running Rule Name</th>
+          <th>Online Rule Name</th>
           <th>Rule Type</th>
           <th>Feature</th>
           <th>Param IDs</th>
@@ -1889,7 +2810,189 @@ input[type="text"] {
       <span>2</span>
       <span>3</span>
       <span>&#8250;</span>
-      <span style="border: none; margin-left: 8px;">Total 3 items</span>
+      <span style="border: none; margin-left: 8px;">Total 5 items</span>
+    </div>
+    </div><!-- end rule-panel-TS -->
+
+    <!-- TS V2 Panel -->
+    <div id="rule-panel-TSV2" style="display:none;">
+      <div class="filter-bar">
+        <input type="text" placeholder="Search rule code or name..." style="width: 220px;">
+        <select style="width: 120px;">
+          <option selected>Status: All</option>
+          <option>Enabled</option>
+          <option>Pending</option>
+          <option>Disabled</option>
+        </select>
+        <select style="width: 140px;">
+          <option value="">Rule Type: All</option>
+          <option>TS_A001</option>
+          <option>TS_A006</option>
+          <option>TS_B001</option>
+          <option>TS_C001</option>
+        </select>
+        <button class="btn">查询</button>
+        <button class="btn">Reset</button>
+        <div class="right-actions">
+          <button class="btn btn-primary" onclick="openRRV2Create()">+ Create</button>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <colgroup>
+          <col style="width:70px"><col style="width:200px"><col style="width:80px"><col style="width:110px"><col style="width:80px"><col style="width:75px"><col style="width:65px"><col style="width:90px"><col style="width:65px"><col style="width:130px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Running Rule Name</th>
+            <th>Rule Type</th>
+            <th>Feature Code</th>
+            <th>Param Sets</th>
+            <th>Status</th>
+            <th>Queued</th>
+            <th>Effective Time</th>
+            <th>Operator</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2001</td>
+            <td>Pre-arranged Trading - Profit</td>
+            <td>TS_A006</td>
+            <td>TS_A006_V6.1</td>
+            <td>P1</td>
+            <td><span class="status-tag status-enabled">Enabled</span></td>
+            <td><span style="color:#ff7d00; font-size:12px;">Yes</span></td>
+            <td>2026-01-01</td>
+            <td>admin</td>
+            <td>
+              <button class="btn-link" onclick="openRRV2Detail('2001')">Detail</button>
+              <button class="btn-link" onclick="openRRV2Detail('2001','edit')">Edit</button>
+              <button class="btn-link" onclick="openRRV2Detail('2001','log')">Log</button>
+              <button class="btn-link" style="color:#f53f3f;">Disable</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2002</td>
+            <td>Pre-arranged Trading - Loss</td>
+            <td>TS_A006</td>
+            <td>TS_A006_V6.1</td>
+            <td>P2</td>
+            <td><span class="status-tag status-enabled">Enabled</span></td>
+            <td style="color:#86909c; font-size:11px;">--</td>
+            <td>2026-01-01</td>
+            <td>admin</td>
+            <td>
+              <button class="btn-link" onclick="openRRV2Detail('2002')">Detail</button>
+              <button class="btn-link" onclick="openRRV2Detail('2002','edit')">Edit</button>
+              <button class="btn-link" onclick="openRRV2Detail('2002','log')">Log</button>
+              <button class="btn-link" style="color:#f53f3f;">Disable</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2003</td>
+            <td>Possible Wash Trade (A to B)</td>
+            <td>TS_A001</td>
+            <td>TS_A001_V6.5</td>
+            <td>P1</td>
+            <td><span class="status-tag status-enabled">Enabled</span></td>
+            <td style="color:#86909c; font-size:11px;">--</td>
+            <td>2026-03-10</td>
+            <td>shuhan</td>
+            <td>
+              <button class="btn-link" onclick="openRRV2Detail('2003')">Detail</button>
+              <button class="btn-link" onclick="openRRV2Detail('2003','edit')">Edit</button>
+              <button class="btn-link" onclick="openRRV2Detail('2003','log')">Log</button>
+              <button class="btn-link" style="color:#f53f3f;">Disable</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2004</td>
+            <td>Market Dominance - Open/Close</td>
+            <td>TS_C001</td>
+            <td>TS_C001_V1.2</td>
+            <td>S1:P1, S2:P1</td>
+            <td><span class="status-tag status-enabled">Enabled</span></td>
+            <td style="color:#86909c; font-size:11px;">--</td>
+            <td>2026-04-15</td>
+            <td>shuhan</td>
+            <td>
+              <button class="btn-link" onclick="openRRV2Detail('2004')">Detail</button>
+              <button class="btn-link" onclick="openRRV2Detail('2004','edit')">Edit</button>
+              <button class="btn-link" onclick="openRRV2Detail('2004','log')">Log</button>
+              <button class="btn-link" style="color:#f53f3f;">Disable</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2005</td>
+            <td>Pump and Dump - HKEX</td>
+            <td>TS_B001</td>
+            <td>TS_B001_V6.3</td>
+            <td>P1</td>
+            <td><span class="status-tag" style="background:#fff3e5; color:#ff7d00;">Pending</span></td>
+            <td style="color:#86909c; font-size:11px;">--</td>
+            <td style="color:#ff7d00;">2026-06-01</td>
+            <td>admin</td>
+            <td>
+              <button class="btn-link" onclick="openRRV2Detail('2005')">Detail</button>
+              <button class="btn-link" onclick="openRRV2Detail('2005','edit')">Edit</button>
+              <button class="btn-link" onclick="openRRV2Detail('2005','log')">Log</button>
+              <button class="btn-link" style="color:#f53f3f;">Disable</button>
+            </td>
+          </tr>
+          <tr style="color:#86909c;">
+            <td>2006</td>
+            <td>Market Dominance - Legacy</td>
+            <td>TS_C001</td>
+            <td>TS_C001_V1.1</td>
+            <td>S1:P1</td>
+            <td><span class="status-tag" style="background:#f0f0f0; color:#86909c;">Disabled</span></td>
+            <td style="font-size:11px;">--</td>
+            <td>2025-06-01</td>
+            <td>admin</td>
+            <td>
+              <button class="btn-link" onclick="openRRV2Detail('2006')">Detail</button>
+              <button class="btn-link" onclick="openRRV2Detail('2006','log')">Log</button>
+              <button class="btn-link" style="color:#00b42a;">Enable</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <span>&#8249;</span>
+        <span class="current">1</span>
+        <span>&#8250;</span>
+        <span style="border: none; margin-left: 8px;">Total 6 items</span>
+      </div>
+    </div><!-- end rule-panel-TSV2 -->
+
+    <!-- Other (Legacy) Panel -->
+    <div id="rule-panel-OTHER" style="display:none;">
+      <div style="padding:20px 0;">
+        <div style="background:#fff8e6; border:1px solid #ffcf70; border-radius:4px; padding:10px 14px; font-size:12px; color:#8b6914;">
+          旧版 Rule（TM / AML 等）不在本次改造范围内，保留原有功能。
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== MODAL: Online Rule V2 Detail ==================== -->
+<div class="modal-overlay" id="modal-rr-v2-detail" style="align-items:center;">
+  <div class="modal" style="width:720px; max-height:80vh; overflow-y:auto; margin:auto;">
+    <div class="modal-header">
+      <span id="rr-v2-detail-title">Running Rule Detail</span>
+      <span class="modal-close" onclick="hideModal('modal-rr-v2-detail')">&times;</span>
+    </div>
+    <div class="modal-body" id="rr-v2-detail-body">
+      <!-- Content injected by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-rr-v2-detail')">Close</button>
     </div>
   </div>
 </div>
@@ -2044,12 +3147,12 @@ input[type="text"] {
   </div>
 </div>
 
-<!-- ==================== MODAL: Running Rule Create ==================== -->
-<div class="modal-overlay" id="modal-running-rule">
+<!-- ==================== MODAL: Online Rule Create ==================== -->
+<div class="modal-overlay" id="modal-online-rule">
   <div class="modal" style="width: 800px;">
     <div class="modal-header">
-      Create Running Rule
-      <span class="modal-close" onclick="hideModal('modal-running-rule')">&times;</span>
+      Create Online Rule
+      <span class="modal-close" onclick="hideModal('modal-online-rule')">&times;</span>
     </div>
     <div class="modal-body">
       <!-- Step 1: Select Rule Type -->
@@ -2122,10 +3225,10 @@ input[type="text"] {
 
       <div style="border-top:1px solid var(--border); margin:16px 0; padding-top:16px;"></div>
 
-      <!-- Running Rule specific fields -->
+      <!-- Online Rule specific fields -->
 
       <div class="form-group">
-        <label>Running Rule Name <span style="color:red">*</span> <span title="The prefix is auto-generated from Rule Type Name and cannot be modified. The suffix after '-' is customizable by compliance, and will be displayed in Alert." style="cursor:help; color:#86909c;">&#9432;</span></label>
+        <label>Online Rule Name <span style="color:red">*</span> <span title="The prefix is auto-generated from Rule Type Name and cannot be modified. The suffix after '-' is customizable by compliance, and will be displayed in Alert." style="cursor:help; color:#86909c;">&#9432;</span></label>
         <div style="display:flex; gap:8px; align-items:center;">
           <span id="rr-name-prefix" style="font-size:13px; color:#86909c; white-space:nowrap;">—</span>
           <span style="color:#86909c;">-</span>
@@ -2182,8 +3285,8 @@ input[type="text"] {
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="hideModal('modal-running-rule')">Cancel</button>
-      <button class="btn" onclick="hideModal('modal-running-rule')">Reset</button>
+      <button class="btn" onclick="hideModal('modal-online-rule')">Cancel</button>
+      <button class="btn" onclick="hideModal('modal-online-rule')">Reset</button>
       <button class="btn btn-primary" onclick="confirmCreateRunningRule()">Confirm</button>
     </div>
   </div>
@@ -2202,18 +3305,21 @@ function showPage(pageId) {
   const tabLabel = document.querySelector('.tab-label');
   const names = {
     ruletype: 'Rule Type',
-    feature: 'Feature',
+    feature: 'Rule Logic',
     ruletesting: 'Rule Testing',
     addtest: 'Add Test',
     testdetail: 'Test Detail',
-    rule: 'Running Rule'
+    rule: 'Online Rule'
   };
   if (tabLabel) tabLabel.textContent = names[pageId] || pageId;
 
   // Update nav active state
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (pageId === 'ruletesting' || pageId === 'addtest' || pageId === 'testdetail') {
-    document.getElementById('nav-ruletesting').classList.add('active');
+  if (pageId === 'ruletype' || pageId === 'feature') {
+    document.getElementById('nav-policy').classList.add('active');
+  }
+  if (pageId === 'rule' || pageId === 'ruletesting' || pageId === 'ruletesting2' || pageId === 'addtest' || pageId === 'addtest2' || pageId === 'testdetail') {
+    document.getElementById('nav-tsrule').classList.add('active');
   }
 
   // Close any open dropdowns
@@ -2461,7 +3567,7 @@ function showTestDetailPage(subId) {
   document.getElementById('detail-sub-id').textContent = subId;
 }
 
-// ==================== Running Rule Cascade Dropdowns ====================
+// ==================== Online Rule Cascade Dropdowns ====================
 const rrFeaturesByType = {
   'TS_A001': [
     { value: 'TS_A001_V6.5', label: 'TS_A001_V6.5 - Possible Wash Trade (A to B) [In Use]' },
@@ -2554,7 +3660,7 @@ function updateRRTestingOptions() {
 
 let currentConditionTarget = null;
 
-// ==================== Running Rule Detail/Edit ====================
+// ==================== Online Rule Detail/Edit ====================
 const rrData = {
   '1011': { code:'1011', name:'Pre-arranged Trading - Profit', ruleType:'TS_A006', feature:'TS_A006_V6.1', params:[
     {id:'P1', params:'priceDiffRatio:0.05, orderTradeIntervalMinute:5, isProfit:true, orderTimes:5', condition:'Security Type in (STK)'},
@@ -2647,7 +3753,7 @@ function openRRDetail(row) {
     <div style="border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:4px;">
       <div style="font-size:13px; font-weight:600; margin-bottom:12px; color:${currentLabelColor};">${currentLabel}</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-        <div><span style="font-size:11px; color:#86909c;">Running Rule Name</span><div style="font-size:13px; margin-top:2px;">${data.name}</div></div>
+        <div><span style="font-size:11px; color:#86909c;">Online Rule Name</span><div style="font-size:13px; margin-top:2px;">${data.name}</div></div>
         <div><span style="font-size:11px; color:#86909c;">Rule Type</span><div style="font-size:13px; margin-top:2px;">${data.ruleType}</div></div>
         <div><span style="font-size:11px; color:#86909c;">Feature</span><div style="font-size:13px; margin-top:2px;">${data.feature}</div></div>
         <div><span style="font-size:11px; color:#86909c;">Weight</span><div style="font-size:13px; margin-top:2px;">${data.weight}</div></div>
@@ -2709,7 +3815,7 @@ function openRREdit(row) {
     </div>
     <div class="form-group"><label>Rule Type</label><input type="text" value="${data.ruleType}" disabled style="background:#f5f5f5; color:#86909c;"></div>
     <div class="form-group"><label>Feature Version</label><select style="width:100%; font-size:13px;"><option selected>${data.feature}</option><option>${data.ruleType}_V6.2</option><option>${data.ruleType}_V5.9</option></select></div>
-    <div class="form-group"><label>Running Rule Name</label><input type="text" value="${data.name}"></div>
+    <div class="form-group"><label>Online Rule Name</label><input type="text" value="${data.name}"></div>
     <div style="border-top:1px solid var(--border); margin:16px 0; padding-top:12px;">
       <div class="form-group">
         <label>Parameter Set <span style="font-size:11px; color:#86909c; font-weight:normal;">(Select to add more parameter groups)</span></label>
@@ -2732,7 +3838,7 @@ function openRREdit(row) {
   document.body.appendChild(overlay);
 }
 
-// ==================== Running Rule Enable/Disable ====================
+// ==================== Online Rule Enable/Disable ====================
 function toggleRRStatus(row) {
   const statusTd = row.querySelector('.status-tag');
   const actionTd = row.querySelector('td:last-child');
@@ -2741,7 +3847,7 @@ function toggleRRStatus(row) {
 
   if (isEnabled) {
     const hasUpcoming = rrData[ruleCode] && rrData[ruleCode].upcoming;
-    let items = '<li>Stop the current running rule</li><li>Update associated Parameter Set status to Offline</li><li>Update Feature status if no other Running Rule references it</li><li>Update Rule Type running rules count</li>';
+    let items = '<li>Stop the current online rule</li><li>Update associated Parameter Set status to Offline</li><li>Update Feature status if no other Online Rule references it</li><li>Update Rule Type online rules count</li>';
     if (hasUpcoming) {
       items += '<li style="color:#f53f3f;">Cancel the upcoming change (effective ' + rrData[ruleCode].upcoming.effectiveDate + ')</li>';
     }
@@ -2754,7 +3860,7 @@ function toggleRRStatus(row) {
       disableBtn.style.color = '#00b42a';
     });
   } else {
-    let items = '<li>Set this Running Rule to Enabled</li><li>Update associated Parameter Set status to In Use</li><li>Update Feature status to In Use</li><li>Update Rule Type running rules count</li>';
+    let items = '<li>Set this Online Rule to Enabled</li><li>Update associated Parameter Set status to In Use</li><li>Update Feature status to In Use</li><li>Update Rule Type online rules count</li>';
     showConfirmModal('Enable "' + ruleCode + '"', 'This will:', items, function() {
       statusTd.textContent = 'Enabled';
       statusTd.className = 'status-tag status-enabled';
@@ -2766,7 +3872,7 @@ function toggleRRStatus(row) {
   }
 }
 
-// Running Rule create confirm with conflict check
+// Online Rule create confirm with conflict check
 function confirmCreateRunningRule() {
   const ruleType = document.getElementById('rr-ruletype').value;
   if (!ruleType) {
@@ -2774,7 +3880,7 @@ function confirmCreateRunningRule() {
     return;
   }
 
-  // Check if there are existing enabled running rules with the same rule type
+  // Check if there are existing enabled online rules with the same rule type
   const existingRules = Object.values(rrData).filter(r => r.ruleType === ruleType);
   const enabledRules = existingRules.filter(r => !r.effectiveTime); // not pending = likely enabled
 
@@ -2782,14 +3888,14 @@ function confirmCreateRunningRule() {
     const ruleNames = enabledRules.map(r => '• ID: ' + r.code + ' | ' + r.name).join('<br>');
     showConfirmModal(
       'Existing rules detected for ' + ruleType,
-      'The following running rules with the same Rule Type are currently active:',
+      'The following online rules with the same Rule Type are currently active:',
       '<div style="background:#f7f8fa; border:1px solid var(--border); border-radius:4px; padding:10px 12px; margin:8px 0; font-size:12px;">' + ruleNames + '</div><li>Please confirm the new rule does not conflict with existing ones</li><li>If conflict exists, consider disabling the existing rule first</li>',
       function() {
-        hideModal('modal-running-rule');
+        hideModal('modal-online-rule');
       }
     );
   } else {
-    hideModal('modal-running-rule');
+    hideModal('modal-online-rule');
   }
 }
 
@@ -2814,7 +3920,7 @@ function showConfirmModal(title, subtitle, itemsHtml, onConfirm) {
   overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 }
 
-// ==================== Running Rule Log ====================
+// ==================== Online Rule Log ====================
 function showRRLog(ruleCode) {
   const logs = {
     '1011': [
@@ -3113,12 +4219,718 @@ document.getElementById('rt-category').addEventListener('change', updateRtCodePr
 document.getElementById('rt-number').addEventListener('input', updateRtCodePreview);
 
 // ==================== Feature Domain Tab ====================
+// ==================== Online Rule V2 Detail ====================
+var rrV2Data = {
+  '2001': { name:'Pre-arranged Trading - Profit', ruleType:'TS_A006', feature:'TS_A006_V6.1', status:'Enabled', effectiveTime:'2026-01-01', operator:'admin',
+    params:[{set:'P1', values:'priceDiffRatio:0.05, tradePairTimes:3, isProfit:true', condition:'Security Type in (STK) | HKEX, SGX'}],
+    queued:{desc:'Parameter update: P1 → P2', effective:'2026-06-01', by:'admin', time:'2026-01-14 10:30'},
+    logs:['2026-01-14 10:30 admin Queued param change (P1→P2, effective 2026-06-01)','2026-01-01 09:00 admin Status: Enabled','2025-12-20 14:00 admin Created']},
+  '2002': { name:'Pre-arranged Trading - Loss', ruleType:'TS_A006', feature:'TS_A006_V6.1', status:'Enabled', effectiveTime:'2026-01-01', operator:'admin',
+    params:[{set:'P2', values:'priceDiffRatio:0.05, tradePairTimes:3, isProfit:false', condition:'Security Type in (STK) | HKEX, SGX'}],
+    queued:null, logs:['2026-01-01 09:00 admin Status: Enabled','2025-12-20 14:30 admin Created']},
+  '2003': { name:'Possible Wash Trade (A to B)', ruleType:'TS_A001', feature:'TS_A001_V6.5', status:'Enabled', effectiveTime:'2026-03-10', operator:'shuhan',
+    params:[{set:'P1', values:'intervalMinute:5, crossTimesThreshold:3', condition:'Security Type in (STK) | HKEX, SGX'}],
+    queued:null, logs:['2026-05-13 11:00 shuhan Updated condition (added SGX)','2026-03-10 09:00 shuhan Created & Enabled']},
+  '2004': { name:'Market Dominance - Open/Close', ruleType:'TS_C001', feature:'TS_C001_V1.2', status:'Enabled', effectiveTime:'2026-04-15', operator:'shuhan',
+    params:[
+      {set:'S1:P1', subtype:'S1: Tick Data Detection', values:'ratio:0.3, tickInterval:100', condition:'Market in (HKEX) | STK, OPT'},
+      {set:'S2:P1', subtype:'S2: Daily K Detection', values:'ratio:0.25, minVolume:50000', condition:'Market in (SGX) | STK'}
+    ],
+    queued:null, logs:['2026-04-15 14:00 shuhan Created & Enabled','2026-04-15 14:00 shuhan Selected params: S1:P1 (Tick Data, tested 2025-08~09, best alerts: HKEX|STK 18), S2:P1 (Daily K, tested 2025-03~05, best alerts: HKEX|STK 22)']},
+  '2005': { name:'Pump and Dump - HKEX', ruleType:'TS_B001', feature:'TS_B001_V6.3', status:'Pending', effectiveTime:'2026-06-01', operator:'admin',
+    params:[{set:'P1', values:'spikeThreshold:0.1, volumeRatio:3', condition:'Market in (HKEX) | STK'}],
+    queued:null, logs:['2026-05-10 16:00 admin Created (Pending, effective 2026-06-01)']},
+  '2006': { name:'Market Dominance - Legacy', ruleType:'TS_C001', feature:'TS_C001_V1.1', status:'Disabled', effectiveTime:'2025-06-01', operator:'admin',
+    params:[{set:'S1:P1', subtype:'S1: Tick Data Detection', values:'ratio:0.3, tickInterval:80', condition:'Market in (HKEX) | STK'}],
+    queued:null, logs:['2026-04-15 14:30 shuhan Disabled (replaced by Rule 2004)','2025-06-01 09:00 admin Created & Enabled']}
+};
+
+function openRRV2Detail(id, tab) {
+  var d = rrV2Data[id];
+  if (!d) return;
+  var title = document.getElementById('rr-v2-detail-title');
+  var body = document.getElementById('rr-v2-detail-body');
+
+  if (tab === 'log') {
+    title.textContent = 'Operation Log — Running Rule #' + id;
+    var html = '<div style="font-size:12px; color:var(--text-secondary);">';
+    d.logs.forEach(function(log) { html += '<div style="padding:6px 0; border-bottom:1px solid #f2f3f5;">' + log + '</div>'; });
+    html += '</div>';
+    body.innerHTML = html;
+    showModal('modal-rr-v2-detail');
+    return;
+  }
+
+  if (tab === 'edit') {
+    if (d.queued) {
+      showConfirmModal(
+        'Cannot Edit — Queued Change Exists',
+        'This rule has a pending change scheduled for ' + d.queued.effective + '. You must cancel the queued change before editing.',
+        '<li>Go to Detail view to cancel the queued change</li><li>Then return to edit the current configuration</li>',
+        function() { /* just close */ }
+      );
+      return;
+    }
+    var paramHtml = '';
+    d.params.forEach(function(p) {
+      paramHtml += '<div style="border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden;">';
+      paramHtml += '<div style="background:#f7f8fa;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">';
+      paramHtml += '<div><strong style="font-size:13px;">' + p.set + '</strong>';
+      if (p.subtype) paramHtml += ' <span style="font-size:11px;background:#f0e6ff;color:#7b2cbf;padding:1px 6px;border-radius:3px;margin-left:6px;">' + p.subtype + '</span>';
+      paramHtml += ' <span style="font-size:12px;color:#86909c;margin-left:8px;">' + p.values + '</span></div>';
+      paramHtml += '<button class="btn-link" style="color:#f53f3f;font-size:12px;" onclick="this.parentElement.parentElement.remove()">Remove</button></div>';
+      paramHtml += '<div style="padding:10px 14px;"><div style="font-size:12px;color:#4e5969;margin-bottom:6px;">Conditions:</div>';
+      paramHtml += '<span style="display:inline-block;background:#e8f3ff;color:#165dff;padding:2px 8px;border-radius:3px;font-size:11px;margin-right:6px;">' + p.condition + ' <span style="cursor:pointer;margin-left:4px;" onclick="this.parentElement.remove()">&times;</span></span>';
+      paramHtml += '<button class="btn" style="font-size:11px;padding:3px 10px;margin-top:6px;display:block;">+ Add Condition</button></div></div>';
+    });
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:300;display:flex;align-items:center;justify-content:center;';
+    overlay.onclick = function(e) { if (e.target === this) this.remove(); };
+    overlay.innerHTML = '<div style="background:#fff;border-radius:8px;width:700px;max-height:80vh;overflow-y:auto;padding:24px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><strong style="font-size:15px;">Edit - Running Rule #' + id + '</strong><span style="cursor:pointer;font-size:20px;" onclick="this.closest(\'[style]\').parentElement.remove()">&times;</span></div>'
+      + '<div class="form-group"><label>Rule Type</label><input type="text" value="' + d.ruleType + '" disabled style="background:#f5f5f5;color:#86909c;"></div>'
+      + '<div class="form-group"><label>Feature Version</label><select style="width:100%;"><option selected>' + d.feature + '</option></select></div>'
+      + '<div class="form-group"><label>Running Rule Name</label><input type="text" value="' + d.name + '"></div>'
+      + '<div style="border-top:1px solid var(--border);margin:16px 0;padding-top:12px;">'
+      + '<div class="form-group"><label>Parameter Sets <span style="font-size:11px;color:#86909c;font-weight:normal;">(Select to add more)</span></label>'
+      + '<select style="width:100%;" onchange="addRRV2Param(this)"><option value="">+ Select Parameter Set to add</option><option value="P1" data-vals="ratio:0.3, tickInterval:100">P1 (ratio:0.3, tickInterval:100)</option><option value="P2" data-vals="ratio:0.2, tickInterval:150">P2 (ratio:0.2, tickInterval:150)</option><option value="P3" data-vals="ratio:0.4, tickInterval:80">P3 (ratio:0.4, tickInterval:80)</option></select></div>'
+      + '<div style="margin-top:8px;" id="rr-v2-edit-params">' + paramHtml + '</div></div>'
+      + '<div class="form-group"><label>Alert Category</label><select><option>Dynamic</option><option>Stable</option></select></div>'
+      + '<div class="form-group"><label>Alert Frequency</label><select><option>Daily</option><option>Weekly</option><option>Real-time</option></select></div>'
+      + '<div class="form-group"><label>Effective Time <span style="font-size:11px;color:#86909c;font-weight:normal;">(leave empty = immediate)</span></label><div style="display:flex;gap:8px;"><input type="text" placeholder="YYYY-MM-DD" style="width:140px;"><input type="text" placeholder="HH:MM" style="width:80px;"><span style="font-size:12px;color:#86909c;align-self:center;">GMT+8</span></div></div>'
+      + '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);"><button class="btn" onclick="this.closest(\'[style]\').parentElement.remove()">Cancel</button><button class="btn btn-primary" onclick="this.closest(\'[style]\').parentElement.remove()">Save</button></div>'
+      + '</div>';
+    document.body.appendChild(overlay);
+    return;
+  }
+
+  title.textContent = 'Detail — Running Rule #' + id;
+
+  var html = '';
+  // Basic info
+  html += '<div style="display:grid; grid-template-columns:120px 1fr; gap:8px 16px; font-size:13px; margin-bottom:16px;">';
+  html += '<div style="color:#86909c;">Rule Name</div><div style="font-weight:500;">' + d.name + '</div>';
+  html += '<div style="color:#86909c;">Rule Type</div><div>' + d.ruleType + '</div>';
+  html += '<div style="color:#86909c;">Feature Code</div><div>' + d.feature + '</div>';
+  html += '<div style="color:#86909c;">Status</div><div><span class="status-tag ' + (d.status==='Enabled'?'status-enabled':d.status==='Pending'?'':'status-offline') + '" style="' + (d.status==='Pending'?'background:#fff3e5;color:#ff7d00;':d.status==='Disabled'?'background:#f0f0f0;color:#86909c;':'') + '">' + d.status + '</span></div>';
+  html += '<div style="color:#86909c;">Effective Time</div><div>' + d.effectiveTime + '</div>';
+  html += '<div style="color:#86909c;">Operator</div><div>' + d.operator + '</div>';
+  html += '</div>';
+
+  // Parameter Sets
+  html += '<div style="font-weight:600; font-size:13px; margin-bottom:8px; padding-top:12px; border-top:1px solid var(--border);">Parameter Sets</div>';
+  d.params.forEach(function(p) {
+    html += '<div style="border:1px solid var(--border); border-radius:4px; padding:10px 12px; margin-bottom:8px; background:#fafbfc;">';
+    if (p.subtype) {
+      html += '<div style="font-size:12px; font-weight:500; color:#7b2cbf; margin-bottom:4px;">' + p.subtype + '</div>';
+    }
+    html += '<div style="display:grid; grid-template-columns:80px 1fr; gap:4px 12px; font-size:12px;">';
+    html += '<div style="color:#86909c;">Set ID</div><div style="font-weight:500;">' + p.set + '</div>';
+    html += '<div style="color:#86909c;">Parameters</div><div><code style="background:#f0f0f0;padding:2px 6px;border-radius:3px;font-size:11px;">' + p.values + '</code></div>';
+    html += '<div style="color:#86909c;">Condition</div><div>' + p.condition + '</div>';
+    html += '</div></div>';
+  });
+
+  // Queued Change
+  if (d.queued) {
+    html += '<div style="margin-top:12px; padding:10px 12px; background:#fff8e6; border:1px solid #ffcf70; border-radius:4px;">';
+    html += '<div style="font-size:12px; font-weight:600; color:#d46b08; margin-bottom:4px;">⏳ Queued Change</div>';
+    html += '<div style="font-size:12px; display:grid; grid-template-columns:80px 1fr; gap:4px 12px;">';
+    html += '<div style="color:#86909c;">Change</div><div>' + d.queued.desc + '</div>';
+    html += '<div style="color:#86909c;">Effective</div><div style="color:#ff7d00; font-weight:500;">' + d.queued.effective + '</div>';
+    html += '<div style="color:#86909c;">Queued by</div><div>' + d.queued.by + ' at ' + d.queued.time + '</div>';
+    html += '</div>';
+    html += '<button class="btn" style="margin-top:8px; height:26px; font-size:11px; color:#f53f3f; border-color:#f53f3f;" onclick="alert(\'Queued change cancelled.\')">Cancel Queued Change</button>';
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+  var footer = document.querySelector('#modal-rr-v2-detail .modal-footer');
+  footer.innerHTML = '<button class="btn" onclick="hideModal(\'modal-rr-v2-detail\')">Close</button>';
+  showModal('modal-rr-v2-detail');
+}
+
+// Online Rule V2 Create
+function openRRV2Create() {
+  var title = document.getElementById('rr-v2-detail-title');
+  var body = document.getElementById('rr-v2-detail-body');
+  title.textContent = 'Create Running Rule';
+
+  var html = '';
+  html += '<div class="form-group"><label>Rule Type <span style="color:red">*</span></label>';
+  html += '<select style="width:100%;" id="rr-create-rt" onchange="onRRCreateRTChange()"><option value="">-- Select Rule Type --</option><option value="TS_A001">TS_A001 - Possible Wash Trade</option><option value="TS_A006">TS_A006 - Pre-arranged Trading</option><option value="TS_B001">TS_B001 - Pump and Dump</option><option value="TS_C001">TS_C001 - Market Dominance</option></select></div>';
+
+  html += '<div class="form-group"><label>Feature Version <span style="color:red">*</span></label>';
+  html += '<select style="width:100%;" id="rr-create-feat" onchange="onRRCreateFeatChange()"><option value="">-- Select Rule Type first --</option></select></div>';
+
+  html += '<div class="form-group" id="rr-create-params-section" style="display:none;"><label>Parameter Sets <span style="color:red">*</span></label>';
+  html += '<div style="font-size:11px;color:#86909c;margin-bottom:6px;">Select parameter sets and configure conditions for each</div>';
+  html += '<select style="width:100%;margin-bottom:8px;" id="rr-create-param-select" onchange="onRRCreateAddParam(this)"><option value="">+ Select Parameter Set to add</option></select>';
+  html += '<div id="rr-create-param-cards"></div></div>';
+
+  html += '<div class="form-group"><label>Running Rule Name</label>';
+  html += '<div style="display:flex;align-items:center;gap:4px;">';
+  html += '<input type="text" id="rr-create-name-prefix" style="background:#f5f5f5;width:180px;" disabled placeholder="Auto from Rule Type">';
+  html += '<span style="color:#86909c;">-</span>';
+  html += '<input type="text" placeholder="Suffix (optional)" style="width:160px;">';
+  html += '</div><div style="font-size:11px;color:#86909c;margin-top:4px;">Prefix from Rule Type Name, suffix optional</div></div>';
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+  html += '<div class="form-group"><label>Alert Frequency</label><select style="width:100%;"><option>Daily</option><option>Weekly</option><option>Real-time</option></select></div>';
+  html += '<div class="form-group"><label>Alert Category</label><select style="width:100%;"><option>Dynamic</option><option>Stable</option></select></div>';
+  html += '</div>';
+
+  html += '<div class="form-group"><label>Effective Time <span style="font-size:11px;color:#86909c;font-weight:normal;">(Optional, leave empty for immediate)</span></label>';
+  html += '<div style="display:flex;gap:8px;align-items:center;"><input type="text" placeholder="YYYY-MM-DD" style="width:130px;"><input type="text" placeholder="HH:MM" style="width:80px;"><span style="font-size:11px;color:#86909c;">GMT+8</span></div></div>';
+
+  body.innerHTML = html;
+
+  // Change footer button
+  var footer = document.querySelector('#modal-rr-v2-detail .modal-footer');
+  footer.innerHTML = '<button class="btn" onclick="hideModal(\'modal-rr-v2-detail\')">Cancel</button><button class="btn btn-primary" onclick="hideModal(\'modal-rr-v2-detail\')">Confirm</button>';
+  showModal('modal-rr-v2-detail');
+}
+
+// Create cascade data
+var rrCreateFeatures = {
+  'TS_A001': [{code:'TS_A001_V6.5',status:'In Use'},{code:'TS_A001_V6.6',status:'Draft'}],
+  'TS_A006': [{code:'TS_A006_V6.1',status:'In Use'}],
+  'TS_B001': [{code:'TS_B001_V6.3',status:'In Use'}],
+  'TS_C001': [{code:'TS_C001_V1.2',status:'In Use'},{code:'TS_C001_V1.3',status:'Testing'}]
+};
+var rrCreateParams = {
+  'TS_A001_V6.5': [{id:'P1',vals:'intervalMinute:5, crossTimesThreshold:3',sub:''},{id:'P2',vals:'intervalMinute:3, crossTimesThreshold:5',sub:''}],
+  'TS_A001_V6.6': [{id:'P1',vals:'intervalMinute:5, crossTimesThreshold:3, minVolume:1000',sub:''}],
+  'TS_A006_V6.1': [{id:'P1',vals:'priceDiffRatio:0.05, tradePairTimes:3, isProfit:true',sub:''},{id:'P2',vals:'priceDiffRatio:0.05, tradePairTimes:3, isProfit:false',sub:''}],
+  'TS_B001_V6.3': [{id:'P1',vals:'spikeThreshold:0.1, volumeRatio:3',sub:''},{id:'P2',vals:'spikeThreshold:0.05, volumeRatio:5',sub:''}],
+  'TS_C001_V1.2': [{id:'S1:P1',vals:'ratio:0.3, tickInterval:100',sub:'S1'},{id:'S1:P2',vals:'ratio:0.2, tickInterval:150',sub:'S1'},{id:'S2:P1',vals:'ratio:0.25, minVolume:50000',sub:'S2'},{id:'S2:P2',vals:'ratio:0.15, minVolume:100000',sub:'S2'}],
+  'TS_C001_V1.3': [{id:'S1:P1',vals:'ratio:0.3, tickInterval:100',sub:'S1'},{id:'S1:P2',vals:'ratio:0.2, tickInterval:150',sub:'S1'},{id:'S1:P3',vals:'ratio:0.4, tickInterval:80',sub:'S1'},{id:'S2:P1',vals:'ratio:0.25, minVolume:50000',sub:'S2'},{id:'S2:P2',vals:'ratio:0.15, minVolume:100000',sub:'S2'}]
+};
+var rrCreateNames = {'TS_A001':'Possible Wash Trade','TS_A006':'Pre-arranged Trading','TS_B001':'Pump and Dump','TS_C001':'Market Dominance'};
+
+function onRRCreateRTChange() {
+  var rt = document.getElementById('rr-create-rt').value;
+  var featSel = document.getElementById('rr-create-feat');
+  featSel.innerHTML = '<option value="">-- Select Feature --</option>';
+  document.getElementById('rr-create-params-section').style.display = 'none';
+  document.getElementById('rr-create-param-cards').innerHTML = '';
+  document.getElementById('rr-create-name-prefix').value = rrCreateNames[rt] || '';
+  if (!rt) return;
+  var feats = rrCreateFeatures[rt] || [];
+  feats.forEach(function(f) { featSel.innerHTML += '<option value="' + f.code + '">' + f.code + ' (' + f.status + ')</option>'; });
+}
+
+function onRRCreateFeatChange() {
+  var feat = document.getElementById('rr-create-feat').value;
+  var section = document.getElementById('rr-create-params-section');
+  var paramSel = document.getElementById('rr-create-param-select');
+  document.getElementById('rr-create-param-cards').innerHTML = '';
+  if (!feat) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  paramSel.innerHTML = '<option value="">+ Select Parameter Set to add</option>';
+  var params = rrCreateParams[feat] || [];
+  params.forEach(function(p) {
+    var subLabel = p.sub ? ' [' + p.sub + ']' : '';
+    paramSel.innerHTML += '<option value="' + p.id + '" data-vals="' + p.vals + '" data-sub="' + p.sub + '">' + p.id + subLabel + ' — ' + p.vals + '</option>';
+  });
+}
+
+function onRRCreateAddParam(selectEl) {
+  var val = selectEl.value;
+  if (!val) return;
+  var opt = selectEl.options[selectEl.selectedIndex];
+  var vals = opt.dataset.vals || '';
+  var sub = opt.dataset.sub || '';
+  var container = document.getElementById('rr-create-param-cards');
+  var card = document.createElement('div');
+  card.style.cssText = 'border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden;';
+  var subTag = sub ? '<span style="font-size:11px;background:' + (sub==='S1'?'#f0e6ff':'#e6f7e6') + ';color:' + (sub==='S1'?'#7b2cbf':'#0a8a0a') + ';padding:1px 6px;border-radius:3px;margin-left:6px;">' + sub + '</span>' : '';
+  card.innerHTML = '<div style="background:#f7f8fa;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">'
+    + '<div><strong style="font-size:13px;">' + val + '</strong>' + subTag + '<span style="font-size:12px;color:#86909c;margin-left:8px;">' + vals + '</span></div>'
+    + '<button class="btn-link" style="color:#f53f3f;font-size:12px;" onclick="this.parentElement.parentElement.remove()">Remove</button></div>'
+    + '<div style="padding:10px 14px;"><div style="font-size:12px;color:#4e5969;margin-bottom:6px;">Conditions:</div>'
+    + '<div class="rr-cond-rows"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:12px;"><select style="height:26px;font-size:12px;padding:0 6px;"><option>Security Type</option><option>Market</option></select><select style="height:26px;font-size:12px;padding:0 6px;"><option>in</option><option>not in</option></select><input type="text" placeholder="e.g., STK" style="height:26px;font-size:12px;width:140px;"><button class="btn-link" style="color:#f53f3f;" onclick="this.parentElement.remove()">x</button></div></div>'
+    + '<button class="btn" style="font-size:11px;padding:3px 10px;" onclick="var rows=this.previousElementSibling;var row=rows.children[0].cloneNode(true);row.querySelectorAll(\'input\').forEach(function(i){i.value=\'\';});rows.appendChild(row);">+ Add Condition</button></div>';
+  container.appendChild(card);
+  selectEl.value = '';
+}
+
+function addRRV2Param(selectEl) {
+  var val = selectEl.value;
+  if (!val) return;
+  var vals = selectEl.options[selectEl.selectedIndex].dataset.vals || '';
+  var container = document.getElementById('rr-v2-edit-params');
+  var card = document.createElement('div');
+  card.style.cssText = 'border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden;';
+  card.innerHTML = '<div style="background:#f7f8fa;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">'
+    + '<div><strong style="font-size:13px;">' + val + '</strong><span style="font-size:12px;color:#86909c;margin-left:8px;">' + vals + '</span></div>'
+    + '<button class="btn-link" style="color:#f53f3f;font-size:12px;" onclick="this.parentElement.parentElement.remove()">Remove</button></div>'
+    + '<div style="padding:10px 14px;"><div style="font-size:12px;color:#4e5969;margin-bottom:6px;">Conditions:</div>'
+    + '<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:12px;"><select style="height:26px;font-size:12px;padding:0 6px;"><option>Security Type</option><option>Market</option></select><select style="height:26px;font-size:12px;padding:0 6px;"><option>in</option><option>not in</option></select><input type="text" placeholder="e.g., STK, HKEX" style="height:26px;font-size:12px;width:140px;"><button class="btn" style="height:26px;font-size:11px;padding:0 8px;" onclick="var row=this.parentElement.cloneNode(true);this.parentElement.parentElement.insertBefore(row,this.parentElement.nextSibling)">+</button></div>'
+    + '</div>';
+  container.appendChild(card);
+  selectEl.value = '';
+}
+
+function switchRuleDomain(domain) {
+  document.querySelectorAll('#page-rule .domain-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('rule-tab-' + domain).classList.add('active');
+  document.getElementById('rule-panel-TS').style.display = domain === 'TS' ? '' : 'none';
+  document.getElementById('rule-panel-TSV2').style.display = domain === 'TSV2' ? '' : 'none';
+  document.getElementById('rule-panel-OTHER').style.display = domain === 'OTHER' ? '' : 'none';
+}
+
 function switchFeatDomain(domain) {
   document.querySelectorAll('#page-feature .domain-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('feat-tab-' + domain).classList.add('active');
   document.getElementById('feat-panel-TS').style.display = domain === 'TS' ? '' : 'none';
+  document.getElementById('feat-panel-TSV2').style.display = domain === 'TSV2' ? '' : 'none';
   document.getElementById('feat-panel-OTHER').style.display = domain === 'OTHER' ? '' : 'none';
 }
+
+// ==================== Feature V2 (SubType) Functions ====================
+function filterV2Table() {
+  const rt = document.getElementById('v2-filter-ruletype').value;
+  const st = document.getElementById('v2-filter-subtype').value;
+  const search = document.getElementById('v2-search').value.toLowerCase();
+  document.querySelectorAll('#v2-feature-table tbody tr').forEach(row => {
+    let show = true;
+    if (rt && row.dataset.v2rt !== rt) show = false;
+    if (st && row.dataset.v2st !== st) show = false;
+    if (search && !row.textContent.toLowerCase().includes(search)) show = false;
+    row.style.display = show ? '' : 'none';
+  });
+}
+
+function openV2CreateModal() { openV2Modal('create', null); }
+
+// ==================== V2 Feature Modal ====================
+var v2Mode = 'create';
+var v2Data = {
+  'TS_A001': { subtypes: [], maxVer: {_: '6.5'} },
+  'TS_A006': { subtypes: [], maxVer: {_: '6.1'} },
+  'TS_B001': { subtypes: [], maxVer: {_: '6.3'} },
+  'TS_C001': { subtypes: ['S1: Tick Data Detection / 逐笔行情检测', 'S2: Daily K Detection / 日K行情检测'], maxVer: {S1: '1.2', S2: '1.1'} }
+};
+
+function openV2Modal(mode, row) {
+  v2Mode = mode;
+  var modal = document.getElementById('modal-v2-feature');
+  var title = document.getElementById('v2-modal-title');
+  var submitBtn = document.getElementById('v2-submit-btn');
+  var body = document.getElementById('v2-modal-body');
+
+  // Reset fields
+  document.getElementById('v2f-ruletype').value = '';
+  document.getElementById('v2f-name').value = '';
+  document.getElementById('v2f-major').value = '1';
+  document.getElementById('v2f-minor').value = '1';
+  document.getElementById('v2f-code').value = '';
+  document.getElementById('v2f-status').value = 'Draft';
+  document.getElementById('v2f-expression').value = '';
+  document.getElementById('v2f-desc').value = '';
+  document.getElementById('v2f-version-info').textContent = '';
+  document.getElementById('v2f-log-section').style.display = 'none';
+  // Reset variant mode to single
+  var radioNone = document.getElementById('v2f-chip-none');
+  if (radioNone) radioNone.querySelector('input').checked = true;
+  document.getElementById('v2f-single-panel').style.display = '';
+  document.getElementById('v2f-multi-panel').style.display = 'none';
+
+  // Enable/disable fields
+  var fields = body.querySelectorAll('select, input:not([type=radio]), textarea');
+  fields.forEach(function(f) { f.disabled = false; f.style.background = ''; f.style.color = ''; });
+  // Minor always disabled
+  document.getElementById('v2f-minor').disabled = true;
+  document.getElementById('v2f-minor').style.background = '#f5f5f5';
+  document.getElementById('v2f-minor').style.color = '#86909c';
+
+  if (mode === 'create') {
+    title.textContent = 'Create Feature (V2)';
+    submitBtn.textContent = 'Create';
+    submitBtn.style.display = '';
+  } else if (mode === 'detail') {
+    title.textContent = 'Feature Detail (V2)';
+    submitBtn.style.display = 'none';
+    fields.forEach(function(f) { f.disabled = true; f.style.background = '#f7f8fa'; f.style.color = '#86909c'; });
+    fillV2ModalFromRow(row);
+    document.getElementById('v2f-log-section').style.display = '';
+  } else if (mode === 'edit') {
+    title.textContent = 'Edit Feature (V2)';
+    submitBtn.textContent = 'Save';
+    submitBtn.style.display = '';
+    fillV2ModalFromRow(row);
+    // Lock rule type, version in edit
+    document.getElementById('v2f-ruletype').disabled = true;
+    document.getElementById('v2f-ruletype').style.background = '#f7f8fa';
+    document.getElementById('v2f-major').disabled = true;
+    document.getElementById('v2f-major').style.background = '#f7f8fa';
+    document.getElementById('v2f-minor').disabled = true;
+    document.getElementById('v2f-code').disabled = true;
+    document.getElementById('v2f-log-section').style.display = '';
+  }
+
+  modal.classList.add('show');
+}
+
+function fillV2ModalFromRow(row) {
+  if (!row) return;
+  var cells = row.querySelectorAll('td');
+  var code = cells[0].textContent.trim();
+  var name = cells[1].textContent.trim();
+  // Handle rowspan: Rule Type might be in cell[2] or missing due to rowspan
+  var rt = row.dataset.v2rt || '';
+  var verCell = cells[3] || cells[2];
+  var ver = '';
+  var variant = '';
+
+  // Parse from code: TS_C001_V1.2_S1 or TS_A001_V6.5
+  var codeMatch = code.match(/^(TS_\w+)_V(\d+\.\d+)(?:_(S\d+))?$/);
+  if (codeMatch) {
+    rt = codeMatch[1];
+    ver = 'V' + codeMatch[2];
+    variant = codeMatch[3] || '';
+  }
+
+  document.getElementById('v2f-ruletype').value = rt;
+  document.getElementById('v2f-name').value = name;
+  var parts = ver.replace('V','').split('.');
+  document.getElementById('v2f-major').value = parts[0] || '1';
+  document.getElementById('v2f-minor').value = parts[1] || '1';
+  document.getElementById('v2f-code').value = code;
+
+  // Show multi-panel if has variant
+  if (variant) {
+    document.getElementById('v2f-chip-multi').querySelector('input').checked = true;
+    switchV2VariantMode();
+  }
+
+  document.getElementById('v2f-expression').value = 'SELECT account_id, symbol\nFROM transactions t\nWHERE t.trade_interval < {intervalMinute}\n  AND t.dominance_ratio > {ratio}';
+  document.getElementById('v2f-desc').value = '检测' + name + '相关的交易行为';
+  document.getElementById('v2f-version-info').innerHTML = '当前版本: <strong>' + ver + '</strong>' + (variant ? ' / ' + variant : '');
+  document.getElementById('v2f-log-list').innerHTML = '<div style="padding:3px 0;">2025-09-01 10:00 shuhan Created</div><div style="padding:3px 0;">2025-09-05 14:30 shuhan Updated SQL logic</div>';
+}
+
+function closeV2Modal() { document.getElementById('modal-v2-feature').classList.remove('show'); }
+
+function onV2RuleTypeChange() {
+  var rt = document.getElementById('v2f-ruletype').value;
+  if (!rt) {
+    document.getElementById('v2f-version-info').textContent = '选择 Rule Type 后自动计算';
+    document.getElementById('v2f-code').value = '';
+    return;
+  }
+  updateV2Version();
+}
+
+// Version history: { ruleType: { majorNum: highestMinor } }
+// In V2 design, version is global per Rule Type (not per SubType)
+var v2VersionHistory = {
+  'TS_A001': { 6: 5, 5: 3, 4: 2 },
+  'TS_A006': { 6: 1 },
+  'TS_B001': { 6: 3 },
+  'TS_C001': { 1: 2, 2: 0 }
+};
+
+function updateV2Version() {
+  var rt = document.getElementById('v2f-ruletype').value;
+  if (!rt) return;
+
+  var history = v2VersionHistory[rt] || {};
+
+  // Find the current highest major version
+  var majors = Object.keys(history).map(Number);
+  var defaultMajor = majors.length > 0 ? Math.max.apply(null, majors) : 1;
+  var currentHighestMinor = history[defaultMajor] || 0;
+  var nextMinor = currentHighestMinor + 1;
+
+  document.getElementById('v2f-major').value = defaultMajor;
+  document.getElementById('v2f-minor').value = nextMinor;
+
+  // Info text — same style as original TS tab
+  var info = document.getElementById('v2f-version-info');
+  info.innerHTML = '当前该Rule Type下最新版本：<strong>V' + defaultMajor + '.' + currentHighestMinor + '</strong> → 本次将创建 <strong style="color:var(--text);">V' + defaultMajor + '.' + nextMinor + '</strong>';
+
+  updateV2Code();
+}
+
+function onV2MajorChange() {
+  var rt = document.getElementById('v2f-ruletype').value;
+  var major = parseInt(document.getElementById('v2f-major').value) || 1;
+  if (!rt) return;
+
+  var history = v2VersionHistory[rt] || {};
+  var info = document.getElementById('v2f-version-info');
+
+  if (history[major] !== undefined) {
+    // This major version line already exists, auto minor = highest + 1
+    var nextMinor = history[major] + 1;
+    document.getElementById('v2f-minor').value = nextMinor;
+    info.innerHTML = 'V' + major + ' 版本线已存在（当前最高 V' + major + '.' + history[major] + '）→ 本次将创建 <strong style="color:var(--text);">V' + major + '.' + nextMinor + '</strong>';
+  } else {
+    // New major version line, start from .1
+    document.getElementById('v2f-minor').value = 1;
+    info.innerHTML = 'V' + major + ' 为新版本线 → 本次将创建 <strong style="color:var(--success);">V' + major + '.1</strong>';
+  }
+
+  updateV2Code();
+}
+
+function updateV2Code() {
+  var rt = document.getElementById('v2f-ruletype').value;
+  var major = document.getElementById('v2f-major').value;
+  var minor = document.getElementById('v2f-minor').value;
+  if (!rt) { document.getElementById('v2f-code').value = ''; return; }
+  // Feature Code always at version level, no SubType suffix
+  document.getElementById('v2f-code').value = rt + '_V' + major + '.' + minor;
+}
+
+function switchV2VariantMode() {
+  var mode = document.querySelector('input[name="v2f-variant-mode"]:checked').value;
+  document.getElementById('v2f-single-panel').style.display = mode === 'none' ? '' : 'none';
+  document.getElementById('v2f-multi-panel').style.display = mode === 'multi' ? '' : 'none';
+  updateV2Code();
+}
+
+function addV2Variant() {
+  document.getElementById('v2f-add-variant-input').style.display = '';
+  document.getElementById('v2f-new-variant-name').focus();
+}
+
+var v2VariantColors = [
+  {bg:'#f0e6ff',color:'#7b2cbf',border:'#d4b5f0',panelBg:'#fefbff'},
+  {bg:'#e6f7e6',color:'#0a8a0a',border:'#a3d9a3',panelBg:'#fbfffc'},
+  {bg:'#fff3e6',color:'#d46b08',border:'#ffc069',panelBg:'#fffdf8'},
+  {bg:'#e6fffb',color:'#08979c',border:'#87e8de',panelBg:'#f8fffe'},
+  {bg:'#fff0f6',color:'#c41d7f',border:'#ffadd2',panelBg:'#fffbfd'}
+];
+
+function confirmAddV2Variant() {
+  var input = document.getElementById('v2f-new-variant-name');
+  var name = input.value.trim();
+  if (!name) return;
+  var list = document.getElementById('v2f-tag-list');
+  var idx = list.querySelectorAll('.v2-variant-tag').length;
+  var c = v2VariantColors[idx % v2VariantColors.length];
+
+  // Add tag
+  var tag = document.createElement('span');
+  tag.className = 'v2-variant-tag';
+  tag.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:'+c.bg+';color:'+c.color+';border-radius:4px;font-size:12px;font-weight:500;';
+  tag.innerHTML = 'S'+(idx+1)+': '+name+' <span style="cursor:pointer;margin-left:4px;font-size:14px;" onclick="this.parentElement.remove();rebuildV2Panels()">&times;</span>';
+  list.insertBefore(tag, list.querySelector('button'));
+
+  // Add panel
+  var stack = document.getElementById('v2f-panels-stack');
+  var panelId = 'v2f-params-s' + (idx+1);
+  var panel = document.createElement('div');
+  panel.className = 'v2-variant-panel';
+  panel.style.cssText = 'border:2px solid '+c.border+';border-radius:6px;padding:16px;margin-bottom:12px;background:'+c.panelBg+';';
+  var sLabel = 'S'+(idx+1);
+  panel.innerHTML = '<div style="font-size:13px;font-weight:600;color:'+c.color+';margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;"><div style="display:flex;align-items:center;gap:8px;"><span style="background:'+c.bg+';padding:2px 8px;border-radius:3px;">'+sLabel+'</span> '+name+'</div><button class="btn btn-primary" style="height:28px;font-size:12px;padding:0 12px;" onclick="v2SaveVariant(this)">Save '+sLabel+'</button></div>'
+    + '<div class="form-group" style="margin-bottom:12px;"><label>Feature Name <span style="color:red">*</span></label><input type="text" style="height:32px;" placeholder="Enter feature name for this variant"></div>'
+    + '<div class="form-group" style="margin-bottom:12px;"><label>Logic (SQL) <span style="color:red">*</span></label><textarea style="min-height:80px;font-family:SF Mono,monospace;font-size:12px;" placeholder="SELECT ..."></textarea></div>'
+    + '<div class="form-group" style="margin-bottom:12px;"><label>Logic Description <span style="color:red">*</span></label><textarea style="min-height:50px;" placeholder="Describe this variant logic..."></textarea></div>'
+    + '<div class="form-group" style="margin-bottom:12px;"><label>Configurable Parameters</label>'
+    + '<table class="data-table" style="font-size:12px;"><thead><tr><th style="width:130px;">Key</th><th style="width:70px;">Default</th><th>Description</th><th style="width:35px;"></th></tr></thead><tbody id="'+panelId+'"><tr><td><input type="text" style="width:100%;height:28px;" placeholder="paramName"></td><td><input type="text" style="width:100%;height:28px;" placeholder="value"></td><td><input type="text" style="width:100%;height:28px;" placeholder="description"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest(\'tr\').remove()">&times;</button></td></tr></tbody></table>'
+    + '<button class="btn" style="margin-top:6px;font-size:12px;height:28px;" onclick="v2AddParam(\''+panelId+'\')">+ Add Parameter</button></div>'
+    + '<div class="form-group" style="margin-bottom:0;"><label>Detail Template</label><select style="width:100%;"><option value="">-- Select Template --</option><option value="K002_SAM">K002_SAM</option><option value="K003_CROSS">K003_CROSS</option><option value="K004_DOMINANCE">K004_DOMINANCE</option><option value="K005_VOLUME">K005_VOLUME</option></select></div>';
+  stack.appendChild(panel);
+
+  input.value = '';
+  document.getElementById('v2f-add-variant-input').style.display = 'none';
+  updateV2Code();
+}
+
+function rebuildV2Panels() { updateV2Code(); }
+
+// ==================== Rule Testing V2 ====================
+function selectV2Testing(el, panelId) {
+  // Update sidebar active state
+  document.querySelectorAll('#page-ruletesting2 .sidebar-tree-item').forEach(function(i) { i.classList.remove('active'); });
+  el.classList.add('active');
+  // Hide all panels, show selected
+  document.querySelectorAll('#v2-testing-content > div').forEach(function(p) { p.style.display = 'none'; });
+  var panel = document.getElementById('v2t-panel-' + panelId);
+  if (panel) panel.style.display = '';
+}
+
+function applyV2Filters(tab) {
+  if (!tab) return;
+  // Get filter values
+  var paramFilter = (tab.querySelector('[id$="-filter-param"]') || {}).value || '';
+  var condFilter = (tab.querySelector('[id$="-filter-cond"]') || {}).value || '';
+  var periodFilter = (tab.querySelector('[id$="-filter-period"]') || {}).value || '';
+
+  var hasAnyFilter = paramFilter || condFilter || periodFilter;
+
+  // Apply to all views within this tab
+  tab.querySelectorAll('.v2-groupby-view').forEach(function(view) {
+    view.querySelectorAll('tbody tr[data-period]').forEach(function(row) {
+      var show = true;
+      if (paramFilter && row.dataset.param !== paramFilter) show = false;
+      if (condFilter && row.dataset.cond !== condFilter) show = false;
+      if (periodFilter && row.dataset.period !== periodFilter) show = false;
+      row.style.display = show ? '' : 'none';
+    });
+
+    // Update counts and opacity
+    view.querySelectorAll('.test-group').forEach(function(group) {
+      var allRows = group.querySelectorAll('tbody tr[data-period]');
+      var visibleRows = group.querySelectorAll('tbody tr[data-period]:not([style*="display:none"])');
+      var total = allRows.length;
+      var visible = visibleRows.length;
+      var countEl = group.querySelector('.v2-record-count');
+      if (countEl) {
+        if (hasAnyFilter) {
+          countEl.textContent = visible + '/' + total;
+          countEl.style.color = visible === 0 ? '#f53f3f' : '#165dff';
+        } else {
+          countEl.textContent = total + ' records';
+          countEl.style.color = '#86909c';
+        }
+      }
+      group.style.opacity = (hasAnyFilter && visible === 0) ? '0.35' : '';
+    });
+  });
+}
+
+function switchV2GroupBy(btn, view) {
+  // Update button active states
+  btn.parentElement.querySelectorAll('.v2-groupby-btn').forEach(function(b) {
+    b.classList.remove('active');
+    b.style.background = '';
+    b.style.borderColor = '';
+    b.style.fontWeight = '';
+  });
+  btn.classList.add('active');
+  btn.style.background = 'var(--accent)';
+  btn.style.borderColor = 'var(--accent)';
+  btn.style.fontWeight = '500';
+
+  // Show/hide views within the same tab
+  var container = btn.closest('[id^="v2t-tab-"]');
+  container.querySelectorAll('.v2-groupby-view').forEach(function(v) { v.style.display = 'none'; });
+  var target = container.querySelector('[id$="-view-' + view + '"]');
+  if (target) target.style.display = '';
+}
+
+function switchV2AddSubType() {
+  var val = document.querySelector('input[name="v2add-subtype"]:checked').value;
+  var descEl = document.getElementById('v2add-logic-desc');
+  var paramsBody = document.getElementById('v2add-params-body');
+  var s1Label = document.getElementById('v2add-st-s1');
+  var s2Label = document.getElementById('v2add-st-s2');
+
+  if (val === 'S1') {
+    s1Label.style.borderColor = '#d4b5f0';
+    s1Label.style.background = '#fefbff';
+    s2Label.style.borderColor = '';
+    s2Label.style.background = '#fff';
+    descEl.textContent = '\u57fa\u4e8e\u9010\u7b14\u884c\u60c5\u6570\u636e\uff0c\u68c0\u6d4b\u5f00\u76d8/\u6536\u76d8\u65f6\u6bb5\u5355\u4e00\u8d26\u6237\u7684\u5e02\u573a\u4e3b\u5bfc\u884c\u4e3a';
+    paramsBody.innerHTML = '<tr><td>ratio</td><td>\u5e02\u573a\u5360\u6bd4\u9608\u503c\uff0c\u5c0f\u6570(0-1)</td><td><input type=\"text\" value=\"0.3\" style=\"width:100px;\"></td></tr><tr><td>tickInterval</td><td>\u9010\u7b14\u95f4\u9694\u9608\u503c(ms)</td><td><input type=\"text\" value=\"100\" style=\"width:100px;\"></td></tr>';
+  } else {
+    s2Label.style.borderColor = '#a3d9a3';
+    s2Label.style.background = '#fbfffc';
+    s1Label.style.borderColor = '';
+    s1Label.style.background = '#fff';
+    descEl.textContent = '\u57fa\u4e8e\u65e5K\u805a\u5408\u6570\u636e\uff0c\u68c0\u6d4b\u5f00\u76d8/\u6536\u76d8\u65f6\u6bb5\u7684\u5e02\u573a\u4e3b\u5bfc\u884c\u4e3a(\u9002\u7528\u4e8e\u65e0\u9010\u7b14\u884c\u60c5\u7684\u5e02\u573a)';
+    paramsBody.innerHTML = '<tr><td>ratio</td><td>\u5e02\u573a\u5360\u6bd4\u9608\u503c\uff0c\u5c0f\u6570(0-1)</td><td><input type=\"text\" value=\"0.25\" style=\"width:100px;\"></td></tr><tr><td>minVolume</td><td>\u6700\u5c0f\u6210\u4ea4\u91cf(\u80a1)</td><td><input type=\"text\" value=\"50000\" style=\"width:100px;\"></td></tr>';
+  }
+}
+
+function switchV2TestingTab(tabEl, contentId) {
+  // Update tab active states
+  var parent = tabEl.parentElement;
+  parent.querySelectorAll('.v2t-subtab').forEach(function(t) {
+    t.classList.remove('active');
+    t.style.fontWeight = '';
+    t.style.color = 'var(--text-secondary)';
+    t.style.borderBottom = '2px solid transparent';
+  });
+  tabEl.classList.add('active');
+  tabEl.style.fontWeight = '500';
+  tabEl.style.color = 'var(--text)';
+  tabEl.style.borderBottom = '2px solid var(--accent)';
+  // Show/hide content
+  var container = parent.parentElement;
+  container.querySelectorAll('[id^="v2t-tab-"]').forEach(function(c) { c.style.display = 'none'; });
+  var target = document.getElementById('v2t-tab-' + contentId);
+  if (target) target.style.display = '';
+}
+
+function toggleV2SubRows(parentRow) {
+  var arrow = parentRow.querySelector('.v2-expand-arrow');
+  var nextRow = parentRow.nextElementSibling;
+  var expanding = arrow.textContent.trim() === '▶';
+
+  while (nextRow && nextRow.classList.contains('v2-sub-row')) {
+    nextRow.style.display = expanding ? '' : 'none';
+    nextRow = nextRow.nextElementSibling;
+  }
+  arrow.textContent = expanding ? '▼' : '▶';
+}
+
+function v2SaveVariant(btn) {
+  var panel = btn.closest('.v2-variant-panel');
+  // Disable all inputs/textareas/selects within this panel
+  panel.querySelectorAll('input, textarea, select').forEach(function(f) {
+    f.disabled = true;
+    f.style.background = '#f7f8fa';
+    f.style.color = '#4e5969';
+  });
+  // Hide remove buttons and add-param buttons
+  panel.querySelectorAll('.btn-link[style*="f53f3f"]').forEach(function(b) { b.style.display = 'none'; });
+  panel.querySelectorAll('button.btn:not(.btn-primary)').forEach(function(b) { if (b.textContent.includes('Add')) b.style.display = 'none'; });
+  // Change Save button to Edit button
+  btn.textContent = 'Edit ' + btn.textContent.replace('Save ', '');
+  btn.className = 'btn';
+  btn.style.cssText = 'height:28px;font-size:12px;padding:0 12px;background:#fff;border:1px solid #e5e6eb;color:#1d2129;cursor:pointer;border-radius:4px;';
+  btn.onclick = function() { v2EditVariant(this); };
+  // Add a saved indicator
+  var header = panel.querySelector('div:first-child');
+  if (!header.querySelector('.saved-badge')) {
+    var badge = document.createElement('span');
+    badge.className = 'saved-badge';
+    badge.style.cssText = 'font-size:11px;background:#e8ffea;color:#00b42a;padding:2px 6px;border-radius:3px;font-weight:500;margin-left:8px;';
+    badge.textContent = 'Saved';
+    header.querySelector('div').appendChild(badge);
+  }
+  // Dim the panel border slightly
+  panel.style.opacity = '0.9';
+}
+
+function v2EditVariant(btn) {
+  var panel = btn.closest('.v2-variant-panel');
+  // Re-enable all inputs
+  panel.querySelectorAll('input, textarea, select').forEach(function(f) {
+    f.disabled = false;
+    f.style.background = '';
+    f.style.color = '';
+  });
+  // Show remove buttons and add-param buttons
+  panel.querySelectorAll('.btn-link[style*="f53f3f"]').forEach(function(b) { b.style.display = ''; });
+  panel.querySelectorAll('button.btn:not(.btn-primary)').forEach(function(b) { if (b.textContent.includes('Add')) b.style.display = ''; });
+  // Change Edit back to Save
+  var sLabel = btn.textContent.replace('Edit ', '');
+  btn.textContent = 'Save ' + sLabel;
+  btn.className = 'btn btn-primary';
+  btn.style.cssText = 'height:28px;font-size:12px;padding:0 12px;';
+  btn.onclick = function() { v2SaveVariant(this); };
+  // Remove saved badge
+  var badge = panel.querySelector('.saved-badge');
+  if (badge) badge.remove();
+  // Restore opacity
+  panel.style.opacity = '';
+}
+
+function v2AddParam(tbodyId) {
+  var tbody = document.getElementById(tbodyId);
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><input type="text" style="width:100%;height:28px;" placeholder="paramName"></td><td><input type="text" style="width:100%;height:28px;" placeholder="value"></td><td><input type="text" style="width:100%;height:28px;" placeholder="description"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest(\'tr\').remove()">&times;</button></td>';
+  tbody.appendChild(tr);
+}
+
 
 // ==================== Feature CRUD ====================
 function openFeatureModal(mode, row) {
@@ -3409,5 +5221,223 @@ function submitRuleType() {
   hideModal('modal-ruletype');
 }
 </script>
+
+<!-- ==================== MODAL: V2 Feature (SubType as Variant) ==================== -->
+<div class="modal-overlay" id="modal-v2-feature">
+  <div class="modal" style="width:720px; max-width:95vw;">
+    <div class="modal-header">
+      <span id="v2-modal-title">Create Feature (V2)</span>
+      <span class="modal-close" onclick="closeV2Modal()">&times;</span>
+    </div>
+    <div class="modal-body" id="v2-modal-body">
+
+      <!-- Rule Type -->
+      <div class="form-group">
+        <label>Rule Type <span style="color:red">*</span></label>
+        <select id="v2f-ruletype" onchange="onV2RuleTypeChange()">
+          <option value="">-- Select Rule Type --</option>
+          <option value="TS_A001">TS_A001 - Possible Wash Trade (A to B)</option>
+          <option value="TS_A006">TS_A006 - Pre-arranged Trading</option>
+          <option value="TS_B001">TS_B001 - Pump and Dump</option>
+          <option value="TS_C001">TS_C001 - Market Dominance at Open/Close</option>
+        </select>
+      </div>
+
+      <!-- Version — same pattern as original -->
+      <div class="form-group">
+        <label>Feature Version <span style="color:red">*</span></label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span style="font-size:13px; color:#86909c;">V</span>
+          <input type="number" id="v2f-major" min="1" max="99" style="width:60px; text-align:center;" value="1" onchange="onV2MajorChange()">
+          <span style="font-size:13px; color:#86909c;">.</span>
+          <input type="number" id="v2f-minor" min="0" max="99" style="width:60px; text-align:center; background:#f5f5f5; color:#86909c;" disabled value="1">
+          <span style="font-size:12px; color:#86909c; margin-left:8px;">小版本自动递增，大版本可手动调整</span>
+        </div>
+        <div style="margin-top:6px; font-size:11px; color:#86909c; background:#f7f8fa; padding:6px 10px; border-radius:4px;" id="v2f-version-info">
+          选择 Rule Type 后自动计算
+        </div>
+      </div>
+
+      <!-- Feature Code (Auto) -->
+      <div class="form-group">
+        <label>Feature Code <span style="font-size:11px; color:#86909c; font-weight:normal;">(Auto-generated)</span></label>
+        <input type="text" id="v2f-code" disabled style="background:#f5f5f5; color:#86909c;">
+        <input type="hidden" id="v2f-status" value="Draft">
+      </div>
+
+      <!-- Variant Mode -->
+      <div class="form-group">
+        <label>该版本需要几套代码逻辑？</label>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:13px;" id="v2f-chip-none">
+            <input type="radio" name="v2f-variant-mode" value="none" checked onchange="switchV2VariantMode()"> 单逻辑
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:13px;" id="v2f-chip-multi">
+            <input type="radio" name="v2f-variant-mode" value="multi" onchange="switchV2VariantMode()"> 多变体 (SubType)
+          </label>
+        </div>
+      </div>
+
+      <!-- ========== SINGLE LOGIC PANEL ========== -->
+      <div id="v2f-single-panel">
+        <div class="form-group">
+          <label>Feature Name <span style="color:red">*</span></label>
+          <input type="text" id="v2f-name" placeholder="e.g., Possible Wash Trade (A to B) - enhanced">
+        </div>
+        <div class="form-group">
+          <label>Logic (SQL) <span style="color:red">*</span></label>
+          <textarea id="v2f-expression" style="min-height:100px; font-family:'SF Mono',Consolas,monospace; font-size:12px;" placeholder="SELECT account_id, symbol&#10;FROM transactions&#10;WHERE ..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Logic Description <span style="color:red">*</span> <span title="Describe in plain language" style="cursor:help;color:#86909c;">&#9432;</span></label>
+          <textarea id="v2f-desc" placeholder="Describe what this logic detects in plain language..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Configurable Parameters <span title="Extract parameters from SQL" style="cursor:help;color:#86909c;">&#9432;</span></label>
+          <table class="data-table" style="font-size:12px;">
+            <thead><tr><th style="width:140px;">Parameter Key</th><th style="width:80px;">Default</th><th>Description</th><th style="width:35px;"></th></tr></thead>
+            <tbody id="v2f-params">
+              <tr><td><input type="text" style="width:100%;height:28px;" placeholder="e.g., intervalMinute"></td><td><input type="text" style="width:100%;height:28px;" placeholder="5"></td><td><input type="text" style="width:100%;height:28px;" placeholder="交易间隔(分钟),整数格式"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
+            </tbody>
+          </table>
+          <button class="btn" style="margin-top:6px;font-size:12px;height:28px;" onclick="v2AddParam('v2f-params')">+ Add Parameter</button>
+        </div>
+        <div class="form-group">
+          <label>Detail Template</label>
+          <select id="v2f-template">
+            <option value="">-- Select Template --</option>
+            <option value="K002_SAM">K002_SAM</option>
+            <option value="K003_CROSS">K003_CROSS</option>
+            <option value="K004_DOMINANCE">K004_DOMINANCE</option>
+            <option value="K005_VOLUME">K005_VOLUME</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ========== MULTI-VARIANT PANEL ========== -->
+      <div id="v2f-multi-panel" style="display:none;">
+        <!-- Variant list -->
+        <div style="margin-bottom:12px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;" id="v2f-tag-list">
+          <span class="v2-variant-tag" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#f0e6ff;color:#7b2cbf;border-radius:4px;font-size:12px;font-weight:500;">S1: Tick Data Detection <span style="cursor:pointer;margin-left:4px;font-size:14px;" onclick="this.parentElement.remove();rebuildV2Panels()">&times;</span></span>
+          <span class="v2-variant-tag" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#e6f7e6;color:#0a8a0a;border-radius:4px;font-size:12px;font-weight:500;">S2: Daily K Detection <span style="cursor:pointer;margin-left:4px;font-size:14px;" onclick="this.parentElement.remove();rebuildV2Panels()">&times;</span></span>
+          <button class="btn" style="height:28px;font-size:12px;padding:0 10px;" onclick="addV2Variant()">+ Add Variant</button>
+        </div>
+        <div id="v2f-add-variant-input" style="display:none;margin-bottom:12px;padding:8px 12px;background:#f7f8fa;border:1px solid var(--border);border-radius:4px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="v2f-new-variant-name" placeholder="Variant name (e.g., Real-time Detection)" style="flex:1;height:30px;font-size:12px;">
+            <button class="btn btn-primary" style="height:30px;font-size:12px;" onclick="confirmAddV2Variant()">添加</button>
+            <button class="btn" style="height:30px;font-size:12px;" onclick="document.getElementById('v2f-add-variant-input').style.display='none'">取消</button>
+          </div>
+        </div>
+
+        <!-- Variant panels: vertical stack -->
+        <div id="v2f-panels-stack">
+          <!-- S1 Panel -->
+          <div class="v2-variant-panel" style="border:2px solid #d4b5f0; border-radius:6px; padding:16px; margin-bottom:12px; background:#fefbff;">
+            <div style="font-size:13px; font-weight:600; color:#7b2cbf; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
+              <div style="display:flex; align-items:center; gap:8px;"><span style="background:#f0e6ff;padding:2px 8px;border-radius:3px;">S1</span> Tick Data Detection</div>
+              <button class="btn btn-primary" style="height:28px;font-size:12px;padding:0 12px;" onclick="v2SaveVariant(this)">Save S1</button>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Feature Name <span style="color:red">*</span></label>
+              <input type="text" style="height:32px;" value="Market Dominance - Tick Data (enhanced)">
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Logic (SQL) <span style="color:red">*</span></label>
+              <textarea style="min-height:80px;font-family:'SF Mono',monospace;font-size:12px;">SELECT account_id, symbol
+FROM tick_data t
+WHERE t.dominance_ratio > {ratio}
+  AND t.tick_interval < {tickInterval}
+  AND t.period IN ('OPEN','CLOSE')</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Logic Description <span style="color:red">*</span></label>
+              <textarea style="min-height:50px;">基于逐笔行情数据，检测开盘/收盘时段单一账户的市场主导行为，通过逐笔成交占比判断是否存在操纵嫌疑</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Configurable Parameters</label>
+              <table class="data-table" style="font-size:12px;">
+                <thead><tr><th style="width:130px;">Key</th><th style="width:70px;">Default</th><th>Description</th><th style="width:35px;"></th></tr></thead>
+                <tbody id="v2f-params-s1">
+                  <tr><td><input type="text" style="width:100%;height:28px;" value="ratio"></td><td><input type="text" style="width:100%;height:28px;" value="0.3"></td><td><input type="text" style="width:100%;height:28px;" value="市场占比阈值，小数(0-1)"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
+                  <tr><td><input type="text" style="width:100%;height:28px;" value="tickInterval"></td><td><input type="text" style="width:100%;height:28px;" value="100"></td><td><input type="text" style="width:100%;height:28px;" value="逐笔间隔阈值(ms)"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
+                </tbody>
+              </table>
+              <button class="btn" style="margin-top:6px;font-size:12px;height:28px;" onclick="v2AddParam('v2f-params-s1')">+ Add Parameter</button>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Detail Template</label>
+              <select style="width:100%;">
+                <option value="">-- Select Template --</option>
+                <option value="K002_SAM">K002_SAM</option>
+                <option value="K003_CROSS">K003_CROSS</option>
+                <option value="K004_DOMINANCE" selected>K004_DOMINANCE</option>
+                <option value="K005_VOLUME">K005_VOLUME</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- S2 Panel -->
+          <div class="v2-variant-panel" style="border:2px solid #a3d9a3; border-radius:6px; padding:16px; margin-bottom:12px; background:#fbfffc;">
+            <div style="font-size:13px; font-weight:600; color:#0a8a0a; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
+              <div style="display:flex; align-items:center; gap:8px;"><span style="background:#e6f7e6;padding:2px 8px;border-radius:3px;">S2</span> Daily K Detection</div>
+              <button class="btn btn-primary" style="height:28px;font-size:12px;padding:0 12px;" onclick="v2SaveVariant(this)">Save S2</button>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Feature Name <span style="color:red">*</span></label>
+              <input type="text" style="height:32px;" value="Market Dominance - Daily K (enhanced)">
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Logic (SQL) <span style="color:red">*</span></label>
+              <textarea style="min-height:80px;font-family:'SF Mono',monospace;font-size:12px;">SELECT account_id, symbol
+FROM agg_data a
+WHERE a.dominance_ratio > {ratio}
+  AND a.volume > {minVolume}
+  AND a.period IN ('OPEN','CLOSE')</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Logic Description <span style="color:red">*</span></label>
+              <textarea style="min-height:50px;">基于日K聚合数据，检测开盘/收盘时段的市场主导行为(适用于无逐笔行情的市场)</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Configurable Parameters</label>
+              <table class="data-table" style="font-size:12px;">
+                <thead><tr><th style="width:130px;">Key</th><th style="width:70px;">Default</th><th>Description</th><th style="width:35px;"></th></tr></thead>
+                <tbody id="v2f-params-s2">
+                  <tr><td><input type="text" style="width:100%;height:28px;" value="ratio"></td><td><input type="text" style="width:100%;height:28px;" value="0.25"></td><td><input type="text" style="width:100%;height:28px;" value="市场占比阈值，小数(0-1)"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
+                  <tr><td><input type="text" style="width:100%;height:28px;" value="minVolume"></td><td><input type="text" style="width:100%;height:28px;" value="50000"></td><td><input type="text" style="width:100%;height:28px;" value="最小成交量(股)"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
+                </tbody>
+              </table>
+              <button class="btn" style="margin-top:6px;font-size:12px;height:28px;" onclick="v2AddParam('v2f-params-s2')">+ Add Parameter</button>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Detail Template</label>
+              <select style="width:100%;">
+                <option value="">-- Select Template --</option>
+                <option value="K002_SAM">K002_SAM</option>
+                <option value="K003_CROSS">K003_CROSS</option>
+                <option value="K004_DOMINANCE" selected>K004_DOMINANCE</option>
+                <option value="K005_VOLUME">K005_VOLUME</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operation Log (detail/edit only) -->
+      <div id="v2f-log-section" style="display:none; margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
+        <label style="font-weight:600; font-size:13px; margin-bottom:8px; display:block;">Operation Log</label>
+        <div id="v2f-log-list" style="max-height:120px; overflow-y:auto; font-size:12px; color:var(--text-secondary);">
+          <div style="padding:3px 0;">2025-09-01 10:00 shuhan Created</div>
+          <div style="padding:3px 0;">2025-09-05 14:30 shuhan Updated SQL logic</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeV2Modal()">Cancel</button>
+      <button class="btn btn-primary" id="v2-submit-btn" onclick="closeV2Modal()">Create</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
