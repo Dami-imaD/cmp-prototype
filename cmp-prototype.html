@@ -1189,6 +1189,16 @@ input[type="text"] {
             <td>admin</td>
             <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
           </tr>
+          <tr data-v2rt="TS_B001" data-v2st="none">
+            <td style="font-weight:500;">TS_B001_V6.4</td>
+            <td>Pump and Dump (enhanced)</td>
+            <td>TS_B001</td>
+            <td>V6.4</td>
+            <td><span class="status-tag status-testing">Testing</span></td>
+            <td>2025-10-08</td>
+            <td>shuhan</td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button> <button class="btn-link" style="color:#ff7d00;" onclick="publishFeature(this.closest('tr'))">Publish</button></td>
+          </tr>
 
           <!-- TS_C001 V1.3: has SubTypes, expandable -->
           <tr data-v2rt="TS_C001" data-v2st="parent" class="v2-parent-row" onclick="toggleV2SubRows(this)" style="cursor:pointer;">
@@ -1196,17 +1206,17 @@ input[type="text"] {
             <td>Market Dominance at Open/Close (enhanced)</td>
             <td>TS_C001</td>
             <td>V1.3</td>
-            <td><span style="font-size:11px;color:#86909c;">2 subtypes</span></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td><span class="status-tag status-draft">Draft</span></td>
+            <td style="font-size:12px;">2025-09-12</td>
+            <td style="font-size:12px;">shuhan</td>
+            <td><button class="btn-link" onclick="event.stopPropagation();openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="event.stopPropagation();openV2Modal('edit',this.closest('tr'))">Edit</button> <button class="btn-link" style="color:#ff7d00;" onclick="event.stopPropagation();publishFeatureV2(this.closest('tr'))">Publish</button></td>
           </tr>
           <tr data-v2rt="TS_C001" data-v2st="Sub-1" class="v2-sub-row v2-sub-of-c001v13" style="background:#fefbff;">
             <td style="padding-left:30px;"><span style="color:#d4b5f0;">├─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#f0e6ff;color:#7b2cbf;font-weight:500;">Sub-1</span></td>
             <td style="font-size:12px;">Tick Data Detection</td>
             <td></td>
             <td></td>
-            <td><span class="status-tag status-testing">Testing</span></td>
+            <td></td>
             <td style="font-size:12px;">2025-09-12</td>
             <td style="font-size:12px;">shuhan</td>
             <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
@@ -1216,10 +1226,10 @@ input[type="text"] {
             <td style="font-size:12px;">Daily K Detection</td>
             <td></td>
             <td></td>
-            <td><span class="status-tag status-draft">Draft</span></td>
+            <td></td>
             <td style="font-size:12px;">2025-09-15</td>
             <td style="font-size:12px;">shuhan</td>
-            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button> <button class="btn-link" style="color:#ff7d00;" onclick="publishFeature(this.closest('tr'))">Publish</button></td>
+            <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
           </tr>
 
           <!-- TS_C001 V1.2: In Use, expandable -->
@@ -1228,17 +1238,17 @@ input[type="text"] {
             <td>Market Dominance at Open/Close</td>
             <td>TS_C001</td>
             <td>V1.2</td>
-            <td><span style="font-size:11px;color:#86909c;">2 subtypes</span></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td><span class="status-tag status-active">In Use</span></td>
+            <td style="font-size:12px;">2025-06-15</td>
+            <td style="font-size:12px;">shuhan</td>
+            <td><button class="btn-link" onclick="event.stopPropagation();openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="event.stopPropagation();openV2Modal('edit',this.closest('tr'))">Edit</button></td>
           </tr>
           <tr data-v2rt="TS_C001" data-v2st="Sub-1" class="v2-sub-row v2-sub-of-c001v12" style="background:#fefbff; display:none;">
             <td style="padding-left:30px;"><span style="color:#d4b5f0;">├─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#f0e6ff;color:#7b2cbf;font-weight:500;">Sub-1</span></td>
             <td style="font-size:12px;">Tick Data Detection</td>
             <td></td>
             <td></td>
-            <td><span class="status-tag status-active">In Use</span></td>
+            <td></td>
             <td style="font-size:12px;">2025-06-15</td>
             <td style="font-size:12px;">shuhan</td>
             <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
@@ -1248,7 +1258,7 @@ input[type="text"] {
             <td style="font-size:12px;">Daily K Detection</td>
             <td></td>
             <td></td>
-            <td><span class="status-tag status-active">In Use</span></td>
+            <td></td>
             <td style="font-size:12px;">2025-06-15</td>
             <td style="font-size:12px;">shuhan</td>
             <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button> <button class="btn-link" onclick="openV2Modal('edit',this.closest('tr'))">Edit</button></td>
@@ -1260,16 +1270,16 @@ input[type="text"] {
             <td>Market Dominance at Open/Close (initial)</td>
             <td>TS_C001</td>
             <td>V1.1</td>
-            <td><span style="font-size:11px;color:#aaa;">2 subtypes</span></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td><span class="status-tag status-offline">Offline</span></td>
+            <td style="font-size:12px;">2025-02-15</td>
+            <td style="font-size:12px;">admin</td>
+            <td><button class="btn-link" onclick="event.stopPropagation();openV2Modal('detail',this.closest('tr'))">Detail</button></td>
           </tr>
           <tr data-v2rt="TS_C001" data-v2st="Sub-1" class="v2-sub-row v2-sub-of-c001v11" style="display:none; color:#86909c;">
             <td style="padding-left:30px;"><span style="color:#ccc;">├─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#f2f3f5;color:#86909c;">Sub-1</span></td>
             <td style="font-size:12px;">Tick Data Detection</td>
             <td></td><td></td>
-            <td><span class="status-tag status-offline">Offline</span></td>
+            <td></td>
             <td style="font-size:12px;">2025-02-15</td>
             <td style="font-size:12px;">admin</td>
             <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button></td>
@@ -1278,7 +1288,7 @@ input[type="text"] {
             <td style="padding-left:30px;"><span style="color:#ccc;">└─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:#f2f3f5;color:#86909c;">Sub-2</span></td>
             <td style="font-size:12px;">Daily K Detection</td>
             <td></td><td></td>
-            <td><span class="status-tag status-offline">Offline</span></td>
+            <td></td>
             <td style="font-size:12px;">2025-02-15</td>
             <td style="font-size:12px;">admin</td>
             <td><button class="btn-link" onclick="openV2Modal('detail',this.closest('tr'))">Detail</button></td>
@@ -5172,6 +5182,10 @@ function openV2Modal(mode, row) {
   // Remove any existing status banners
   body.querySelectorAll('.v2f-status-banner').forEach(function(b) { b.remove(); });
 
+  // Reset variant mode selector visibility and SubType Name field
+  document.getElementById('v2f-chip-none').closest('.form-group').style.display = '';
+  document.getElementById('v2f-subtype-name-group').style.display = 'none';
+
   // Enable/disable fields
   var fields = body.querySelectorAll('select, input:not([type=radio]), textarea');
   fields.forEach(function(f) { f.disabled = false; f.style.background = ''; f.style.color = ''; });
@@ -5180,13 +5194,20 @@ function openV2Modal(mode, row) {
   document.getElementById('v2f-minor').style.background = '#f5f5f5';
   document.getElementById('v2f-minor').style.color = '#86909c';
 
+  // Control logic panel visibility based on mode
+  var createHint = document.getElementById('v2f-create-hint');
+  var singlePanel = document.getElementById('v2f-single-panel');
   if (mode === 'create') {
     title.textContent = 'Create Feature (V2)';
     submitBtn.textContent = 'Create';
     submitBtn.style.display = '';
+    // Hide logic panel, show hint
+    singlePanel.style.display = 'none';
+    if (createHint) createHint.style.display = '';
   } else if (mode === 'detail') {
     title.textContent = 'Feature Detail (V2)';
     submitBtn.style.display = 'none';
+    if (createHint) createHint.style.display = 'none';
     fields.forEach(function(f) { f.disabled = true; f.style.background = '#f7f8fa'; f.style.color = '#86909c'; });
     fillV2ModalFromRow(row);
     document.getElementById('v2f-log-section').style.display = '';
@@ -5194,6 +5215,7 @@ function openV2Modal(mode, row) {
     title.textContent = 'Edit Feature (V2)';
     submitBtn.textContent = 'Save';
     submitBtn.style.display = '';
+    if (createHint) createHint.style.display = 'none';
     fillV2ModalFromRow(row);
     // Lock rule type, version in edit (always)
     document.getElementById('v2f-ruletype').disabled = true;
@@ -5258,45 +5280,316 @@ function openV2Modal(mode, row) {
   modal.classList.add('show');
 }
 
+// Mock data for sub-type details (keyed by ruleType_version_subId)
+var v2SubTypeData = {
+  'TS_C001_V1.3_Sub-1': {
+    subTypeName: 'Tick Data Detection',
+    expression: 'SELECT account_id, symbol\nFROM tick_data t\nWHERE t.dominance_ratio > {ratio}\n  AND t.tick_interval < {tickInterval}\n  AND t.period IN (\'OPEN\',\'CLOSE\')',
+    desc: '基于逐笔行情数据，检测开盘/收盘时段单一账户的市场主导行为，通过逐笔成交占比判断是否存在操纵嫌疑',
+    log: '<div style="padding:3px 0;">2025-09-01 10:00 shuhan Created</div><div style="padding:3px 0;">2025-09-05 14:30 shuhan Updated SQL logic</div>'
+  },
+  'TS_C001_V1.3_Sub-2': {
+    subTypeName: 'Daily K Detection',
+    expression: 'SELECT account_id, symbol\nFROM agg_data a\nWHERE a.dominance_ratio > {ratio}\n  AND a.volume > {minVolume}\n  AND a.period IN (\'OPEN\',\'CLOSE\')',
+    desc: '基于日K聚合数据，检测开盘/收盘时段的市场主导行为(适用于无逐笔行情的市场)',
+    log: '<div style="padding:3px 0;">2025-09-01 10:00 shuhan Created</div><div style="padding:3px 0;">2025-09-10 16:00 shuhan Updated SQL logic</div>'
+  },
+  'TS_C001_V1.2_Sub-1': {
+    subTypeName: 'Tick Data Detection',
+    expression: 'SELECT account_id, symbol\nFROM tick_data t\nWHERE t.dominance_ratio > {ratio}\n  AND t.tick_interval < {tickInterval}\n  AND t.period IN (\'OPEN\',\'CLOSE\')',
+    desc: '基于逐笔行情数据，检测开盘/收盘时段单一账户的市场主导行为',
+    log: '<div style="padding:3px 0;">2025-06-01 10:00 shuhan Created</div><div style="padding:3px 0;">2025-06-15 11:00 shuhan Published to In Use</div>'
+  },
+  'TS_C001_V1.2_Sub-2': {
+    subTypeName: 'Daily K Detection',
+    expression: 'SELECT account_id, symbol\nFROM agg_data a\nWHERE a.dominance_ratio > {ratio}\n  AND a.volume > {minVolume}\n  AND a.period IN (\'OPEN\',\'CLOSE\')',
+    desc: '基于日K聚合数据，检测开盘/收盘时段的市场主导行为(适用于无逐笔行情的市场)',
+    log: '<div style="padding:3px 0;">2025-06-01 10:00 shuhan Created</div><div style="padding:3px 0;">2025-06-15 11:00 shuhan Published to In Use</div>'
+  },
+  'TS_C001_V1.1_Sub-1': {
+    subTypeName: 'Tick Data Detection',
+    expression: 'SELECT account_id, symbol\nFROM tick_data t\nWHERE t.dominance_ratio > {ratio}\n  AND t.tick_interval < {tickInterval}',
+    desc: '基于逐笔行情数据，检测市场主导行为（初始版本）',
+    log: '<div style="padding:3px 0;">2025-02-01 10:00 admin Created</div><div style="padding:3px 0;">2025-02-15 11:00 admin Offline</div>'
+  },
+  'TS_C001_V1.1_Sub-2': {
+    subTypeName: 'Daily K Detection',
+    expression: 'SELECT account_id, symbol\nFROM agg_data a\nWHERE a.dominance_ratio > {ratio}\n  AND a.volume > {minVolume}',
+    desc: '基于日K聚合数据，检测市场主导行为（初始版本）',
+    log: '<div style="padding:3px 0;">2025-02-01 10:00 admin Created</div><div style="padding:3px 0;">2025-02-15 11:00 admin Offline</div>'
+  }
+};
+
 function fillV2ModalFromRow(row) {
   if (!row) return;
   var cells = row.querySelectorAll('td');
-  var code = cells[0].textContent.trim();
-  var name = cells[1].textContent.trim();
-  // Handle rowspan: Rule Type might be in cell[2] or missing due to rowspan
   var rt = row.dataset.v2rt || '';
-  var verCell = cells[3] || cells[2];
-  var ver = '';
-  var variant = '';
+  var subId = row.dataset.v2st || '';
+  var isSubRow = row.classList.contains('v2-sub-row');
 
-  // Parse from code: TS_C001_V1.2_S1 or TS_A001_V6.5
-  var codeMatch = code.match(/^(TS_\w+)_V(\d+\.\d+)(?:_(S\d+))?$/);
-  if (codeMatch) {
-    rt = codeMatch[1];
-    ver = 'V' + codeMatch[2];
-    variant = codeMatch[3] || '';
-  }
+  if (isSubRow) {
+    // === Sub-type row: find parent to get version/feature name ===
+    var parentRow = row.previousElementSibling;
+    while (parentRow && !parentRow.classList.contains('v2-parent-row')) {
+      parentRow = parentRow.previousElementSibling;
+    }
+    var parentCells = parentRow ? parentRow.querySelectorAll('td') : [];
+    var parentCode = parentCells[0] ? parentCells[0].textContent.replace(/[▼▶]/g,'').trim() : '';
+    var parentName = parentCells[1] ? parentCells[1].textContent.trim() : '';
+    var parentVer = parentCells[3] ? parentCells[3].textContent.trim() : '';
+    var parentStatus = parentCells[4] ? parentCells[4].textContent.trim() : '';
 
-  document.getElementById('v2f-ruletype').value = rt;
-  document.getElementById('v2f-name').value = name;
-  var parts = ver.replace('V','').split('.');
-  document.getElementById('v2f-major').value = parts[0] || '1';
-  document.getElementById('v2f-minor').value = parts[1] || '1';
-  document.getElementById('v2f-code').value = code;
+    // Fill basic fields
+    document.getElementById('v2f-ruletype').value = rt;
+    document.getElementById('v2f-name').value = parentName;
+    var parts = parentVer.replace('V','').split('.');
+    document.getElementById('v2f-major').value = parts[0] || '1';
+    document.getElementById('v2f-minor').value = parts[1] || '1';
+    document.getElementById('v2f-code').value = parentCode;
+    document.getElementById('v2f-version-info').innerHTML = '当前版本: <strong>' + parentVer + '</strong>';
 
-  // Show multi-panel if has variant
-  if (variant) {
+    // Variant mode = 多变体
     document.getElementById('v2f-chip-multi').querySelector('input').checked = true;
-    switchV2VariantMode();
+    // Show logic panel for this sub, hide multi-panel
+    document.getElementById('v2f-single-panel').style.display = '';
+    document.getElementById('v2f-multi-panel').style.display = 'none';
+
+    // Show SubType Name field
+    var dataKey = rt + '_' + parentVer + '_' + subId;
+    var subData = v2SubTypeData[dataKey] || {};
+    document.getElementById('v2f-subtype-name-group').style.display = '';
+    document.getElementById('v2f-subtype-name').value = subId + ': ' + (subData.subTypeName || cells[1].textContent.trim());
+    // SubType Name is always editable (unless detail mode)
+    if (v2Mode === 'edit') {
+      document.getElementById('v2f-subtype-name').disabled = false;
+      document.getElementById('v2f-subtype-name').style.background = '';
+      document.getElementById('v2f-subtype-name').style.color = '';
+    }
+
+    // Fill logic
+    document.getElementById('v2f-expression').value = subData.expression || '';
+    document.getElementById('v2f-desc').value = subData.desc || '';
+    document.getElementById('v2f-log-list').innerHTML = subData.log || '<div style="padding:3px 0;">No log available</div>';
+
+    // If parent is not Draft, lock logic fields (only SubType Name remains editable)
+    if (v2Mode === 'edit' && parentStatus !== 'Draft') {
+      document.getElementById('v2f-expression').disabled = true;
+      document.getElementById('v2f-expression').style.background = '#f7f8fa';
+      document.getElementById('v2f-expression').style.color = '#86909c';
+      document.getElementById('v2f-desc').disabled = true;
+      document.getElementById('v2f-desc').style.background = '#f7f8fa';
+      document.getElementById('v2f-desc').style.color = '#86909c';
+      // Lock parameter inputs
+      document.getElementById('v2f-single-panel').querySelectorAll('tbody input').forEach(function(inp) {
+        inp.disabled = true; inp.style.background = '#f7f8fa'; inp.style.color = '#86909c';
+      });
+      // Lock template select
+      var tpl = document.getElementById('v2f-template');
+      if (tpl) { tpl.disabled = true; tpl.style.background = '#f7f8fa'; }
+    }
+
+  } else {
+    // === Parent row or single-logic row ===
+    var code = cells[0].textContent.replace(/[▼▶]/g,'').trim();
+    var name = cells[1] ? cells[1].textContent.trim() : '';
+    var ver = cells[3] ? cells[3].textContent.trim() : '';
+
+    // Parse version
+    var codeMatch = code.match(/^(TS_\w+)_V(\d+\.\d+)$/);
+    if (codeMatch) {
+      rt = codeMatch[1];
+      ver = 'V' + codeMatch[2];
+    }
+
+    document.getElementById('v2f-ruletype').value = rt;
+    document.getElementById('v2f-name').value = name;
+    var parts = ver.replace('V','').split('.');
+    document.getElementById('v2f-major').value = parts[0] || '1';
+    document.getElementById('v2f-minor').value = parts[1] || '1';
+    document.getElementById('v2f-code').value = code;
+    document.getElementById('v2f-version-info').innerHTML = '当前版本: <strong>' + ver + '</strong>';
+    document.getElementById('v2f-subtype-name-group').style.display = 'none';
+
+    // Determine if this is a multi-variant parent (check if next sibling is a sub-row)
+    var hasSubtypes = row.dataset.v2st === 'parent' && row.nextElementSibling && row.nextElementSibling.classList.contains('v2-sub-row');
+    if (hasSubtypes) {
+      document.getElementById('v2f-chip-multi').querySelector('input').checked = true;
+      // Parent row of multi-variant: show SubType management panel, hide logic panel and hint
+      document.getElementById('v2f-single-panel').style.display = 'none';
+      document.getElementById('v2f-multi-panel').style.display = '';
+      var hint = document.getElementById('v2f-create-hint');
+      if (hint) hint.style.display = 'none';
+      // Build SubType status list from sub-rows
+      var subRows = [];
+      var nextRow = row.nextElementSibling;
+      while (nextRow && nextRow.classList.contains('v2-sub-row')) {
+        var subCells = nextRow.querySelectorAll('td');
+        var subName = subCells[1] ? subCells[1].textContent.trim() : '';
+        var subStatus = subCells[4] ? subCells[4].textContent.trim() : '';
+        var subIdAttr = nextRow.dataset.v2st || '';
+        subRows.push({id: subIdAttr, name: subName, status: subStatus});
+        nextRow = nextRow.nextElementSibling;
+      }
+      // Render SubType management tags with status
+      var tagListEl = document.getElementById('v2f-tag-list');
+      tagListEl.innerHTML = '';
+      var tagColors = [
+        {bg:'#f0e6ff',color:'#7b2cbf'},
+        {bg:'#e6f7e6',color:'#0a8a0a'},
+        {bg:'#e6f0ff',color:'#165dff'},
+        {bg:'#fff3e6',color:'#d46b08'}
+      ];
+      // Store reference to parent row for sub-row sync
+      window._v2EditingParentRow = row;
+      // SubType structure only editable in Draft status
+      var featureStatus = cells[4] ? cells[4].textContent.trim() : '';
+      var isEditable = (v2Mode === 'edit' || v2Mode === 'create') && featureStatus === 'Draft';
+      subRows.forEach(function(sub, idx) {
+        var c = tagColors[idx % tagColors.length];
+        var statusBadge = '';
+        if (sub.status) {
+          var statusColor = sub.status === 'Draft' ? '#86909c' : sub.status === 'Testing' ? '#165dff' : sub.status === 'In Use' ? '#00b42a' : '#86909c';
+          statusBadge = ' <span style="font-size:10px;color:' + statusColor + ';margin-left:4px;">(' + sub.status + ')</span>';
+        }
+        var removeBtn = isEditable ? ' <span style="cursor:pointer;margin-left:4px;font-size:14px;" onclick="removeV2SubFromList(this.parentElement)">&times;</span>' : '';
+        tagListEl.innerHTML += '<span class="v2-variant-tag" data-sub-id="' + sub.id + '" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:' + c.bg + ';color:' + c.color + ';border-radius:4px;font-size:12px;font-weight:500;">' + sub.id + ': ' + sub.name + statusBadge + removeBtn + '</span> ';
+      });
+      if (isEditable) {
+        tagListEl.innerHTML += '<button class="btn" style="height:28px;font-size:12px;padding:0 10px;" onclick="addV2Variant()">+ Add SubType</button>';
+      }
+    } else {
+      document.getElementById('v2f-chip-none').querySelector('input').checked = true;
+      // Single logic: show logic panel
+      document.getElementById('v2f-single-panel').style.display = '';
+      document.getElementById('v2f-multi-panel').style.display = 'none';
+      document.getElementById('v2f-expression').value = 'SELECT account_id, symbol\nFROM transactions t\nWHERE t.trade_interval < {intervalMinute}\n  AND t.dominance_ratio > {ratio}';
+      document.getElementById('v2f-desc').value = '检测' + name + '相关的交易行为';
+    }
+
+    document.getElementById('v2f-log-list').innerHTML = '<div style="padding:3px 0;">2025-09-01 10:00 shuhan Created</div>';
+  }
+}
+
+function saveV2Feature() {
+  var parentRow = window._v2EditingParentRow;
+
+  // If editing a multi-variant parent, sync sub-rows to match current tags
+  if (parentRow && v2Mode === 'edit' && parentRow.dataset.v2st === 'parent') {
+    var tagEls = document.querySelectorAll('#v2f-tag-list .v2-variant-tag');
+    var newSubs = [];
+    tagEls.forEach(function(tag) {
+      var subId = tag.dataset.subId;
+      var text = tag.textContent.replace('×','').trim();
+      var namePart = text.replace(/^Sub-\d+:\s*/, '').replace(/\s*\(.*\)\s*$/, '').trim();
+      newSubs.push({id: subId, name: namePart});
+    });
+
+    // Get existing sub-rows
+    var existingSubRows = [];
+    var next = parentRow.nextElementSibling;
+    while (next && next.classList.contains('v2-sub-row')) {
+      existingSubRows.push(next);
+      next = next.nextElementSibling;
+    }
+
+    // Remove sub-rows not in newSubs
+    var newSubIds = newSubs.map(function(s) { return s.id; });
+    existingSubRows.forEach(function(row) {
+      if (newSubIds.indexOf(row.dataset.v2st) === -1) {
+        row.remove();
+      }
+    });
+
+    // Add sub-rows for new subs (not already in list)
+    var existingIds = existingSubRows.map(function(r) { return r.dataset.v2st; });
+    var tagColors = [
+      {bg:'#f0e6ff',color:'#7b2cbf',border:'#d4b5f0',panelBg:'#fefbff'},
+      {bg:'#e6f7e6',color:'#0a8a0a',border:'#a3d9a3',panelBg:'#fbfffc'},
+      {bg:'#e6f0ff',color:'#165dff',border:'#91caff',panelBg:'#f8fbff'},
+      {bg:'#fff3e6',color:'#d46b08',border:'#ffc069',panelBg:'#fffdf8'}
+    ];
+    newSubs.forEach(function(sub, idx) {
+      if (existingIds.indexOf(sub.id) === -1) {
+        var c = tagColors[idx % tagColors.length];
+        // Find insertion point (after last sub-row)
+        var lastSub = parentRow;
+        var n = parentRow.nextElementSibling;
+        while (n && n.classList.contains('v2-sub-row')) { lastSub = n; n = n.nextElementSibling; }
+        // Get class for sub-of grouping
+        var subOfClass = '';
+        var firstSub = parentRow.nextElementSibling;
+        if (firstSub && firstSub.classList.contains('v2-sub-row')) {
+          firstSub.className.split(' ').forEach(function(cls) { if (cls.indexOf('v2-sub-of') === 0) subOfClass = cls; });
+        }
+        var newRow = document.createElement('tr');
+        newRow.dataset.v2rt = parentRow.dataset.v2rt;
+        newRow.dataset.v2st = sub.id;
+        newRow.className = 'v2-sub-row' + (subOfClass ? ' ' + subOfClass : '');
+        newRow.style.cssText = 'background:' + c.panelBg + ';';
+        newRow.innerHTML = '<td style="padding-left:30px;"><span style="color:' + c.border + ';">├─</span> <span style="padding:2px 6px;border-radius:3px;font-size:11px;background:' + c.bg + ';color:' + c.color + ';font-weight:500;">' + sub.id + '</span></td>'
+          + '<td style="font-size:12px;">' + sub.name + '</td>'
+          + '<td></td><td></td><td></td>'
+          + '<td style="font-size:12px;">—</td>'
+          + '<td style="font-size:12px;">—</td>'
+          + '<td><button class="btn-link" onclick="openV2Modal(\'detail\',this.closest(\'tr\'))">Detail</button> <button class="btn-link" onclick="openV2Modal(\'edit\',this.closest(\'tr\'))">Edit</button></td>';
+        lastSub.insertAdjacentElement('afterend', newRow);
+      }
+    });
   }
 
-  document.getElementById('v2f-expression').value = 'SELECT account_id, symbol\nFROM transactions t\nWHERE t.trade_interval < {intervalMinute}\n  AND t.dominance_ratio > {ratio}';
-  document.getElementById('v2f-desc').value = '检测' + name + '相关的交易行为';
-  document.getElementById('v2f-version-info').innerHTML = '当前版本: <strong>' + ver + '</strong>' + (variant ? ' / ' + variant : '');
-  document.getElementById('v2f-log-list').innerHTML = '<div style="padding:3px 0;">2025-09-01 10:00 shuhan Created</div><div style="padding:3px 0;">2025-09-05 14:30 shuhan Updated SQL logic</div>';
+  closeV2Modal();
 }
 
 function closeV2Modal() { document.getElementById('modal-v2-feature').classList.remove('show'); }
+
+// Publish Feature V2 (from parent row): show all sub status and publish as a whole
+function publishFeatureV2(parentRow) {
+  if (!parentRow) return;
+  var cells = parentRow.querySelectorAll('td');
+  var code = cells[0].textContent.replace(/[▼▶]/g,'').trim();
+  var name = cells[1] ? cells[1].textContent.trim() : '';
+
+  // Collect sub-type statuses
+  var subRows = [];
+  var nextRow = parentRow.nextElementSibling;
+  while (nextRow && nextRow.classList.contains('v2-sub-row')) {
+    var subCells = nextRow.querySelectorAll('td');
+    var subName = subCells[1] ? subCells[1].textContent.trim() : '';
+    var subStatus = subCells[4] ? subCells[4].textContent.trim() : '';
+    var subId = nextRow.dataset.v2st || '';
+    subRows.push({id: subId, name: subName, status: subStatus});
+    nextRow = nextRow.nextElementSibling;
+  }
+
+  // Check if all subs are ready
+  var allReady = subRows.every(function(s) { return s.status !== 'Draft' && s.status !== ''; });
+  var statusHtml = subRows.map(function(s) {
+    var color = s.status === 'Testing' ? '#165dff' : s.status === 'Draft' ? '#ff7d00' : s.status === 'In Use' ? '#00b42a' : '#86909c';
+    var icon = (s.status === 'Draft' || s.status === '') ? '&#10007;' : '&#10003;';
+    return '<div style="padding:6px 0;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f2f3f5;">' +
+      '<span style="color:' + color + ';font-size:14px;">' + icon + '</span>' +
+      '<span style="font-weight:500;">' + s.id + ': ' + s.name + '</span>' +
+      '<span style="margin-left:auto;font-size:11px;color:' + color + ';">' + s.status + '</span></div>';
+  }).join('');
+
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:400;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:8px;padding:24px;width:440px;box-shadow:0 8px 24px rgba(0,0,0,0.15);">' +
+    '<h3 style="margin:0 0 4px;font-size:15px;">Publish Feature</h3>' +
+    '<p style="margin:0 0 16px;font-size:12px;color:#86909c;">' + code + ' — ' + name + '</p>' +
+    '<div style="margin-bottom:16px;">' +
+    '<div style="font-size:12px;font-weight:600;margin-bottom:8px;">SubType 状态：</div>' +
+    statusHtml +
+    '</div>' +
+    (allReady
+      ? '<p style="font-size:12px;color:#00b42a;margin-bottom:16px;">&#10003; 所有 SubType 已就绪，可以发布</p>'
+      : '<p style="font-size:12px;color:#ff7d00;margin-bottom:16px;">&#9888; 部分 SubType 尚未完成（Draft 状态），请先完善逻辑后再发布</p>') +
+    '<div style="display:flex;justify-content:flex-end;gap:8px;">' +
+    '<button class="btn" onclick="this.closest(\'div[style*=position]\').remove()">Cancel</button>' +
+    (allReady ? '<button class="btn btn-primary" onclick="alert(\'Feature ' + code + ' published successfully!\');this.closest(\'div[style*=position]\').remove()">Confirm Publish</button>' : '') +
+    '</div></div>';
+  document.body.appendChild(overlay);
+}
 
 // Publish Feature: Draft → Testing
 function publishFeature(row) {
@@ -5444,9 +5737,17 @@ function updateV2Code() {
 }
 
 function switchV2VariantMode() {
-  var mode = document.querySelector('input[name="v2f-variant-mode"]:checked').value;
-  document.getElementById('v2f-single-panel').style.display = mode === 'none' ? '' : 'none';
-  document.getElementById('v2f-multi-panel').style.display = mode === 'multi' ? '' : 'none';
+  var variantMode = document.querySelector('input[name="v2f-variant-mode"]:checked').value;
+  // In create mode, logic panel stays hidden regardless of variant choice
+  if (v2Mode === 'create') {
+    document.getElementById('v2f-single-panel').style.display = 'none';
+    // Show create hint only for single logic, hide for multi (multi-panel has its own hint)
+    var hint = document.getElementById('v2f-create-hint');
+    if (hint) hint.style.display = variantMode === 'none' ? '' : 'none';
+  } else {
+    document.getElementById('v2f-single-panel').style.display = variantMode === 'none' ? '' : 'none';
+  }
+  document.getElementById('v2f-multi-panel').style.display = variantMode === 'multi' ? '' : 'none';
   updateV2Code();
 }
 
@@ -5463,6 +5764,11 @@ var v2VariantColors = [
   {bg:'#fff0f6',color:'#c41d7f',border:'#ffadd2',panelBg:'#fffbfd'}
 ];
 
+// Remove a SubType tag (only in modal, list syncs on Save)
+function removeV2SubFromList(tagEl) {
+  tagEl.remove();
+}
+
 function confirmAddV2Variant() {
   var input = document.getElementById('v2f-new-variant-name');
   var name = input.value.trim();
@@ -5470,30 +5776,15 @@ function confirmAddV2Variant() {
   var list = document.getElementById('v2f-tag-list');
   var idx = list.querySelectorAll('.v2-variant-tag').length;
   var c = v2VariantColors[idx % v2VariantColors.length];
+  var newSubId = 'Sub-' + (idx + 1);
 
-  // Add tag
+  // Add tag in modal only (list syncs on Save)
   var tag = document.createElement('span');
   tag.className = 'v2-variant-tag';
+  tag.dataset.subId = newSubId;
   tag.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:'+c.bg+';color:'+c.color+';border-radius:4px;font-size:12px;font-weight:500;';
-  tag.innerHTML = 'S'+(idx+1)+': '+name+' <span style="cursor:pointer;margin-left:4px;font-size:14px;" onclick="this.parentElement.remove();rebuildV2Panels()">&times;</span>';
+  tag.innerHTML = newSubId + ': ' + name + ' <span style="cursor:pointer;margin-left:4px;font-size:14px;" onclick="removeV2SubFromList(this.parentElement)">&times;</span>';
   list.insertBefore(tag, list.querySelector('button'));
-
-  // Add panel
-  var stack = document.getElementById('v2f-panels-stack');
-  var panelId = 'v2f-params-s' + (idx+1);
-  var panel = document.createElement('div');
-  panel.className = 'v2-variant-panel';
-  panel.style.cssText = 'border:2px solid '+c.border+';border-radius:6px;padding:16px;margin-bottom:12px;background:'+c.panelBg+';';
-  var sLabel = 'S'+(idx+1);
-  panel.innerHTML = '<div style="font-size:13px;font-weight:600;color:'+c.color+';margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;"><div style="display:flex;align-items:center;gap:8px;"><span style="background:'+c.bg+';padding:2px 8px;border-radius:3px;">'+sLabel+'</span> '+name+'</div><button class="btn btn-primary" style="height:28px;font-size:12px;padding:0 12px;" onclick="v2SaveVariant(this)">Save '+sLabel+'</button></div>'
-    + '<div class="form-group" style="margin-bottom:12px;"><label>Feature Name <span style="color:red">*</span></label><input type="text" style="height:32px;" placeholder="Enter feature name for this variant"></div>'
-    + '<div class="form-group" style="margin-bottom:12px;"><label>Logic (SQL) <span style="color:red">*</span></label><textarea style="min-height:80px;font-family:SF Mono,monospace;font-size:12px;" placeholder="SELECT ..."></textarea></div>'
-    + '<div class="form-group" style="margin-bottom:12px;"><label>Logic Description <span style="color:red">*</span></label><textarea style="min-height:50px;" placeholder="Describe this variant logic..."></textarea></div>'
-    + '<div class="form-group" style="margin-bottom:12px;"><label>Configurable Parameters</label>'
-    + '<table class="data-table" style="font-size:12px;table-layout:fixed;"><colgroup><col style="width:180px;"><col style="width:100px;"><col><col style="width:35px;"></colgroup><thead><tr><th>Key</th><th>Default</th><th>Description</th><th></th></tr></thead><tbody id="'+panelId+'"><tr><td><input type="text" style="width:100%;height:28px;" placeholder="paramName"></td><td><input type="text" style="width:100%;height:28px;" placeholder="value"></td><td><input type="text" style="width:100%;height:28px;" placeholder="description"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest(\'tr\').remove()">&times;</button></td></tr></tbody></table>'
-    + '<button class="btn" style="margin-top:6px;font-size:12px;height:28px;" onclick="v2AddParam(\''+panelId+'\')">+ Add Parameter</button></div>'
-    + '<div class="form-group" style="margin-bottom:0;"><label>Detail Template</label><select style="width:100%;"><option value="">-- Select Template --</option><option value="K002_SAM">K002_SAM</option><option value="K003_CROSS">K003_CROSS</option><option value="K004_DOMINANCE">K004_DOMINANCE</option><option value="K005_VOLUME">K005_VOLUME</option></select></div>';
-  stack.appendChild(panel);
 
   input.value = '';
   document.getElementById('v2f-add-variant-input').style.display = 'none';
@@ -6157,6 +6448,12 @@ function copyV2TestToAdd(paramId, paramValues) {
         </select>
       </div>
 
+      <!-- Feature Name (universal, moved above variant mode) -->
+      <div class="form-group">
+        <label>Feature Name <span style="color:red">*</span></label>
+        <input type="text" id="v2f-name" placeholder="e.g., Possible Wash Trade (A to B) - enhanced">
+      </div>
+
       <!-- Version — same pattern as original -->
       <div class="form-group">
         <label>Feature Version <span style="color:red">*</span></label>
@@ -6192,12 +6489,14 @@ function copyV2TestToAdd(paramId, paramValues) {
         </div>
       </div>
 
-      <!-- ========== SINGLE LOGIC PANEL ========== -->
-      <div id="v2f-single-panel">
-        <div class="form-group">
-          <label>Feature Name <span style="color:red">*</span></label>
-          <input type="text" id="v2f-name" placeholder="e.g., Possible Wash Trade (A to B) - enhanced">
-        </div>
+      <!-- SubType Name (only visible in sub-type detail/edit, placed after variant mode) -->
+      <div class="form-group" id="v2f-subtype-name-group" style="display:none;">
+        <label>SubType Name</label>
+        <input type="text" id="v2f-subtype-name" disabled style="background:#f5f5f5; color:var(--text); font-weight:500;">
+      </div>
+
+      <!-- Logic panel: hidden in create mode, shown in edit/detail mode -->
+      <div id="v2f-single-panel" style="display:none;">
         <div class="form-group">
           <label>Logic (SQL) <span style="color:red">*</span></label>
           <textarea id="v2f-expression" style="min-height:100px; font-family:'SF Mono',Consolas,monospace; font-size:12px;" placeholder="SELECT account_id, symbol&#10;FROM transactions&#10;WHERE ..."></textarea>
@@ -6228,116 +6527,31 @@ function copyV2TestToAdd(paramId, paramValues) {
           </select>
         </div>
       </div>
+      <!-- Hint shown only in create mode -->
+      <div style="margin:16px 0 0; padding:10px 12px; background:#f7f8fa; border:1px solid var(--border); border-radius:4px; font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:6px;" id="v2f-create-hint">
+        <span style="font-size:14px;">&#9432;</span> 创建完成后，可通过编辑补充 Logic（SQL）、参数和描述。
+      </div>
 
       <!-- ========== MULTI-VARIANT PANEL ========== -->
       <div id="v2f-multi-panel" style="display:none;">
-        <!-- Variant list -->
+        <!-- Variant name tags -->
+        <div class="form-group">
+          <label>SubType 列表 <span style="color:red">*</span></label>
+        </div>
         <div style="margin-bottom:12px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;" id="v2f-tag-list">
           <span class="v2-variant-tag" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#f0e6ff;color:#7b2cbf;border-radius:4px;font-size:12px;font-weight:500;">Sub-1: Tick Data Detection <span style="cursor:pointer;margin-left:4px;font-size:14px;" onclick="this.parentElement.remove();rebuildV2Panels()">&times;</span></span>
           <span class="v2-variant-tag" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#e6f7e6;color:#0a8a0a;border-radius:4px;font-size:12px;font-weight:500;">Sub-2: Daily K Detection <span style="cursor:pointer;margin-left:4px;font-size:14px;" onclick="this.parentElement.remove();rebuildV2Panels()">&times;</span></span>
-          <button class="btn" style="height:28px;font-size:12px;padding:0 10px;" onclick="addV2Variant()">+ Add Variant</button>
+          <button class="btn" style="height:28px;font-size:12px;padding:0 10px;" onclick="addV2Variant()">+ Add SubType</button>
         </div>
         <div id="v2f-add-variant-input" style="display:none;margin-bottom:12px;padding:8px 12px;background:#f7f8fa;border:1px solid var(--border);border-radius:4px;">
           <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" id="v2f-new-variant-name" placeholder="Variant name (e.g., Real-time Detection)" style="flex:1;height:30px;font-size:12px;">
+            <input type="text" id="v2f-new-variant-name" placeholder="SubType name (e.g., Tick Data Detection)" style="flex:1;height:30px;font-size:12px;">
             <button class="btn btn-primary" style="height:30px;font-size:12px;" onclick="confirmAddV2Variant()">添加</button>
             <button class="btn" style="height:30px;font-size:12px;" onclick="document.getElementById('v2f-add-variant-input').style.display='none'">取消</button>
           </div>
         </div>
-
-        <!-- Variant panels: vertical stack -->
-        <div id="v2f-panels-stack">
-          <!-- S1 Panel -->
-          <div class="v2-variant-panel" style="border:2px solid #d4b5f0; border-radius:6px; padding:16px; margin-bottom:12px; background:#fefbff;">
-            <div style="font-size:13px; font-weight:600; color:#7b2cbf; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
-              <div style="display:flex; align-items:center; gap:8px;"><span style="background:#f0e6ff;padding:2px 8px;border-radius:3px;">Sub-1</span> Tick Data Detection</div>
-              <button class="btn btn-primary" style="height:28px;font-size:12px;padding:0 12px;" onclick="v2SaveVariant(this)">Save S1</button>
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Feature Name <span style="color:red">*</span></label>
-              <input type="text" style="height:32px;" value="Market Dominance - Tick Data (enhanced)">
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Logic (SQL) <span style="color:red">*</span></label>
-              <textarea style="min-height:80px;font-family:'SF Mono',monospace;font-size:12px;">SELECT account_id, symbol
-FROM tick_data t
-WHERE t.dominance_ratio > {ratio}
-  AND t.tick_interval < {tickInterval}
-  AND t.period IN ('OPEN','CLOSE')</textarea>
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Logic Description <span style="color:red">*</span></label>
-              <textarea style="min-height:50px;">基于逐笔行情数据，检测开盘/收盘时段单一账户的市场主导行为，通过逐笔成交占比判断是否存在操纵嫌疑</textarea>
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Configurable Parameters</label>
-              <table class="data-table" style="font-size:12px; table-layout:fixed;">
-                <colgroup><col style="width:180px;"><col style="width:100px;"><col><col style="width:35px;"></colgroup>
-                <thead><tr><th>Key</th><th>Default</th><th>Description</th><th></th></tr></thead>
-                <tbody id="v2f-params-s1">
-                  <tr><td><input type="text" style="width:100%;height:28px;" value="ratio"></td><td><input type="text" style="width:100%;height:28px;" value="0.3"></td><td><input type="text" style="width:100%;height:28px;" value="市场占比阈值，小数(0-1)"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
-                  <tr><td><input type="text" style="width:100%;height:28px;" value="tickInterval"></td><td><input type="text" style="width:100%;height:28px;" value="100"></td><td><input type="text" style="width:100%;height:28px;" value="逐笔间隔阈值(ms)"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
-                </tbody>
-              </table>
-              <button class="btn" style="margin-top:6px;font-size:12px;height:28px;" onclick="v2AddParam('v2f-params-s1')">+ Add Parameter</button>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Detail Template</label>
-              <select style="width:100%;">
-                <option value="">-- Select Template --</option>
-                <option value="K002_SAM">K002_SAM</option>
-                <option value="K003_CROSS">K003_CROSS</option>
-                <option value="K004_DOMINANCE" selected>K004_DOMINANCE</option>
-                <option value="K005_VOLUME">K005_VOLUME</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- S2 Panel -->
-          <div class="v2-variant-panel" style="border:2px solid #a3d9a3; border-radius:6px; padding:16px; margin-bottom:12px; background:#fbfffc;">
-            <div style="font-size:13px; font-weight:600; color:#0a8a0a; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
-              <div style="display:flex; align-items:center; gap:8px;"><span style="background:#e6f7e6;padding:2px 8px;border-radius:3px;">Sub-2</span> Daily K Detection</div>
-              <button class="btn btn-primary" style="height:28px;font-size:12px;padding:0 12px;" onclick="v2SaveVariant(this)">Save S2</button>
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Feature Name <span style="color:red">*</span></label>
-              <input type="text" style="height:32px;" value="Market Dominance - Daily K (enhanced)">
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Logic (SQL) <span style="color:red">*</span></label>
-              <textarea style="min-height:80px;font-family:'SF Mono',monospace;font-size:12px;">SELECT account_id, symbol
-FROM agg_data a
-WHERE a.dominance_ratio > {ratio}
-  AND a.volume > {minVolume}
-  AND a.period IN ('OPEN','CLOSE')</textarea>
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Logic Description <span style="color:red">*</span></label>
-              <textarea style="min-height:50px;">基于日K聚合数据，检测开盘/收盘时段的市场主导行为(适用于无逐笔行情的市场)</textarea>
-            </div>
-            <div class="form-group" style="margin-bottom:12px;">
-              <label>Configurable Parameters</label>
-              <table class="data-table" style="font-size:12px; table-layout:fixed;">
-                <colgroup><col style="width:180px;"><col style="width:100px;"><col><col style="width:35px;"></colgroup>
-                <thead><tr><th>Key</th><th>Default</th><th>Description</th><th></th></tr></thead>
-                <tbody id="v2f-params-s2">
-                  <tr><td><input type="text" style="width:100%;height:28px;" value="ratio"></td><td><input type="text" style="width:100%;height:28px;" value="0.25"></td><td><input type="text" style="width:100%;height:28px;" value="市场占比阈值，小数(0-1)"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
-                  <tr><td><input type="text" style="width:100%;height:28px;" value="minVolume"></td><td><input type="text" style="width:100%;height:28px;" value="50000"></td><td><input type="text" style="width:100%;height:28px;" value="最小成交量(股)"></td><td style="text-align:center;"><button class="btn-link" style="color:#f53f3f;font-size:16px;" onclick="this.closest('tr').remove()">&times;</button></td></tr>
-                </tbody>
-              </table>
-              <button class="btn" style="margin-top:6px;font-size:12px;height:28px;" onclick="v2AddParam('v2f-params-s2')">+ Add Parameter</button>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Detail Template</label>
-              <select style="width:100%;">
-                <option value="">-- Select Template --</option>
-                <option value="K002_SAM">K002_SAM</option>
-                <option value="K003_CROSS">K003_CROSS</option>
-                <option value="K004_DOMINANCE" selected>K004_DOMINANCE</option>
-                <option value="K005_VOLUME">K005_VOLUME</option>
-              </select>
-            </div>
-          </div>
+        <div style="padding:8px 12px; background:#f7f8fa; border:1px solid var(--border); border-radius:4px; font-size:12px; color:var(--text-secondary);">
+          各 SubType 的 Logic 在创建后通过 Sub 行编辑。
         </div>
       </div>
 
@@ -6352,7 +6566,7 @@ WHERE a.dominance_ratio > {ratio}
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeV2Modal()">Cancel</button>
-      <button class="btn btn-primary" id="v2-submit-btn" onclick="closeV2Modal()">Create</button>
+      <button class="btn btn-primary" id="v2-submit-btn" onclick="saveV2Feature()">Create</button>
     </div>
   </div>
 </div>
