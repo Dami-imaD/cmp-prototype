@@ -7272,42 +7272,6 @@ WHERE a.dominance_ratio > {ratio}
   </div>
 </div>
 
-<!-- ==================== MODAL: Save & Comment ==================== -->
-<div class="modal-overlay" id="modal-save-comment">
-  <div class="modal" style="width:520px;">
-    <div class="modal-header">
-      <span style="font-size:15px;font-weight:600;">Save Comparison Record</span>
-      <span class="modal-close" onclick="hideModal('modal-save-comment')">&times;</span>
-    </div>
-    <div class="modal-body">
-      <!-- Summary -->
-      <div style="padding:10px 12px;background:#f7f8fa;border-radius:4px;margin-bottom:16px;font-size:12px;">
-        <div><strong>Test:</strong> Sub-1 P1 + Sub-2 P1 (V1.3) | HKEX|STK | 2025-09</div>
-        <div style="margin-top:4px;"><strong>vs Online:</strong> #2004 (V1.2)</div>
-      </div>
-
-      <!-- Comment -->
-      <div class="form-group">
-        <label style="font-size:13px;font-weight:500;">Comment（备注）</label>
-        <textarea style="width:100%;min-height:80px;margin-top:6px;" placeholder="记录本次对比的观察、结论或下一步计划...&#10;&#10;例：TROO 标的漏检，需将 tickInterval 从 100 调整为 80 后重新测试。"></textarea>
-      </div>
-
-      <!-- Conclusion tag -->
-      <div class="form-group">
-        <label style="font-size:13px;font-weight:500;">Conclusion</label>
-        <div style="display:flex;gap:8px;margin-top:6px;">
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;"><input type="radio" name="save-conclusion" value="pass"> <span style="color:#00b42a;">Pass — 可上线</span></label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;"><input type="radio" name="save-conclusion" value="adjust" checked> <span style="color:#ff7d00;">Need Adjust — 需调参</span></label>
-          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;"><input type="radio" name="save-conclusion" value="reject"> <span style="color:#f53f3f;">Reject — 不可用</span></label>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="hideModal('modal-save-comment')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmSaveRecord()">Confirm Save</button>
-    </div>
-  </div>
-</div>
 
 <!-- ==================== MODAL: Comparison History ==================== -->
 <div class="modal-overlay" id="modal-compare-history">
@@ -7566,7 +7530,6 @@ WHERE a.dominance_ratio > {ratio}
       </div>
       <div class="modal-footer" style="border-top:1px solid var(--border);">
         <button class="btn" onclick="hideModal('modal-compare-online')">Close</button>
-        <button class="btn btn-primary" onclick="saveAndComment()">Save Record</button>
       </div>
     </div>
 
@@ -8044,19 +8007,6 @@ function saveCompareRecord() {
   setTimeout(function(){ toast.remove(); }, 2500);
 }
 
-function saveAndComment() {
-  hideModal('modal-compare-online');
-  document.getElementById('modal-save-comment').classList.add('show');
-}
-
-function confirmSaveRecord() {
-  hideModal('modal-save-comment');
-  var toast = document.createElement('div');
-  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1d2129;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:9999;animation:fadeIn 0.2s;';
-  toast.textContent = 'Record saved successfully';
-  document.body.appendChild(toast);
-  setTimeout(function(){ toast.remove(); }, 2500);
-}
 
 function viewCompareHistory() {
   document.getElementById('modal-compare-history').classList.add('show');
