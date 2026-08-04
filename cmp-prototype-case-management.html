@@ -321,6 +321,15 @@ input[type="text"] {
   background: var(--row-hover);
 }
 
+/* Link-to-case picker: 6 data columns inside a modal, so use tighter
+   gutters than the full-page tables to keep Case Name / Remark readable. */
+#link-case-table th,
+#link-case-table td,
+#cm-alert-table th,
+#cm-alert-table td {
+  padding: 9px 8px;
+}
+
 /* Group Header */
 .group-header {
   background: var(--header-bg);
@@ -756,7 +765,7 @@ input[type="text"] {
       Compliance Monitoring &#9660;
       <div class="dropdown-menu" id="compliance-dropdown">
         <div class="dropdown-item" onclick="showPage('alertmgmt')">Alert Viewer</div>
-        <div class="dropdown-item">Case Management</div>
+        <div class="dropdown-item" onclick="showPage('casemgmt')">Case Management</div>
         <div class="dropdown-item">Rule Management</div>
         <div class="dropdown-item">WatchList Viewer</div>
       </div>
@@ -6720,7 +6729,7 @@ WHERE a.dominance_ratio > {ratio}
       <span style="font-size:13px;color:var(--text-secondary);cursor:pointer;">Symbol</span>
       <span style="font-size:13px;color:var(--text-secondary);cursor:pointer;">Account</span>
       <span style="font-size:13px;color:var(--text-secondary);cursor:pointer;">Market</span>
-      <div style="margin-left:auto;font-size:12px;color:var(--info);">Go to <a href="#" style="color:var(--info);text-decoration:underline;" onclick="event.preventDefault()">Case Management</a> to review cases</div>
+      <div style="margin-left:auto;font-size:12px;color:var(--info);">Go to <a href="#" style="color:var(--info);text-decoration:underline;" onclick="event.preventDefault();showPage('casemgmt')">Case Management</a> to review cases</div>
     </div>
 
     <!-- Status Cards (Yellow) -->
@@ -6763,12 +6772,6 @@ WHERE a.dominance_ratio > {ratio}
       <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Risk Level</div><select style="width:100%;"><option value="">Please select</option></select></div>
     </div>
 
-    <!-- NEW: Outcome Filter (AB Test enhancement) -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px 20px;margin-bottom:16px;">
-      <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Outcome <span style="background:#165dff;color:#fff;font-size:9px;padding:1px 4px;border-radius:2px;margin-left:4px;">NEW</span></div><select style="width:100%;"><option value="">All</option><option>True Positive</option><option>False Positive</option><option>Inconclusive</option></select></div>
-      <div></div><div></div><div></div>
-    </div>
-
     <!-- Action Buttons -->
     <div style="display:flex;gap:8px;margin-bottom:16px;">
       <button class="btn btn-primary" style="border-radius:20px;padding:0 16px;">&#128269; 查询</button>
@@ -6778,46 +6781,46 @@ WHERE a.dominance_ratio > {ratio}
 
     <!-- Results Bar -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <span style="font-size:13px;color:var(--text-secondary);">0 Alerts selected, <strong>1,507</strong> Alerts in total</span>
+      <span style="font-size:13px;color:var(--text-secondary);">0 Alerts selected, <strong>2</strong> Alerts in total</span>
       <div style="display:flex;gap:8px;align-items:center;">
-        <select style="height:30px;font-size:12px;padding:0 8px;"><option>Manage in bulk</option></select>
-        <button class="btn" style="height:30px;font-size:12px;">Execute</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="position:relative;display:inline-block;">
+            <select id="bulk-action-select" style="height:30px;font-size:12px;padding:0 8px;min-width:140px;border:1px solid var(--border);border-radius:4px;">
+              <option value="manage">Bulk Manage Alerts</option>
+              <option value="link">Bulk Link Cases</option>
+            </select>
+          </div>
+          <button class="btn" style="height:30px;font-size:12px;" onclick="var sel=document.getElementById('bulk-action-select').value;if(sel==='manage')showModal('modal-bulk-manage');else showModal('modal-alert-link');">Execute</button>
+        </div>
       </div>
     </div>
 
     <!-- Alert Table (matching real system columns + Outcome) -->
     <div style="overflow-x:auto;">
-    <table class="data-table" style="min-width:1400px;">
+    <table class="data-table" style="min-width:1100px;">
       <thead><tr>
         <th style="width:30px;"><input type="checkbox"></th>
         <th style="width:55px;">ID</th>
-        <th style="width:120px;">System Hit Time</th>
-        <th style="width:85px;">Account Id</th>
-        <th style="width:60px;">Symbol</th>
-        <th style="width:55px;">License</th>
-        <th style="width:180px;">Rule Name</th>
-        <th style="width:50px;">Market</th>
-        <th style="width:75px;">Alert Status</th>
-        <th style="width:70px;">Risk Level</th>
-        <th style="width:75px;">Alert Tag</th>
-        <th style="width:80px;">Alert Owner</th>
-        <th style="width:95px;">Linked Case Code</th>
-        <th style="width:85px;">Outcome <span style="background:#165dff;color:#fff;font-size:8px;padding:0 3px;border-radius:2px;">NEW</span></th>
-        <th style="width:120px;">Operation</th>
+        <th style="width:110px;">System Hit Time</th>
+        <th style="width:90px;">Account Id</th>
+        <th style="width:65px;">Symbol</th>
+        <th style="width:45px;">License</th>
+        <th style="width:140px;">Rule Name</th>
+        <th style="width:40px;">Market</th>
+        <th style="width:60px;">Status</th>
+        <th style="width:45px;">Risk</th>
+        <th style="width:60px;">Alert Tag</th>
+        <th style="width:70px;">Owner</th>
+        <th style="width:80px;">Case Code</th>
+        <th style="width:150px;">Operation</th>
       </tr></thead>
       <tbody>
-        <tr><td><input type="checkbox"></td><td>88912</td><td>2026-06-08 18:46:29 GMT+8</td><td>61541300</td><td>01247</td><td>TBHK</td><td>Market Dominance at Close</td><td>HK</td><td><span style="color:#ff7d00;">● New</span></td><td>--</td><td>--</td><td>--</td><td>--</td><td><span style="color:#c0c0c0;">--</span></td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('88912','pending')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal()">Link</button></td></tr>
-        <tr><td><input type="checkbox"></td><td>88911</td><td>2026-06-08 18:46:29 GMT+8</td><td>68488800</td><td>NTCL</td><td>TBHK</td><td>Market Dominance at Close</td><td>US</td><td><span style="color:#ff7d00;">● New</span></td><td>--</td><td>--</td><td>--</td><td>--</td><td><span style="color:#c0c0c0;">--</span></td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('88911','pending')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal()">Link</button></td></tr>
-        <tr><td><input type="checkbox"></td><td>88910</td><td>2026-06-08 18:46:29 GMT+8</td><td>63780800</td><td>TROO</td><td>TBHK</td><td>Market Dominance at Close</td><td>US</td><td><span style="color:#ff7d00;">● New</span></td><td>--</td><td>--</td><td>--</td><td>--</td><td><span style="color:#c0c0c0;">--</span></td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('88910','pending')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal()">Link</button></td></tr>
-        <tr><td><input type="checkbox"></td><td>86416</td><td>2026-05-22 18:44:19 GMT+8</td><td>63780800</td><td>TROO</td><td>TBHK</td><td>significant volume at close#V6_1</td><td>US</td><td><span style="color:#165dff;">● Pending</span></td><td>--</td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 6px;border-radius:3px;font-size:11px;">Escalated</span></td><td>pamela.wong</td><td>--</td><td><span class="outcome-inc">Inconclusive</span></td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('86416','inc')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal()">Link</button></td></tr>
-        <tr><td><input type="checkbox"></td><td>86394</td><td>2026-05-22 18:38:38 GMT+8</td><td>63780800, 67259000</td><td>TROO</td><td>TBHK, TBHK</td><td>possible wash trade(A to B)#V6_1</td><td>US</td><td><span style="color:#165dff;">● Pending</span></td><td>--</td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 6px;border-radius:3px;font-size:11px;">Escalated</span></td><td>pamela.wong</td><td>--</td><td><span class="outcome-tp">TP</span></td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('86394','tp')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal()">Link</button></td></tr>
-        <tr><td><input type="checkbox"></td><td>84851</td><td>2026-05-08 18:44:30 GMT+8</td><td>63680300</td><td>CETY</td><td>TBHK</td><td>Market Dominance at Close</td><td>US</td><td><span style="color:#165dff;">● Pending</span></td><td>--</td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 6px;border-radius:3px;font-size:11px;">Escalated</span></td><td>pamela.wong</td><td>CS-20260510</td><td><span class="outcome-tp">TP</span></td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('84851','tp')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal()">Link</button></td></tr>
-        <tr><td><input type="checkbox"></td><td>83201</td><td>2026-04-15 09:30:12 GMT+8</td><td>62479100</td><td>0700.HK</td><td>TBHK</td><td>Possible Wash Trade (A to B)</td><td>HK</td><td><span style="color:#86909c;">● Closed</span></td><td>--</td><td>--</td><td>zhouyan</td><td>CS-20260420</td><td><span class="outcome-tp">TP</span></td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('83201','tp')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal()">Link</button></td></tr>
-        <tr><td><input type="checkbox"></td><td>82990</td><td>2026-04-10 14:22:45 GMT+8</td><td>62554800</td><td>9988.HK</td><td>TBHK</td><td>Possible Wash Trade (A to B)</td><td>HK</td><td><span style="color:#86909c;">● Closed</span></td><td>--</td><td>--</td><td>zhouyan</td><td>--</td><td><span class="outcome-fp">FP</span></td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('82990','fp')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal()">Link</button></td></tr>
+        <tr style="background:#fffef5;"><td><input type="checkbox"></td><td>88912</td><td>2026-06-08 18:46:29 GMT+8</td><td>61541300</td><td>01247</td><td>TBHK</td><td>Market Dominance at Close</td><td>HK</td><td><span style="color:#ff7d00;">● New</span></td><td>--</td><td>--</td><td>--</td><td>--</td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('88912','pending')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal('01247','61541300')">Link</button></td></tr>
+        <tr><td><input type="checkbox"></td><td>88911</td><td>2026-06-08 18:46:29 GMT+8</td><td>68488800, 63219000</td><td>NTCL, BIYA</td><td>TBHK</td><td>Possible Wash Trade (A to B)</td><td>US</td><td><span style="color:#ff7d00;">● New</span></td><td>--</td><td>--</td><td>--</td><td>--</td><td><button class="btn-link" onclick="showPage('alertdetail')">Detail</button> <button class="btn-link" onclick="openAlertManageModal('88911','pending')">Manage</button> <button class="btn-link" onclick="openAlertLinkModal('NTCL,BIYA','68488800,63219000')">Link</button></td></tr>
       </tbody>
     </table>
     </div>
-    <div class="pagination"><span>&#8249;</span><span class="current">1</span><span>2</span><span>3</span><span>&#8250;</span><span style="border:none;margin-left:8px;">Total 1,507 items</span></div>
+    <div class="pagination"><span>&#8249;</span><span class="current">1</span><span>2</span><span>3</span><span>&#8250;</span><span style="border:none;margin-left:8px;">Total 2 items</span></div>
   </div>
 </div>
 
@@ -6986,21 +6989,6 @@ WHERE a.dominance_ratio > {ratio}
           </div>
         </div>
       </div>
-
-      <!-- NEW: Outcome Assessment (AB Test enhancement) -->
-      <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:16px;">
-        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;">Outcome Assessment <span style="background:#165dff;color:#fff;font-size:9px;padding:1px 5px;border-radius:2px;margin-left:6px;">NEW</span></label>
-        <div style="background:#e8f7ff;border:1px solid #b3e0ff;border-radius:4px;padding:8px 12px;font-size:11px;color:#0077cc;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
-          <span style="font-size:14px;">&#9432;</span>
-          <span>System suggests: <strong>FP</strong> (Status=Closed + "No further action" template selected)</span>
-        </div>
-        <div class="ab-radio-group" id="am-outcome-group">
-          <label onclick="selectOutcome(this,'tp')"><input type="radio" name="am-outcome" value="tp"><span style="width:8px;height:8px;border-radius:50%;background:#00b42a;display:inline-block;"></span> True Positive</label>
-          <label class="selected" onclick="selectOutcome(this,'fp')"><input type="radio" name="am-outcome" value="fp" checked><span style="width:8px;height:8px;border-radius:50%;background:#f53f3f;display:inline-block;"></span> False Positive</label>
-          <label onclick="selectOutcome(this,'inc')"><input type="radio" name="am-outcome" value="inc"><span style="width:8px;height:8px;border-radius:50%;background:#86909c;display:inline-block;"></span> Inconclusive</label>
-        </div>
-        <div style="font-size:11px;color:#86909c;margin-top:6px;">Auto-inferred from disposition. Override if your manual assessment differs.</div>
-      </div>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="hideModal('modal-alert-manage')">Cancel</button>
@@ -7011,48 +6999,95 @@ WHERE a.dominance_ratio > {ratio}
 
 <!-- ==================== MODAL: Alert Link (matches real system) ==================== -->
 <div class="modal-overlay" id="modal-alert-link">
-  <div class="modal" style="width:580px;max-height:80vh;overflow-y:auto;">
+  <div class="modal" style="width:860px;max-height:85vh;overflow-y:auto;">
     <div class="modal-header">
       <span>Link</span>
       <span class="modal-close" onclick="hideModal('modal-alert-link')">&times;</span>
     </div>
     <div class="modal-body">
-      <!-- Add new / Link existing -->
-      <div style="display:flex;gap:16px;margin-bottom:16px;">
-        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="link-type" value="new" checked><span style="width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block;"></span> Add a new case</label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="link-type" value="existing"> Link to an existing case</label>
+      <!-- Link existing / Add new toggle -->
+      <div style="display:flex;gap:16px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;" onclick="document.getElementById('link-existing-panel').style.display='block';document.getElementById('link-new-panel').style.display='none';"><input type="radio" name="link-type" value="existing" checked> Link to an existing case</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;" onclick="document.getElementById('link-new-panel').style.display='block';document.getElementById('link-existing-panel').style.display='none';"><input type="radio" name="link-type" value="new"> Add a new case</label>
       </div>
 
-      <div class="form-group"><label><span style="color:red">*</span> Case Name</label><input type="text" style="width:100%;" value="TROO"></div>
-      <div class="form-group"><label><span style="color:red">*</span> Case Owner</label><select style="width:100%;"><option>zhouyan</option><option>pamela.wong</option></select></div>
-      <div class="form-group"><label><span style="color:red">*</span> Account ID</label><div style="border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:13px;display:flex;align-items:center;"><span style="background:#e8f3ff;color:#165dff;font-size:11px;padding:2px 8px;border-radius:3px;">67259000 &times;</span></div></div>
-      <div class="form-group"><label>Symbol</label><div style="border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:13px;display:flex;align-items:center;"><span style="background:#e8f3ff;color:#165dff;font-size:11px;padding:2px 8px;border-radius:3px;">TROO &times;</span></div></div>
-
-      <div style="padding:8px 12px;background:#f7f8fa;border:1px solid var(--border);border-radius:4px;margin-bottom:12px;font-size:12px;color:var(--text-secondary);cursor:pointer;">
-        &gt; Search Existing Case
-      </div>
-
-      <div class="form-group"><label>Case Source</label><div style="border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:13px;display:flex;align-items:center;gap:4px;"><span style="background:#f2f3f5;color:var(--text);font-size:11px;padding:2px 8px;border-radius:3px;">CMP &times;</span><select style="border:none;flex:1;font-size:12px;"><option value="">Select source</option></select></div></div>
-      <div style="margin-bottom:12px;"><input type="text" style="width:100%;" placeholder="Please enter Case Source supplementary information"></div>
-
-      <div class="form-group">
-        <label><span style="color:red">*</span> Case Status</label>
-        <div style="display:flex;gap:12px;margin-top:4px;">
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="case-status"> New</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="case-status" checked><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span> Processing</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="case-status"> Pending</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="case-status"> Escalated</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="case-status"> Closed</label>
+      <!-- Panel: Add a new case -->
+      <div id="link-new-panel" style="display:none;">
+        <div class="form-group"><label><span style="color:red">*</span> Case Name</label><input type="text" id="link-new-casename" style="width:100%;" placeholder="Please enter Case Name"></div>
+        <div class="form-group"><label><span style="color:red">*</span> Account ID</label><div id="link-new-account" style="border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:13px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;"></div></div>
+        <div class="form-group"><label>Symbol</label><div id="link-new-symbol" style="border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:13px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;"></div></div>
+        <div class="form-group">
+          <label>Case Source</label>
+          <!-- Multi-select: a case can carry several sources (CMP + upstream + external) -->
+          <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:32px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+            <span id="src-chips-link" style="display:contents;"></span>
+            <select id="src-add-link" onchange="srcAddSource('link',this)" style="border:none;outline:none;background:transparent;flex:1;min-width:120px;font-size:12px;padding:2px 0;color:#86909c;"></select>
+          </div>
+          <!-- Nested note: belongs to Case Source, not a standalone field -->
+          <div style="margin-top:6px;background:#f7f8fa;border-left:2px solid #c9cdd4;border-radius:0 4px 4px 0;padding:8px 10px;">
+            <label style="font-size:11px;color:#4e5969;font-weight:500;display:block;margin-bottom:4px;">Supplementary Info <span style="color:#86909c;font-weight:400;">(optional)</span></label>
+            <input type="text" id="link-new-source-note" placeholder="e.g. Referred by TradeUP compliance on 2026-08-01" style="width:100%;font-size:12px;background:#fff;">
+            <div style="font-size:11px;color:#86909c;margin-top:4px;">For sources not covered by the options above.</div>
+          </div>
         </div>
+        <div class="form-group">
+          <label><span style="color:red">*</span> Case Status</label>
+          <div style="display:flex;gap:12px;margin-top:4px;">
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="link-new-status" checked> New</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="link-new-status"> Processing</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="link-new-status"> Pending</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="link-new-status"> Escalated</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="link-new-status"> Closed</label>
+          </div>
+        </div>
+        <div class="form-group"><label><span style="color:red">*</span> Case Owner</label><select style="width:100%;"><option>zhouyan</option><option>pamela.wong</option><option>mayimeng</option></select></div>
       </div>
 
-      <div class="form-group"><label>Case Tag</label><select style="width:100%;"><option value="">Please select Case Tag</option></select></div>
-      <div class="form-group"><label>Data Period</label><div style="display:flex;gap:8px;align-items:center;"><input type="text" style="width:130px;" value="2026-06-05"><span style="color:#86909c;">→</span><input type="text" style="width:130px;" value="2026-06-05"></div></div>
-      <div class="form-group"><label>Comment</label><textarea style="width:100%;min-height:60px;" placeholder="Please enter Comment"></textarea></div>
+      <!-- Panel: Link to existing case -->
+      <div id="link-existing-panel">
+        <!-- Search bar integrated with results -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:13px;font-weight:500;display:block;margin-bottom:8px;">Search and select a case:</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="link-search-input" placeholder="Search by Case Name, Account ID, or Symbol..." style="flex:1;" oninput="linkFilterCases(this.value)">
+          </div>
+          
+        </div>
+        <!-- Case list (directly below search) -->
+        <div style="border:1px solid var(--border);border-radius:4px;max-height:360px;overflow-y:auto;">
+          <table class="data-table" style="font-size:12px;margin:0;" id="link-case-table">
+            <colgroup>
+              <col style="width:30px;">
+              <col style="width:66px;">
+              <col>
+              <col style="width:118px;">
+              <col style="width:104px;">
+              <col style="width:98px;">
+              <col style="width:132px;">
+            </colgroup>
+            <thead style="position:sticky;top:0;background:#fff;z-index:1;"><tr><th></th><th>Case ID</th><th>Case Name</th><th>Case Account</th><th>Case Symbol</th><th>Owner</th><th>Remark</th></tr></thead>
+            <tbody class="link-case-tbody">
+              <tr class="link-case-row" data-case-account="4667800" data-case-symbol="AAPL, TSLA, NVDA" data-search="4667800 possible quote stuffing regarding multiple symbols mayimeng aapl tsla nvda"><td><input type="radio" name="link-select-case"></td><td>3043</td><td>4667800 - Possible quote stuffing regarding multiple symbols</td><td title="4667800">4667800</td><td title="AAPL, TSLA, NVDA">AAPL, TSLA, NVDA</td><td>mayimeng</td><td title="TradeUP inquired about client 4667800 regarding quote stuffing across multiple symbols">TradeUP inquired about client 4667800...</td></tr>
+              <tr class="link-case-row" data-case-account="9793000" data-case-symbol="NTDOY" data-search="ntdoy 9793000 possible spoofing mayimeng"><td><input type="radio" name="link-select-case"></td><td>3026</td><td>NTDOY - 9793000 Possible Spoofing</td><td title="9793000">9793000</td><td title="NTDOY">NTDOY</td><td>mayimeng</td><td title="We analyzed after the alert was triggered and found layered orders on the bid side">We analyzed after the alert was...</td></tr>
+              <tr class="link-case-row" data-case-account="5108800, 5109000, 5110200, 5112900, 5119000, 5120400" data-case-symbol="BDMD" data-search="bdmd cross trades mayimeng 5108800 5109000 5110200 5112900 5119000 5120400"><td><input type="radio" name="link-select-case"></td><td>3027</td><td>BDMD - Cross Trades</td><td title="5108800, 5109000, 5110200, 5112900, 5119000, 5120400">5108800, 5109000, 5110200, 5112900, 5119000, 5120400</td><td title="BDMD">BDMD</td><td>mayimeng</td><td title="As confirmed with Edison, 6 clients were involved in the cross trades">As confirmed with Edison, 6 clients...</td></tr>
+              <tr class="link-case-row" data-case-account="666900" data-case-symbol="NVDA 20260320 140.0 C" data-search="666900 possible pre arranged trading option mayimeng nvda 20260320 140.0 c"><td><input type="radio" name="link-select-case"></td><td>3018</td><td>666900 - Possible Pre arranged Trading - Option</td><td title="666900">666900</td><td title="NVDA 20260320 140.0 C">NVDA 20260320 140.0 C</td><td>mayimeng</td><td title="The client was triggered by CMP on pre-arranged option trades">The client was triggered by CMP...</td></tr>
+              <tr class="link-case-row" data-case-account="5232700, 6047200" data-case-symbol="NCTY" data-search="ncty 5232700 6047200 mayimeng"><td><input type="radio" name="link-select-case"></td><td>3036</td><td>NCTY - 5232700, 6047200</td><td title="5232700, 6047200">5232700, 6047200</td><td title="NCTY">NCTY</td><td>mayimeng</td><td title="As confirmed with Edison, the buy and sell orders came from related parties">As confirmed with Edison, the b...</td></tr>
+              <tr class="link-case-row" data-case-account="4946500, 7503400" data-case-symbol="GSUN" data-search="gsun 4946500 7503400 mayimeng"><td><input type="radio" name="link-select-case"></td><td>3033</td><td>GSUN - 4946500, 7503400</td><td title="4946500, 7503400">4946500, 7503400</td><td title="GSUN">GSUN</td><td>mayimeng</td><td title="TradeUP inquired us about the 2 accounts trading GSUN">TradeUP inquired us about the 2...</td></tr>
+              <tr class="link-case-row" data-case-account="2721600" data-case-symbol="02637" data-search="2721600 02637 houyuexuan"><td><input type="radio" name="link-select-case"></td><td>3042</td><td>2721600 - 02637</td><td title="2721600">2721600</td><td title="02637">02637</td><td>houyuexuan</td><td>--</td></tr>
+              <tr class="link-case-row" data-case-account="1277700" data-case-symbol="BQ" data-search="1277700 bq mayimeng"><td><input type="radio" name="link-select-case"></td><td>3041</td><td>1277700 - BQ</td><td title="1277700">1277700</td><td title="BQ">BQ</td><td>mayimeng</td><td title="On October 30, 2025, BQ experienced an abnormal price movement at close">On October 30, 2025, BQ experienced...</td></tr>
+              <tr class="link-case-row" data-case-account="63780800, 67259000" data-case-symbol="TROO" data-search="troo wash trade 63780800 67259000 zhouyan"><td><input type="radio" name="link-select-case"></td><td>1453</td><td>TROO wash trade</td><td title="63780800, 67259000">63780800, 67259000</td><td title="TROO">TROO</td><td>zhouyan</td><td title="Accounts identified trading TROO in wash pattern">Accounts identified trading TROO in wash pattern</td></tr>
+              <tr class="link-case-row" data-case-account="63680300" data-case-symbol="CETY" data-search="cety market dominance 63680300 zhouyan"><td><input type="radio" name="link-select-case"></td><td>1452</td><td>CETY Market Dominance</td><td title="63680300">63680300</td><td title="CETY">CETY</td><td>zhouyan</td><td title="Market dominance at close pattern">Market dominance at close pattern</td></tr>
+              <tr class="link-case-row" data-case-account="61541300" data-case-symbol="01247" data-search="hk volume spike 61541300 01247 mayimeng"><td><input type="radio" name="link-select-case"></td><td>1450</td><td>HK volume spike - 01247</td><td title="61541300">61541300</td><td title="01247">01247</td><td>mayimeng</td><td title="Volume spike detected at open for 01247">Volume spike detected at open for 01247</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="link-no-results" style="display:none;padding:20px;text-align:center;font-size:12px;color:#86909c;border:1px solid var(--border);border-radius:4px;">No matching cases found. You can switch to "Add a new case" to create one.</div>
+        <div style="font-size:11px;color:#86909c;margin-top:6px;">Select a case above, then click Confirm to link this alert.</div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="hideModal('modal-alert-link')">Cancel</button>
-      <button class="btn btn-primary" onclick="hideModal('modal-alert-link')">Confirm</button>
+      <button class="btn btn-primary" onclick="cmLinkConfirm()">Confirm</button>
     </div>
   </div>
 </div>
@@ -7536,12 +7571,697 @@ WHERE a.dominance_ratio > {ratio}
   </div>
 </div>
 
+
+<!-- ==================== PAGE: Case Management ==================== -->
+<div class="page-container" id="page-casemgmt">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Compliance Monitoring <span>&gt;</span> Case Management</div>
+  <div style="padding: 20px 24px;">
+
+<div id="cm-list-header">
+    <!-- TS/TM tabs (top level) -->
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:12px;">
+      <span style="padding:10px 20px;font-size:14px;font-weight:500;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-2px;cursor:pointer;">TS Case</span>
+      <span style="padding:10px 20px;font-size:14px;color:var(--text-secondary);cursor:pointer;">TM Case</span>
+    </div>
+    <!-- My Case / All Case sub-tabs removed: covered by the Case Owner filter,
+         which defaults to the logged-in user. -->
+
+    <!-- Go to Alert Viewer link -->
+    <div style="text-align:right;margin-bottom:12px;font-size:12px;color:var(--info);">Go to <a href="#" style="color:var(--info);text-decoration:underline;" onclick="event.preventDefault();showPage('alertmgmt')">Alert Viewer</a> to link alerts.</div>
+
+    <!-- Case Filters -->
+    <div style="margin-bottom:16px;">
+      <div class="filter-bar" style="flex-wrap:wrap;gap:16px;align-items:flex-end;">
+        <div class="form-group" style="min-width:160px;">
+          <label style="font-size:11px;color:#86909c;">Case Status</label>
+          <select id="cm-filter-status" style="width:100%;" onchange="cmFilterCases()">
+            <option value="">All</option>
+            <option>New</option>
+            <option>Processing</option>
+            <option>Pending</option>
+            <option>Escalated</option>
+            <option>Closed</option>
+          </select>
+        </div>
+        <div class="form-group" style="min-width:180px;"><label style="font-size:11px;color:#86909c;">Case Name</label><input id="cm-filter-name" type="text" placeholder="Fuzzy search" style="width:100%;"></div>
+        <div class="form-group" style="min-width:180px;"><label style="font-size:11px;color:#86909c;">Account ID</label><input id="cm-filter-account" type="text" placeholder="Match any account" style="width:100%;"></div>
+        <div class="form-group" style="min-width:180px;"><label style="font-size:11px;color:#86909c;">Symbol</label><input id="cm-filter-symbol" type="text" placeholder="Match any symbol" style="width:100%;"></div>
+        <div class="form-group" style="min-width:160px;" id="cm-owner-filter-group"><label style="font-size:11px;color:#86909c;">Case Owner</label><select id="cm-filter-owner" style="width:100%;" onchange="cmFilterCases()"><option value="">All</option><option value="zhouyan" selected>zhouyan (me)</option><option>pamela.wong</option><option>mayimeng</option><option>miaoqing</option><option>liwen</option></select></div>
+        <div class="form-group" style="display:flex;gap:8px;">
+          <button class="btn btn-primary" onclick="cmFilterCases()">查询</button>
+          <button class="btn" onclick="cmResetFilters()">重置</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add New Case Button -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+      <button class="btn btn-primary" onclick="cmOpenAddCase()">Add New Case</button>
+    </div>
+
+</div>
+
+    <!-- Case List (id=cm-list-view for toggling with detail) -->
+    <div id="cm-list-view">
+      <div style="overflow-x:auto;">
+      <table class="data-table" style="min-width:1200px;font-size:12px;table-layout:fixed;">
+        <colgroup>
+          <col style="width:75px;">
+          <col style="width:150px;">
+          <col style="width:130px;">
+          <col style="width:150px;">
+          <col style="width:90px;">
+          <col style="width:100px;">
+          <col style="width:150px;">
+          <col style="width:55px;">
+          <col style="width:95px;">
+          <col style="width:130px;">
+          <col style="width:120px;">
+        </colgroup>
+        <thead><tr>
+          <th>Case Code</th>
+          <th>Case Name</th>
+          <th>Account ID</th>
+          <th>Symbol</th>
+          <th>Case Status</th>
+          <th>Case Tag</th>
+          <th>Data Period</th>
+          <th>Alerts</th>
+          <th>Case Owner</th>
+          <th>Update Time</th>
+          <th>Operation</th>
+        </tr></thead>
+        <tbody style="line-height:1.6;">
+          <tr style="vertical-align:top;" data-owner="zhouyan" data-name="TROO wash trade" data-account="63780800,67259000" data-symbol="TROO" data-status="Processing">
+            <td>TS_840</td>
+            <td>TROO wash trade</td>
+            <td>63780800, 67259000</td>
+            <td>TROO</td>
+            <td><span style="color:#ff7d00;">● Processing</span></td>
+            <td>--</td>
+            <td>2026-04-10 ~ 2026-06-08</td>
+            <td>3</td>
+            <td>zhouyan</td>
+            <td>2026-06-10 11:22:05</td>
+            <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" onclick="cmShowDetailEdit()">Manage</button></td>
+          </tr>
+          <tr style="vertical-align:top;" data-owner="zhouyan" data-name="CETY Market Dominance" data-account="63680300" data-symbol="CETY" data-status="Escalated">
+            <td>TS_838</td>
+            <td>CETY Market Dominance</td>
+            <td>63680300</td>
+            <td>CETY</td>
+            <td><span style="color:#f53f3f;">● Escalated</span></td>
+            <td>Further Action</td>
+            <td>2026-03-15 ~ 2026-05-08</td>
+            <td>6</td>
+            <td>zhouyan</td>
+            <td>2026-05-12 09:15:42</td>
+            <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" onclick="cmShowDetailEdit()">Manage</button></td>
+          </tr>
+          <tr style="vertical-align:top;" data-owner="pamela.wong" data-name="SPXW Option - 1228400" data-account="1228400" data-symbol="SPXW 20250709 6250.0 C" data-status="Closed">
+            <td>TS_815</td>
+            <td>SPXW Option - 1228400</td>
+            <td>1228400</td>
+            <td>SPXW 20250709 6250.0 C</td>
+            <td><span style="color:#86909c;">● Closed</span></td>
+            <td>No Further Action</td>
+            <td>2025-04-03 ~ 2025-07-09</td>
+            <td>8</td>
+            <td>pamela.wong</td>
+            <td>2025-09-19 19:24:32</td>
+            <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" style="display:none;" onclick="cmShowDetailEdit()">Manage</button></td>
+          </tr>
+          <tr style="vertical-align:top;" data-owner="zhouyan" data-name="69179" data-account="2377300" data-symbol="69179" data-status="New">
+            <td>TS_324</td>
+            <td>69179</td>
+            <td>2377300</td>
+            <td>69179</td>
+            <td><span style="color:#ff7d00;">● New</span></td>
+            <td>--</td>
+            <td>2024-02-19 ~ 2024-02-19</td>
+            <td>1</td>
+            <td>zhouyan</td>
+            <td>2026-06-28 15:01:30</td>
+            <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" onclick="cmShowDetailEdit()">Manage</button></td>
+          </tr>
+          <tr style="vertical-align:top;" data-owner="mayimeng" data-name="HK volume spike" data-account="61541300" data-symbol="01247" data-status="Pending">
+            <td>TS_276</td>
+            <td>HK volume spike</td>
+            <td>61541300</td>
+            <td>01247</td>
+            <td><span style="color:#165dff;">● Pending</span></td>
+            <td>--</td>
+            <td>2026-06-01 ~ 2026-06-08</td>
+            <td>2</td>
+            <td>mayimeng</td>
+            <td>2026-06-09 18:50:00</td>
+            <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" style="display:none;" onclick="cmShowDetailEdit()">Manage</button></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="pagination"><span>‹</span><span class="current">1</span><span>›</span><span style="border:none;margin-left:8px;">Total <span id="cm-total-count" style="border:none;padding:0;margin:0;min-width:0;">5</span> items</span></div>
+    </div>
+
+    <!-- Case Detail View (hidden by default) -->
+    <div id="cm-detail-view" style="display:none;">
+      <!-- Back + Manage / Reopen -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <a class="back-link" onclick="cmHideDetail()" style="margin-bottom:0;">&#8592; Back</a>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span id="cm-detail-readonly-note" style="display:none;font-size:11px;color:#86909c;">Read-only — you are not the owner of this case.</span>
+          <button class="btn btn-primary" onclick="cmEnterEdit()" id="cm-detail-manage-btn">Manage</button>
+          <button class="btn" onclick="cmReopenCase()" id="cm-detail-reopen-btn" style="display:none;">Reopen</button>
+        </div>
+      </div>
+
+      <!-- ===== Section 1: Case Overview (view / edit modes) ===== -->
+      <div style="margin-bottom:24px;" id="cd-overview-section">
+        <div style="font-size:15px;font-weight:600;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--accent);">Case Overview</div>
+
+        <!-- Edit form (hidden in view mode) -->
+        <div id="cd-ov-edit" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;">
+            <div class="form-group" style="margin:0;"><label><span style="color:red">*</span> Case Name</label><input id="cd-edit-name" type="text" style="width:100%;"></div>
+            <div class="form-group" style="margin:0;"><label><span style="color:red">*</span> Case Owner</label><select id="cd-edit-owner" style="width:100%;"><option>zhouyan</option><option>pamela.wong</option><option>mayimeng</option><option>miaoqing</option><option>liwen</option></select></div>
+            <div class="form-group" style="margin:0;">
+              <label><span style="color:red">*</span> Account ID</label>
+              <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:32px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <span id="cd-account-chips" style="display:contents;"></span>
+                <input id="cd-account-input" type="text" placeholder="Add, then press Enter" onkeydown="cdChipKey(event,'account')" style="border:none;outline:none;background:transparent;flex:1;min-width:110px;font-size:12px;padding:2px 0;">
+              </div>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label>Symbol</label>
+              <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:32px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <span id="cd-symbol-chips" style="display:contents;"></span>
+                <input id="cd-symbol-input" type="text" placeholder="Add, then press Enter" onkeydown="cdChipKey(event,'symbol')" style="border:none;outline:none;background:transparent;flex:1;min-width:110px;font-size:12px;padding:2px 0;">
+              </div>
+            </div>
+            <div class="form-group" style="margin:0;"><label><span style="color:red">*</span> Case Status</label><select id="cd-edit-status" style="width:100%;"><option>New</option><option>Processing</option><option>Pending</option><option>Escalated</option><option>Closed</option></select></div>
+            <div class="form-group" style="margin:0;"><label>Case Tag</label><select id="cd-edit-tag" style="width:100%;"><option value="">Please select Case Tag</option><option>Further Action</option><option>No Further Action</option></select></div>
+            <div class="form-group" style="margin:0;grid-column:1 / -1;">
+              <label>Case Source</label>
+              <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:32px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <span id="src-chips-cd" style="display:contents;"></span>
+                <select id="src-add-cd" onchange="srcAddSource('cd',this)" style="border:none;outline:none;background:transparent;flex:1;min-width:120px;font-size:12px;padding:2px 0;color:#86909c;"></select>
+              </div>
+              <div style="margin-top:6px;background:#f7f8fa;border-left:2px solid #c9cdd4;border-radius:0 4px 4px 0;padding:8px 10px;">
+                <label style="font-size:11px;color:#4e5969;font-weight:500;display:block;margin-bottom:4px;">Supplementary Info <span style="color:#86909c;font-weight:400;">(optional)</span></label>
+                <input type="text" id="cd-edit-source-note" placeholder="e.g. Referred by TradeUP compliance on 2026-08-01" style="width:100%;font-size:12px;background:#fff;">
+                <div style="font-size:11px;color:#86909c;margin-top:4px;">For sources not covered by the options above.</div>
+              </div>
+            </div>
+            <div class="form-group" style="margin:0;grid-column:1 / -1;">
+              <label>Data Period</label>
+              <div style="display:flex;gap:8px;align-items:center;max-width:360px;"><input id="cd-edit-period-from" type="date" style="flex:1;"> <span style="color:#86909c;">→</span> <input id="cd-edit-period-to" type="date" style="flex:1;"></div>
+            </div>
+            <div class="form-group" style="margin:0;grid-column:1 / -1;">
+              <label>Comment</label>
+              <textarea id="cd-edit-comment" style="width:100%;min-height:70px;" placeholder="Please enter Comment"></textarea>
+              <div style="font-size:11px;color:#86909c;margin-top:4px;">Saving overwrites <strong>Last Comment</strong>. Every change is still recorded in the Operation Log below.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- View grid -->
+        <div id="cd-ov-view">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 30px;font-size:12px;line-height:2.2;">
+          <div><span style="color:#86909c;">Case Name:</span> <strong id="cd-name">TROO wash trade</strong></div>
+          <div><span style="color:#86909c;">Case Code:</span> <strong id="cd-code">TS_840</strong></div>
+          <div><span style="color:#86909c;">Case Owner:</span> <strong id="cd-owner">zhouyan</strong></div>
+          <div><span style="color:#86909c;">Account ID:</span> <strong id="cd-account">63780800, 67259000</strong></div>
+          <div><span style="color:#86909c;">Symbol:</span> <strong id="cd-symbol">TROO</strong></div>
+          <div><span style="color:#86909c;">Case Source:</span> <strong id="cd-source">CMP</strong></div>
+          <div><span style="color:#86909c;">Number of alerts:</span> <strong id="cd-alerts">3</strong></div>
+          <div><span style="color:#86909c;">Case Status:</span> <strong id="cd-status">Processing</strong></div>
+          <div><span style="color:#86909c;">Case Tag:</span> <strong id="cd-tag">--</strong></div>
+          <div><span style="color:#86909c;">Created Time:</span> <span id="cd-created">2026-04-15 09:30:12 GMT+8</span></div>
+          <div><span style="color:#86909c;">Data Period:</span> <span id="cd-period">2026-04-10 ~ 2026-06-08 GMT+8</span></div>
+        </div>
+        <!-- Comment -->
+        <div style="margin-top:14px;">
+          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Last Comment</div>
+          <div id="cd-comment" style="font-size:12px;color:var(--text);line-height:1.8;background:#f7f8fa;border-radius:4px;padding:12px;min-height:40px;">Accounts 63780800 and 67259000 identified trading TROO in a pattern consistent with wash trading. Orders placed within seconds of each other on both sides. Escalated for further investigation.</div>
+        </div>
+        </div><!-- /cd-ov-view -->
+      </div>
+
+      <!-- ===== Section 2: Linked Alerts / Related Client (Tabs) ===== -->
+      <div style="margin-bottom:24px;">
+        <div style="font-size:15px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);">Associated Records</div>
+        <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px;">
+          <span class="cd-tab active" onclick="cmDetailTab(this,'cd-tab-alerts')" style="padding:8px 16px;font-size:13px;font-weight:500;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-1px;cursor:pointer;">Linked Alerts</span>
+          <span class="cd-tab" onclick="cmDetailTab(this,'cd-tab-client')" style="padding:8px 16px;font-size:13px;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;">Related Client</span>
+        </div>
+
+        <!-- Tab: Linked Alerts -->
+        <div id="cd-tab-alerts">
+          <div style="font-size:12px;color:#86909c;margin-bottom:8px;">3 Alerts linked to this case</div>
+          <div style="overflow-x:auto;">
+          <table class="data-table" style="font-size:11px;">
+            <thead><tr><th>ID</th><th>System Hit Time</th><th>Account Id</th><th>Symbol</th><th>License</th><th>Rule Name</th><th>Market</th><th>Alert Status</th><th>Alert Tag</th><th>Alert Owner</th><th>Operation</th></tr></thead>
+            <tbody>
+              <tr><td>86394 <span style="background:#e8f7ff;color:#165dff;font-size:9px;padding:1px 5px;border-radius:2px;">Newly Linked</span></td><td>2026-05-22 18:38:38</td><td>63780800, 67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhouyan</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
+              <tr><td>84851</td><td>2026-05-08 18:44:30</td><td>63780800</td><td>TROO</td><td>TBHK</td><td>Market Dominance at Close</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhouyan</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
+              <tr><td>83201</td><td>2026-04-15 09:30:12</td><td>67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#86909c;">&#9679; Closed</span></td><td><span style="background:#f6ffed;color:#389e0d;padding:1px 5px;border-radius:3px;font-size:10px;">Cleared</span></td><td>zhouyan</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <!-- Tab: Related Client -->
+        <div id="cd-tab-client" style="display:none;">
+          <div style="font-size:12px;color:#86909c;margin-bottom:8px;">2 accounts related to this case</div>
+          <table class="data-table" style="font-size:11px;">
+            <thead><tr><th>Account ID</th><th>Client Name</th><th>License</th><th>Account Status</th><th>Open Date</th><th>Historical Cases</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>63780800</td><td>John Smith</td><td>TBHK</td><td><span style="color:#00b42a;">&#9679; Active</span></td><td>2023-08-15</td><td>2</td><td><button class="btn-link" style="font-size:11px;">View Account</button></td></tr>
+              <tr><td>67259000</td><td>Jane Doe</td><td>TBHK</td><td><span style="color:#00b42a;">&#9679; Active</span></td><td>2024-01-22</td><td>1</td><td><button class="btn-link" style="font-size:11px;">View Account</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== Section 3: AI Compliance Investigation Report ===== -->
+      <div style="margin-bottom:24px;">
+        <div style="font-size:15px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);"><span style="background:#7c3aed;color:#fff;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600;margin-right:6px;">AI</span>Compliance Investigation Report</div>
+        <div style="border:1px solid #d9d2e9;border-radius:8px;overflow:hidden;" id="ai-report-section">
+          <!-- Input + Run -->
+          <div style="background:#f3f0fa;padding:12px 16px;border-bottom:1px solid #d9d2e9;position:relative;">
+            <span id="ai-report-meta" style="font-size:11px;color:#86909c;display:block;text-align:right;margin-bottom:6px;min-height:14px;"></span>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:12px;">
+              <span style="color:#86909c;">Accounts</span><input id="ai-in-accounts" type="text" value="63780800, 67259000" style="width:140px;font-size:11px;padding:3px 6px;">
+              <span style="color:#86909c;">Symbol</span><input id="ai-in-symbol" type="text" value="TROO" style="width:80px;font-size:11px;padding:3px 6px;">
+              <span style="color:#86909c;">From</span><input id="ai-in-from" type="date" value="2026-04-10" style="font-size:11px;padding:3px 6px;">
+              <span style="color:#86909c;">To</span><input id="ai-in-to" type="date" value="2026-06-08" style="font-size:11px;padding:3px 6px;">
+              <span style="color:#86909c;">Market</span><select id="ai-in-market" style="font-size:11px;padding:3px 6px;"><option>US</option><option>HK</option></select>
+              <span style="color:#86909c;">Category</span><select id="ai-in-category" style="font-size:11px;padding:3px 6px;"><option>Wash Trade</option><option>Spoofing</option><option>Market Dominance</option></select>
+              <button id="ai-run-btn" class="btn btn-primary" style="font-size:11px;padding:4px 14px;background:#7c3aed;border-color:#7c3aed;color:#fff;" onclick="cmRunAI()">&#9654; Run</button>
+            </div>
+          </div>
+
+          <!-- AI Report Result (hidden until Run) -->
+          <div id="ai-report-content" style="display:none;padding:16px;">
+            <!-- State banner: what you are looking at and whether it can be edited -->
+            <div id="ai-state-banner" style="border-radius:4px;padding:8px 12px;font-size:12px;margin-bottom:16px;"></div>
+            <!-- Everything below is snapshotted per saved version -->
+            <div id="ai-report-body">
+            <div style="margin-bottom:20px;">
+              <div style="font-size:13px;font-weight:600;color:#7c3aed;margin-bottom:8px;">1. Unusual Identification Detail</div>
+              <div id="ai-params-line" style="background:#f7f8fa;border-radius:4px;padding:8px 12px;font-size:11px;color:#4e5969;margin-bottom:10px;font-family:monospace;">
+                <strong>accountIdList</strong>: [&#39;63780800&#39;, &#39;67259000&#39;] &nbsp; <strong>symbolList</strong>: [&#39;TROO&#39;] &nbsp; <strong>sinceDate</strong>: 2026-04-10 &nbsp; <strong>endDate</strong>: 2026-06-08 &nbsp; <strong>unusualCategory</strong>: Wash Trade &nbsp; <strong>market</strong>: US
+              </div>
+              <div style="font-size:12px;margin-bottom:8px;">A total of <strong style="color:#f53f3f;">3</strong> wash trade pairs identified:</div>
+              <table class="data-table" style="font-size:11px;">
+                <thead><tr><th>Pair</th><th>Time</th><th>Buy Account</th><th>Sell Account</th><th>Symbol</th><th>Qty</th><th>Price</th><th>Amount</th><th>Time Diff</th></tr></thead>
+                <tbody>
+                  <tr><td>#1</td><td>2026-04-15 10:23:41</td><td style="color:#165dff;">BUY 63780800</td><td style="color:#f53f3f;">SELL 67259000</td><td>TROO</td><td>100</td><td>$12.50</td><td>$1,250</td><td style="color:#7c3aed;font-weight:600;">3s</td></tr>
+                  <tr><td>#2</td><td>2026-05-08 14:07:22</td><td style="color:#165dff;">BUY 67259000</td><td style="color:#f53f3f;">SELL 63780800</td><td>TROO</td><td>150</td><td>$8.30</td><td>$1,245</td><td style="color:#7c3aed;font-weight:600;">7s</td></tr>
+                  <tr><td>#3</td><td>2026-05-22 09:34:05</td><td style="color:#165dff;">BUY 63780800</td><td style="color:#f53f3f;">SELL 67259000</td><td>TROO</td><td>200</td><td>$6.75</td><td>$1,350</td><td style="color:#7c3aed;font-weight:600;">2s</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-bottom:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><div style="font-size:13px;font-weight:600;color:#7c3aed;">2. Pairs Analysis</div><span class="ai-edit-badge" style="display:none;font-size:10px;color:#86909c;background:#f2f3f5;padding:2px 6px;border-radius:3px;">Editable</span></div>
+              <div class="ai-editable" contenteditable="false" style="font-size:12px;line-height:2;border:1px dashed #d9d2e9;border-radius:4px;padding:10px;outline:none;" onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#d9d2e9'">
+                <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px;"><span style="background:#f53f3f;color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;" contenteditable="false">1</span><span>All 3 wash trade pairs occurred during regular market hours (09:30-16:00 ET). Both accounts traded TROO as counterparties with execution time difference of 2-7 seconds, inconsistent with normal market behavior.</span></div>
+                <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px;"><span style="background:#ff7d00;color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;" contenteditable="false">2</span><span>Both accounts share the same IP address (192.168.43.x). Login records show alternating device usage, suggesting the same actual controller.</span></div>
+                <div style="display:flex;align-items:flex-start;gap:8px;"><span style="background:#86909c;color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;" contenteditable="false">3</span><span>Total wash trade volume: 450 shares, notional $3,845. P&amp;L near zero (diff &lt; 0.3%), consistent with Wash Trade characteristics.</span></div>
+              </div>
+            </div>
+            <div style="margin-bottom:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><div style="font-size:13px;font-weight:600;color:#7c3aed;">3. Investigation Result</div><span class="ai-edit-badge" style="display:none;font-size:10px;color:#86909c;background:#f2f3f5;padding:2px 6px;border-radius:3px;">Editable</span></div>
+              <div class="ai-editable" data-tint="#faf5ff" contenteditable="false" style="background:#faf5ff;border:1px dashed #d9d2e9;border-radius:4px;padding:12px;font-size:12px;line-height:1.8;outline:none;" onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#d9d2e9'">
+                Based on analysis, accounts 63780800 and 67259000 exhibited clear wash trading between 2026-04-10 and 2026-06-08, involving 3 matched pairs totaling $3,845. Recommendations: &#9312; Classify as Further Action; &#9313; Submit FINRA STR; &#9314; Initiate trading restriction assessment.
+              </div>
+            </div>
+            </div><!-- /ai-report-body -->
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:12px;">
+              <span id="ai-save-status" style="font-size:11px;color:#86909c;"></span>
+              <div style="display:flex;gap:8px;" id="ai-report-actions">
+                <button class="btn" style="font-size:12px;" onclick="cmDiscardRun()">Discard</button>
+                <button class="btn btn-primary" style="font-size:12px;" onclick="cmSaveRunAsRecord()">Save as record</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Error State -->
+          <div id="ai-report-error" style="display:none;padding:40px 16px;text-align:center;">
+            <div style="font-size:40px;margin-bottom:12px;">&#9888;</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:8px;">AI Service Unavailable</div>
+            <div style="font-size:12px;color:#86909c;margin-bottom:16px;">The AI analysis service is currently experiencing issues. Please try again later.</div>
+            <button class="btn btn-primary" style="font-size:12px;" onclick="cmRetryAI()">Retry</button>
+          </div>
+        </div>
+
+        <!-- Report History -->
+        <div style="margin-top:12px;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:8px;color:var(--text-secondary);">Report History <span style="font-weight:400;font-size:11px;color:#86909c;">— only records you chose to save. Each one keeps the AI output and any later human edit.</span></div>
+          <div id="ai-view-hint" style="display:none;font-size:11px;color:#86909c;background:#f7f8fa;border-radius:4px;padding:7px 10px;margin-bottom:8px;">Read-only view. To run a new report, or to edit or delete a saved record, click <strong>Manage</strong> at the top of the page.</div>
+          <div style="overflow-x:auto;">
+          <table class="data-table" style="font-size:11px;min-width:1040px;">
+            <colgroup>
+              <col style="width:150px;"><col style="width:90px;"><col style="width:170px;"><col style="width:60px;">
+              <col style="width:120px;"><col style="width:120px;"><col style="width:120px;"><col style="width:100px;"><col style="width:130px;">
+            </colgroup>
+            <thead><tr><th>Accounts</th><th>Symbol</th><th>Data Period</th><th>Market</th><th>Category</th><th>Generated Time</th><th>Saved Time</th><th>Last Edited By</th><th>Action</th></tr></thead>
+            <tbody id="ai-report-history">
+              <tr data-version="v3" data-edited="1"><td title="63780800, 67259000">63780800, 67259000</td><td>TROO</td><td>2026-04-10 ~ 2026-06-08</td><td>US</td><td>Wash Trade</td><td>2026-07-30 15:00</td><td>2026-07-30 15:02</td><td>zhouyan</td><td class="ai-hist-actions"><button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> <button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> <button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button></td></tr>
+              <tr data-version="v2" data-edited="0"><td title="63780800, 67259000">63780800, 67259000</td><td>TROO</td><td>2026-04-10 ~ 2026-06-08</td><td>US</td><td>Wash Trade</td><td>2026-07-28 10:30</td><td>2026-07-28 10:35</td><td><span style="color:#ff7d00;" title="No human review recorded yet">--</span></td><td class="ai-hist-actions"><button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> <button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> <button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button></td></tr>
+              <tr data-version="v1" data-edited="1"><td title="63780800, 67259000">63780800, 67259000</td><td>TROO</td><td>2026-04-10 ~ 2026-05-31</td><td>US</td><td>Wash Trade</td><td>2026-06-10 11:20</td><td>2026-06-10 11:22</td><td>mayimeng</td><td class="ai-hist-actions"><button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> <button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> <button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Section 4: Case Operation Log ===== -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:15px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);">Operation Log</div>
+        <table class="data-table" style="font-size:12px;">
+          <thead><tr><th>Operation Time</th><th>Operator</th><th>Operation</th><th>Operation Detail</th></tr></thead>
+          <tbody>
+            <tr><td>2026-06-10 11:22:05 GMT+8</td><td>zhouyan</td><td>Manage Task</td><td style="max-width:500px;">Add comment: Accounts 63780800 and 67259000 identified trading TROO in a pattern consistent with wash trading. Escalated for further investigation.</td></tr>
+            <tr><td>2026-05-22 18:40:00 GMT+8</td><td>zhouyan</td><td>Link Alert</td><td style="max-width:500px;">Linked alert #86394 (possible wash trade A to B) to this case.</td></tr>
+            <tr><td>2026-04-15 09:35:00 GMT+8</td><td>zhouyan</td><td>Create Case</td><td style="max-width:500px;">Case created from CMP alert. Initial alert #83201.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Edit-mode action bar: pinned so Save stays reachable however far you scroll -->
+      <div id="cd-edit-bar" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:900;background:#fff;border-top:1px solid var(--border);box-shadow:0 -2px 8px rgba(0,0,0,0.06);padding:10px 24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:#86909c;">Editing <strong style="color:var(--text);" id="cd-edit-bar-code">TS_840</strong> — Save applies to the whole case. Unsaved changes are lost if you cancel. <span style="color:#a9aeb8;">The AI report is saved separately.</span></span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn" onclick="cmCancelEdit()">Cancel</button>
+            <button class="btn btn-primary" onclick="cmSaveEdit()">Save</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: Add New Case ==================== -->
+<div class="modal-overlay" id="modal-cm-addcase">
+  <div class="modal" style="width:860px;max-height:85vh;overflow-y:auto;">
+    <div class="modal-header">
+      <span>Add New Case</span>
+      <span class="modal-close" onclick="hideModal('modal-cm-addcase')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label><span style="color:red">*</span> Case Name</label><input type="text" style="width:100%;" placeholder="Please enter Case Name"></div>
+      <div class="form-group"><label><span style="color:red">*</span> Case Owner</label><select style="width:100%;"><option>zhouyan</option><option>pamela.wong</option><option>mayimeng</option><option>liwen</option></select></div>
+
+      <!-- STEP 1: pick the alerts. Account ID / Symbol below are derived from
+           whatever is selected here, so this block comes first. -->
+      <div class="form-group">
+        <label>Link Alerts <span style="color:#86909c;font-weight:400;">(optional — an externally-raised case may have no alert yet)</span></label>
+        <div style="border:1px solid var(--border);border-radius:4px;">
+          <!-- Search: Account ID / Symbol / Rule Name / Trigger Time range -->
+          <div style="padding:10px 12px;background:#f7f8fa;border-bottom:1px solid var(--border);">
+            <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:8px;">
+              <div style="flex:1;"><label style="font-size:11px;color:#86909c;display:block;margin-bottom:3px;">Account ID</label><input id="cm-af-account" type="text" placeholder="Match any" style="width:100%;font-size:12px;" oninput="cmAddRenderAlerts()"></div>
+              <div style="flex:1;"><label style="font-size:11px;color:#86909c;display:block;margin-bottom:3px;">Symbol</label><input id="cm-af-symbol" type="text" placeholder="Fuzzy" style="width:100%;font-size:12px;" oninput="cmAddRenderAlerts()"></div>
+              <div style="flex:1.6;"><label style="font-size:11px;color:#86909c;display:block;margin-bottom:3px;">Rule Name</label><input id="cm-af-rule" type="text" placeholder="Fuzzy" style="width:100%;font-size:12px;" oninput="cmAddRenderAlerts()"></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-end;">
+              <div style="flex:1;">
+                <label style="font-size:11px;color:#86909c;display:block;margin-bottom:3px;">Trigger Time</label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input id="cm-af-from" type="date" style="width:150px;font-size:12px;" onchange="cmAddRenderAlerts()">
+                  <span style="color:#86909c;font-size:11px;">→</span>
+                  <input id="cm-af-to" type="date" style="width:150px;font-size:12px;" onchange="cmAddRenderAlerts()">
+                </div>
+              </div>
+              <button class="btn" style="height:28px;font-size:12px;" onclick="cmAddResetAlertFilters()">重置</button>
+            </div>
+          </div>
+          <!-- Results -->
+          <div style="max-height:220px;overflow-y:auto;">
+            <table class="data-table" style="font-size:12px;margin:0;border:none;" id="cm-alert-table">
+              <colgroup>
+                <col style="width:30px;">
+                <col style="width:140px;">
+                <col style="width:120px;">
+                <col style="width:70px;">
+                <col>
+                <col style="width:158px;">
+              </colgroup>
+              <thead style="position:sticky;top:0;background:#fff;z-index:1;"><tr><th></th><th>Alert ID</th><th>Account ID</th><th>Symbol</th><th>Rule Name</th><th>Trigger Time</th></tr></thead>
+              <tbody id="cm-alert-tbody"></tbody>
+            </table>
+            <div id="cm-alert-empty" style="display:none;padding:18px;text-align:center;font-size:12px;color:#86909c;">No alerts match these filters.</div>
+          </div>
+          <!-- Selection summary + derived Data Period -->
+          <div style="padding:8px 12px;border-top:1px solid var(--border);background:#f7f8fa;font-size:11px;color:#4e5969;">
+            <span id="cm-alert-summary">No alert selected.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: curate the case-level Account / Symbol -->
+      <div class="form-group">
+        <label><span style="color:red">*</span> Account ID</label>
+        <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:32px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+          <span id="cm-add-account-chips" style="display:contents;"></span>
+          <input id="cm-add-account-input" type="text" placeholder="Type to add manually, then press Enter" onkeydown="cmAddChipKey(event,'account')" style="border:none;outline:none;background:transparent;flex:1;min-width:200px;font-size:12px;padding:2px 0;">
+        </div>
+        <div style="font-size:11px;color:#86909c;margin-top:4px;">Auto-filled from the linked alerts. Remove any this case is not investigating — the alert itself stays linked.</div>
+      </div>
+      <div class="form-group">
+        <label>Symbol</label>
+        <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:32px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+          <span id="cm-add-symbol-chips" style="display:contents;"></span>
+          <input id="cm-add-symbol-input" type="text" placeholder="Type to add manually, then press Enter" onkeydown="cmAddChipKey(event,'symbol')" style="border:none;outline:none;background:transparent;flex:1;min-width:200px;font-size:12px;padding:2px 0;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Case Source</label>
+        <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:32px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+          <span id="src-chips-cmadd" style="display:contents;"></span>
+          <select id="src-add-cmadd" onchange="srcAddSource('cmadd',this)" style="border:none;outline:none;background:transparent;flex:1;min-width:120px;font-size:12px;padding:2px 0;color:#86909c;"></select>
+        </div>
+        <div style="margin-top:6px;background:#f7f8fa;border-left:2px solid #c9cdd4;border-radius:0 4px 4px 0;padding:8px 10px;">
+          <label style="font-size:11px;color:#4e5969;font-weight:500;display:block;margin-bottom:4px;">Supplementary Info <span style="color:#86909c;font-weight:400;">(optional)</span></label>
+          <input type="text" id="cm-add-source-note" placeholder="e.g. Referred by TradeUP compliance on 2026-08-01" style="width:100%;font-size:12px;background:#fff;">
+          <div style="font-size:11px;color:#86909c;margin-top:4px;">For sources not covered by the options above.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><span style="color:red">*</span> Case Status</label>
+        <div style="display:flex;gap:14px;font-size:12px;margin-top:4px;">
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="cm-add-status" checked> New</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="cm-add-status"> Processing</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="cm-add-status"> Pending</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="cm-add-status"> Escalated</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="cm-add-status"> Closed</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-cm-addcase')">Cancel</button>
+      <button class="btn btn-primary" onclick="hideModal('modal-cm-addcase')">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: Saved AI Report Record ====================
+     Viewing / editing an archived record happens here, not in the Run panel:
+     the Run panel only ever shows the output of the run you just triggered. -->
+<div class="modal-overlay" id="modal-ai-record">
+  <div class="modal" style="width:960px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-header" style="border-bottom:1px solid #d9d2e9;background:#f3f0fa;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="background:#7c3aed;color:#fff;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600;">AI</span>
+        <span style="font-size:14px;font-weight:600;color:#5b21b6;">Saved Investigation Report</span>
+        <span id="ai-modal-title-meta" style="font-size:11px;color:#86909c;"></span>
+      </div>
+      <span class="modal-close" onclick="cmCloseRecordModal()">&times;</span>
+    </div>
+    <div class="modal-body" style="padding:16px 20px;">
+      <div id="ai-modal-banner" style="border-radius:4px;padding:8px 12px;font-size:12px;margin-bottom:14px;"></div>
+      <div id="ai-modal-body"></div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;align-items:center;">
+      <span id="ai-modal-status" style="font-size:11px;color:#86909c;"></span>
+      <div>
+        <div id="ai-modal-actions-view" style="display:none;gap:8px;">
+          <button class="btn" onclick="cmCloseRecordModal()">Close</button>
+          <button class="btn" onclick="cmExportReport()">Export</button>
+          <button class="btn btn-primary" id="ai-modal-edit-btn" onclick="cmModalEdit()">Edit</button>
+        </div>
+        <div id="ai-modal-actions-edit" style="display:none;gap:8px;">
+          <button class="btn" onclick="cmModalCancelEdit()">Cancel</button>
+          <button class="btn btn-primary" onclick="cmModalSaveEdit()">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: Bulk Manage Alerts ==================== -->
+<div class="modal-overlay" id="modal-bulk-manage">
+  <div class="modal" style="width:580px;max-height:85vh;overflow-y:auto;">
+    <div class="modal-header">
+      <span>Manage in bulk</span>
+      <span class="modal-close" onclick="hideModal('modal-bulk-manage')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label><span style="color:red">*</span> Alert Status</label>
+        <div style="display:flex;gap:14px;margin-top:6px;">
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="radio" name="bulk-status" checked><span style="width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;"></span> Processing</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="radio" name="bulk-status"> Pending</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="radio" name="bulk-status"> Closed</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Alert Tag</label>
+        <select style="width:100%;"><option value="">Please enter</option><option>Inquired</option><option>Restricted</option><option>Cleared</option><option>Escalated</option></select>
+      </div>
+
+      <div class="form-group">
+        <label><span style="color:red">*</span> Assign to</label>
+        <select style="width:100%;"><option>zhouyan</option><option>pamela.wong</option><option>mayimeng</option><option>houyuexuan</option><option>miaoqing</option></select>
+      </div>
+
+      <div class="form-group">
+        <label>Alert Comment</label>
+        <!-- Templates section -->
+        <div style="border:1px solid var(--border);border-radius:4px;margin-top:4px;">
+          <div style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);background:#fafbfc;" onclick="var tpl=this.nextElementSibling;tpl.style.display=tpl.style.display==='none'?'block':'none';">
+            &#9660; Templates
+          </div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Summary</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"> Inquired by Tradeup</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"> No Further Action Common</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"> Wash Trade</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"> Possible Spoofing</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"> cleared</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"> pre-arranged trading</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"> spoofing</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"> Clear without action</label>
+            </div>
+          </div>
+        </div>
+        <!-- Warning -->
+        <div style="display:flex;align-items:center;gap:8px;background:#fff8e6;border:1px solid #ffe58f;border-radius:4px;padding:8px 12px;margin-top:8px;">
+          <span style="width:20px;height:20px;border-radius:50%;background:#faad14;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">!</span>
+          <span style="font-size:12px;color:#ad6800;">Please select a template before editing the content to avoid loss of manually edited content.</span>
+        </div>
+        <!-- Comment textarea -->
+        <textarea style="width:100%;min-height:70px;margin-top:8px;" placeholder="Please enter"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-bulk-manage')">Cancel</button>
+      <button class="btn btn-primary" onclick="hideModal('modal-bulk-manage')">Confirm</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== MODAL: Link Validation (new account/symbol check) ==================== -->
+<div class="modal-overlay" id="modal-link-validate">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <span>Link Confirmation</span>
+      <span class="modal-close" onclick="hideModal('modal-link-validate')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;">
+        <span style="font-size:24px;">&#9888;&#65039;</span>
+        <div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:8px;">New Account/Symbol Detected</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;">
+            The alert you are linking contains account(s) or symbol(s) not currently in this case:
+          </div>
+        </div>
+      </div>
+      <div id="link-validate-details" style="background:#f7f8fa;border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:16px;font-size:12px;">
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
+        Do you want to automatically add these to the case?
+      </div>
+      <div id="link-validate-checks" style="display:flex;flex-direction:column;gap:8px;">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-link-validate')">Cancel</button>
+      <button class="btn btn-primary" onclick="hideModal('modal-link-validate');hideModal('modal-alert-link');cmShowLinkSuccess()">Confirm & Link</button>
+    </div>
+  </div>
+</div>
+
+
 <script>
+// ==================== CASE MANAGEMENT GLOBAL VARS ====================
+var cmCurrentUser = 'zhouyan';
+
 // ==================== AB TEST V2 FUNCTIONS ====================
 
 // Alert Link Modal
-function openAlertLinkModal() {
+function openAlertLinkModal(symbol, account) {
+  // Store alert context for validation
+  window._linkAlertSymbol = symbol || '';
+  window._linkAlertAccount = account || '';
+  
   document.getElementById('modal-alert-link').classList.add('show');
+  var searchInput = document.getElementById('link-search-input');
+
+  
+  // Auto-search by first symbol
+  var firstSymbol = symbol ? symbol.split(',')[0].trim() : '';
+  if (firstSymbol) {
+    searchInput.value = firstSymbol;
+
+    linkFilterCases(firstSymbol);
+  } else {
+    searchInput.value = '';
+
+    linkFilterCases('');
+  }
+  
+  // Fill "Add a new case" panel with alert data
+  var accountEl = document.getElementById('link-new-account');
+  var symbolEl = document.getElementById('link-new-symbol');
+  if (accountEl) {
+    var accounts = (account || '').split(',');
+    accountEl.innerHTML = '';
+    for (var i = 0; i < accounts.length; i++) {
+      var a = accounts[i].trim();
+      if (a) accountEl.innerHTML += '<span style="background:#e8f3ff;color:#165dff;font-size:11px;padding:2px 8px;border-radius:3px;">' + a + ' &times;</span>';
+    }
+  }
+  if (symbolEl) {
+    var symbols = (symbol || '').split(',');
+    symbolEl.innerHTML = '';
+    for (var i = 0; i < symbols.length; i++) {
+      var s = symbols[i].trim();
+      if (s) symbolEl.innerHTML += '<span style="background:#e8f3ff;color:#165dff;font-size:11px;padding:2px 8px;border-radius:3px;">' + s + ' &times;</span>';
+    }
+  }
+  // Case Source defaults to CMP — the alert being linked came from CMP
+  srcSetSources('link', ['CMP']);
+  var srcNote = document.getElementById('link-new-source-note');
+  if (srcNote) srcNote.value = '';
+
+  // Set today as default date
+  var today = new Date().toISOString().split('T')[0];
+  var ds = document.getElementById('link-new-date-start');
+  var de = document.getElementById('link-new-date-end');
+  if (ds) ds.value = today;
+  if (de) de.value = today;
 }
 
 // Alert Manage Modal
@@ -8095,11 +8815,950 @@ function confirmOverride() {
 const origShowPage = showPage;
 showPage = function(pageId) {
   origShowPage(pageId);
-  if (pageId === 'alertmgmt' || pageId === 'alertdetail') {
+  if (pageId === 'alertmgmt' || pageId === 'alertdetail' || pageId === 'casemgmt') {
+    if (pageId === 'casemgmt' && typeof cmUpdateManageButtons === 'function') cmUpdateManageButtons();
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('nav-compliance').classList.add('active');
   }
 };
+
+// ==================== CASE MANAGEMENT FUNCTIONS ====================
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  cmUpdateManageButtons();
+  // Case Owner filter defaults to the logged-in user, so apply it up front
+  cmFilterCases();
+  // capture the pristine report body and give the seeded versions their own copies
+  aiSeedRecords();
+});
+
+function cmToggleExpand(header) {
+  var panel = header.parentElement.querySelector('.cm-alerts-panel');
+  var icon = header.querySelector('.cm-expand');
+  if (panel.style.display === 'none' || !panel.style.display) {
+    panel.style.display = 'block';
+    icon.textContent = String.fromCharCode(8722);
+  } else {
+    panel.style.display = 'none';
+    icon.textContent = '+';
+  }
+}
+
+function cmShowDetail() {
+  document.getElementById('cm-list-header').style.display = 'none';
+  document.getElementById('cm-list-view').style.display = 'none';
+  document.getElementById('cm-detail-view').style.display = 'block';
+  cmSetEditMode(false);
+  cmApplyDetailPermission(cdText('cd-owner') === cmCurrentUser);
+}
+
+// List row "Manage" lands on the same page, already in edit mode
+function cmShowDetailEdit() {
+  cmShowDetail();
+  cmEnterEdit();
+}
+
+function cmShowCaseDetail(code, name, owner, account, symbol, source, alerts, status, tag, created, period) {
+  // Reset AI report state (collapsed by default)
+  document.getElementById('ai-report-content').style.display = 'none';
+  document.getElementById('ai-report-error').style.display = 'none';
+  document.getElementById('ai-report-meta').textContent = '';
+  document.getElementById('ai-save-status').textContent = '';
+  aiCurrentRow = null;
+  document.getElementById('ai-report-content').style.display = 'none';
+
+  // For TS_838 (CETY), show AI error state to demonstrate the scenario
+  if (code === 'TS_838') {
+    document.getElementById('ai-report-error').style.display = 'block';
+    document.getElementById('ai-report-meta').textContent = 'Last attempt failed at 2026-07-29 10:15';
+  }
+  // Fill detail fields
+  document.getElementById('cd-name').innerHTML = '<strong>' + name + '</strong>';
+  document.getElementById('cd-code').innerHTML = '<strong>' + code + '</strong>';
+  document.getElementById('cd-owner').innerHTML = '<strong>' + owner + '</strong>';
+  document.getElementById('cd-account').innerHTML = '<strong>' + account + '</strong>';
+  document.getElementById('cd-symbol').innerHTML = '<strong>' + symbol + '</strong>';
+  document.getElementById('cd-source').innerHTML = '<strong>' + source + '</strong>';
+  document.getElementById('cd-alerts').innerHTML = '<strong>' + alerts + '</strong>';
+  document.getElementById('cd-status').innerHTML = '<strong>' + status + '</strong>';
+  document.getElementById('cd-tag').innerHTML = '<strong>' + tag + '</strong>';
+  document.getElementById('cd-created').textContent = created + ' GMT+8';
+  document.getElementById('cd-period').textContent = period + ' GMT+8';
+
+  document.getElementById('cm-list-header').style.display = 'none';
+  document.getElementById('cm-list-view').style.display = 'none';
+  document.getElementById('cm-detail-view').style.display = 'block';
+  cmSetEditMode(false);
+  cmApplyDetailPermission(owner === cmCurrentUser, status);
+}
+
+function cmHideDetail() {
+  cmSetEditMode(false);
+  document.getElementById('cm-list-header').style.display = '';
+  document.getElementById('cm-list-view').style.display = 'block';
+  document.getElementById('cm-detail-view').style.display = 'none';
+}
+
+function cmUpdateManageButtons() {
+  var rows = document.querySelectorAll('#cm-list-view tbody tr[data-owner]');
+  for (var i = 0; i < rows.length; i++) {
+    var btn = rows[i].querySelector('.cm-manage-btn');
+    if (btn) {
+      btn.style.display = (rows[i].getAttribute('data-owner') === cmCurrentUser) ? 'inline' : 'none';
+    }
+  }
+}
+
+function cmFilterCases() {
+  var statusVal = (document.getElementById('cm-filter-status').value || '').toLowerCase();
+  var nameVal = (document.getElementById('cm-filter-name').value || '').toLowerCase().trim();
+  var accountVal = (document.getElementById('cm-filter-account').value || '').toLowerCase().trim();
+  var symbolVal = (document.getElementById('cm-filter-symbol').value || '').toLowerCase().trim();
+  var ownerEl = document.getElementById('cm-filter-owner');
+  var ownerVal = ownerEl ? (ownerEl.value || '').toLowerCase() : '';
+
+  var rows = document.querySelectorAll('#cm-list-view tbody tr[data-owner]');
+  var visible = 0;
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var rowStatus = (row.getAttribute('data-status') || '').toLowerCase();
+    var rowName = (row.getAttribute('data-name') || '').toLowerCase();
+    var rowAccount = (row.getAttribute('data-account') || '').toLowerCase();
+    var rowSymbol = (row.getAttribute('data-symbol') || '').toLowerCase();
+    var rowOwner = (row.getAttribute('data-owner') || '').toLowerCase();
+
+    var show = true;
+
+    // Status filter
+    if (show && statusVal && rowStatus !== statusVal) {
+      show = false;
+    }
+
+    // Case Name (fuzzy)
+    if (show && nameVal && rowName.indexOf(nameVal) === -1) {
+      show = false;
+    }
+
+    // Account ID (match any)
+    if (show && accountVal) {
+      var accounts = rowAccount.split(',');
+      var matched = false;
+      for (var j = 0; j < accounts.length; j++) {
+        if (accounts[j].trim().indexOf(accountVal) !== -1) { matched = true; break; }
+      }
+      if (!matched) show = false;
+    }
+
+    // Symbol (fuzzy)
+    if (show && symbolVal && rowSymbol.indexOf(symbolVal) === -1) {
+      show = false;
+    }
+
+    // Owner filter (exact)
+    if (show && ownerVal && rowOwner !== ownerVal) {
+      show = false;
+    }
+
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
+  }
+
+  var totalEl = document.getElementById('cm-total-count');
+  if (totalEl) totalEl.textContent = visible;
+}
+
+function cmResetFilters() {
+  document.getElementById('cm-filter-status').value = '';
+  document.getElementById('cm-filter-name').value = '';
+  document.getElementById('cm-filter-account').value = '';
+  document.getElementById('cm-filter-symbol').value = '';
+  // Reset restores the default view (own cases), not an empty owner filter
+  var ownerEl = document.getElementById('cm-filter-owner');
+  if (ownerEl) ownerEl.value = cmCurrentUser;
+  cmFilterCases();
+}
+
+
+function linkFilterCases(query) {
+  var q = query.toLowerCase().trim();
+  var rows = document.querySelectorAll('.link-case-row');
+  var table = document.getElementById('link-case-table');
+  var noResults = document.getElementById('link-no-results');
+
+  // If no query, hide everything (empty state)
+  if (!q) {
+    for (var i = 0; i < rows.length; i++) { rows[i].style.display = 'none'; }
+    if (table) table.parentElement.style.display = 'none';
+    if (noResults) { noResults.style.display = 'block'; noResults.textContent = 'Please enter a keyword to search for cases.'; }
+    return;
+  }
+
+  var visibleCount = 0;
+  for (var i = 0; i < rows.length; i++) {
+    var searchData = rows[i].getAttribute('data-search') || '';
+    var show = searchData.indexOf(q) !== -1;
+    rows[i].style.display = show ? '' : 'none';
+    if (show) visibleCount++;
+  }
+
+  if (visibleCount === 0) {
+    if (table) table.parentElement.style.display = 'none';
+    if (noResults) { noResults.style.display = 'block'; noResults.textContent = 'No matching cases found. You can switch to "Add a new case" to create one.'; }
+  } else {
+    if (table) table.parentElement.style.display = '';
+    if (noResults) noResults.style.display = 'none';
+  }
+}
+
+
+/* ==================== ADD NEW CASE: link alerts first ====================
+   Interaction: search the alert pool -> tick alerts -> the case-level
+   Account ID / Symbol are auto-filled from them, and can be pruned. Removing
+   a chip does NOT unlink the alert: the case-level fields are the subset the
+   case actually investigates. Data Period is derived, not typed. */
+var CM_ALERT_POOL = [
+  { id: 'AL-20260410-0231', account: '63780800',            symbol: 'TROO',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-04-10 09:41:22' },
+  { id: 'AL-20260412-0288', account: '67259000',            symbol: 'TROO',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-04-12 10:02:15' },
+  { id: 'AL-20260508-0412', account: '63680300',            symbol: 'CETY',  rule: 'TS_C001 Market Dominance at Open/Close',      trigger: '2026-05-08 15:58:03' },
+  { id: 'AL-20260521-0533', account: '61541300',            symbol: '01247', rule: 'TS_B001 Pump and Dump',                       trigger: '2026-05-21 09:30:44' },
+  { id: 'AL-20260603-0677', account: '63780800, 70118800',  symbol: 'TROO',  rule: 'TS_A006 Pre-arranged Trading',                trigger: '2026-06-03 11:15:07' },
+  { id: 'AL-20260608-0701', account: '5232700',             symbol: 'NCTY',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-06-08 14:22:51' }
+];
+
+var cmAddSelAlerts = [];
+var cmAddChips = { account: [], symbol: [] };
+// Values the user explicitly removed, so re-rendering never resurrects them
+var cmAddDropped = { account: {}, symbol: {} };
+
+function cmOpenAddCase() {
+  cmAddSelAlerts = [];
+  cmAddChips = { account: [], symbol: [] };
+  cmAddDropped = { account: {}, symbol: {} };
+  ['cm-af-account', 'cm-af-symbol', 'cm-af-rule', 'cm-af-from', 'cm-af-to',
+   'cm-add-account-input', 'cm-add-symbol-input', 'cm-add-source-note'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  srcSetSources('cmadd', []);
+  cmAddRenderAlerts();
+  cmAddRenderChips('account');
+  cmAddRenderChips('symbol');
+  document.getElementById('modal-cm-addcase').classList.add('show');
+}
+
+function cmAddResetAlertFilters() {
+  ['cm-af-account', 'cm-af-symbol', 'cm-af-rule', 'cm-af-from', 'cm-af-to'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  cmAddRenderAlerts();
+}
+
+function cmAddRenderAlerts() {
+  var tbody = document.getElementById('cm-alert-tbody');
+  if (!tbody) return;
+  var fAcct = (document.getElementById('cm-af-account').value || '').toLowerCase().trim();
+  var fSym = (document.getElementById('cm-af-symbol').value || '').toLowerCase().trim();
+  var fRule = (document.getElementById('cm-af-rule').value || '').toLowerCase().trim();
+  var fFrom = document.getElementById('cm-af-from').value || '';
+  var fTo = document.getElementById('cm-af-to').value || '';
+  var hasQuery = !!(fAcct || fSym || fRule || fFrom || fTo);
+
+  var html = '', shown = 0;
+  CM_ALERT_POOL.forEach(function (a) {
+    var picked = cmAddSelAlerts.indexOf(a.id) !== -1;
+    if (hasQuery) {
+      var day = a.trigger.substring(0, 10);
+      if (fAcct && a.account.toLowerCase().split(',').every(function (x) { return x.trim().indexOf(fAcct) === -1; })) return;
+      if (fSym && a.symbol.toLowerCase().indexOf(fSym) === -1) return;
+      if (fRule && a.rule.toLowerCase().indexOf(fRule) === -1) return;
+      if (fFrom && day < fFrom) return;
+      if (fTo && day > fTo) return;
+    } else if (!picked) {
+      // No search yet: list only the alerts already linked, so the selection
+      // stays visible and can be undone without searching again.
+      return;
+    }
+    shown++;
+    html += '<tr><td><input type="checkbox"' + (picked ? ' checked' : '') + ' onchange="cmAddToggleAlert(\'' + a.id + '\',this.checked)"></td>' +
+      '<td>' + a.id + '</td><td title="' + a.account + '">' + a.account + '</td><td>' + a.symbol + '</td>' +
+      '<td title="' + a.rule + '">' + a.rule + '</td><td>' + a.trigger + '</td></tr>';
+  });
+  tbody.innerHTML = html;
+
+  var emptyEl = document.getElementById('cm-alert-empty');
+  emptyEl.textContent = hasQuery
+    ? 'No alerts match these filters.'
+    : 'Enter Account ID, Symbol, Rule Name or a Trigger Time range above to search alerts.';
+  emptyEl.style.display = shown ? 'none' : 'block';
+  document.getElementById('cm-alert-table').style.display = shown ? '' : 'none';
+  cmAddRenderSummary();
+}
+
+function cmAddToggleAlert(id, checked) {
+  var i = cmAddSelAlerts.indexOf(id);
+  if (checked && i === -1) cmAddSelAlerts.push(id);
+  if (!checked && i !== -1) cmAddSelAlerts.splice(i, 1);
+  cmAddSyncFromAlerts();
+  cmAddRenderSummary();
+}
+
+// Merge the selected alerts' accounts/symbols into the case-level chips.
+// Unticking an alert removes only the values no remaining alert contributes
+// and that were not typed in manually.
+function cmAddSyncFromAlerts() {
+  ['account', 'symbol'].forEach(function (kind) {
+    var fromAlerts = [];
+    cmAddSelAlerts.forEach(function (id) {
+      var a = CM_ALERT_POOL.filter(function (x) { return x.id === id; })[0];
+      if (!a) return;
+      String(a[kind]).split(',').forEach(function (v) {
+        v = v.trim();
+        if (v && fromAlerts.indexOf(v) === -1) fromAlerts.push(v);
+      });
+    });
+    var manual = cmAddChips[kind].filter(function (v) { return v.manual; });
+    var kept = fromAlerts
+      .filter(function (v) { return !cmAddDropped[kind][v]; })
+      .map(function (v) { return { value: v, manual: false }; });
+    // manual entries always survive, and win over an alert-sourced duplicate
+    manual.forEach(function (m) {
+      if (!kept.some(function (k) { return k.value === m.value; })) kept.push(m);
+    });
+    cmAddChips[kind] = kept;
+    cmAddRenderChips(kind);
+  });
+}
+
+function cmAddRenderChips(kind) {
+  var el = document.getElementById('cm-add-' + kind + '-chips');
+  if (!el) return;
+  el.innerHTML = cmAddChips[kind].map(function (c, i) {
+    var bg = c.manual ? '#f2f3f5' : '#e8f3ff';
+    var fg = c.manual ? '#4e5969' : '#165dff';
+    return '<span title="' + (c.manual ? 'Added manually' : 'From a linked alert') + '" style="background:' + bg + ';color:' + fg +
+      ';font-size:11px;padding:2px 8px;border-radius:3px;white-space:nowrap;">' + c.value +
+      ' <span style="cursor:pointer;" onclick="cmAddRemoveChip(\'' + kind + '\',' + i + ')">&times;</span></span>';
+  }).join('');
+}
+
+function cmAddRemoveChip(kind, i) {
+  var c = cmAddChips[kind][i];
+  if (c && !c.manual) cmAddDropped[kind][c.value] = true;
+  cmAddChips[kind].splice(i, 1);
+  cmAddRenderChips(kind);
+}
+
+function cmAddChipKey(e, kind) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  var input = document.getElementById('cm-add-' + kind + '-input');
+  var v = (input.value || '').trim();
+  if (!v) return;
+  if (!cmAddChips[kind].some(function (c) { return c.value === v; })) {
+    cmAddChips[kind].push({ value: v, manual: true });
+    delete cmAddDropped[kind][v];
+  }
+  input.value = '';
+  cmAddRenderChips(kind);
+}
+
+// Data Period is derived from the linked alerts' trigger times, not typed.
+function cmAddRenderSummary() {
+  var el = document.getElementById('cm-alert-summary');
+  if (!el) return;
+  var n = cmAddSelAlerts.length;
+  if (!n) {
+    el.innerHTML = 'No alert selected. <span style="color:#86909c;">Account ID / Symbol / Data Period must then be entered manually.</span>';
+    return;
+  }
+  var days = cmAddSelAlerts.map(function (id) {
+    var a = CM_ALERT_POOL.filter(function (x) { return x.id === id; })[0];
+    return a ? a.trigger.substring(0, 10) : '';
+  }).filter(Boolean).sort();
+  el.innerHTML = '<strong>' + n + '</strong> alert' + (n > 1 ? 's' : '') + ' selected &nbsp;·&nbsp; Data Period will be set to <strong>' +
+    days[0] + ' ~ ' + days[days.length - 1] + '</strong> <span style="color:#86909c;">(earliest → latest trigger time, editable later in the case)</span>';
+}
+
+/* ---- Case Source multi-select ----
+   Shared by three dialogs (Link > Add a new case / Add New Case / Manage),
+   keyed by instance so they keep independent selections. Backend owns the
+   option list, so it is declared once here. */
+var CASE_SOURCE_OPTIONS = ['CMP', 'Manual', 'Risk Identification'];
+var caseSourceState = {};
+
+function srcRenderSources(key) {
+  var chips = document.getElementById('src-chips-' + key);
+  var sel = document.getElementById('src-add-' + key);
+  if (!chips || !sel) return;
+  if (!caseSourceState[key]) caseSourceState[key] = [];
+  var picked = caseSourceState[key];
+
+  chips.innerHTML = picked.map(function (s, i) {
+    return '<span style="background:#e8f3ff;color:#165dff;font-size:11px;padding:2px 8px;border-radius:3px;white-space:nowrap;">' +
+      s + ' <span style="cursor:pointer;" onclick="srcRemoveSource(\'' + key + '\',' + i + ')">&times;</span></span>';
+  }).join('');
+
+  var remaining = CASE_SOURCE_OPTIONS.filter(function (o) { return picked.indexOf(o) === -1; });
+  sel.innerHTML = '<option value="">' +
+    (picked.length ? '+ Add another source' : 'Please select Case Source') +
+    '</option>' + remaining.map(function (o) { return '<option>' + o + '</option>'; }).join('');
+  sel.style.display = remaining.length ? '' : 'none';
+}
+
+function srcAddSource(key, sel) {
+  if (!sel.value) return;
+  if (!caseSourceState[key]) caseSourceState[key] = [];
+  caseSourceState[key].push(sel.value);
+  srcRenderSources(key);
+}
+
+function srcRemoveSource(key, i) {
+  caseSourceState[key].splice(i, 1);
+  srcRenderSources(key);
+}
+
+function srcSetSources(key, arr) {
+  caseSourceState[key] = arr.slice();
+  srcRenderSources(key);
+}
+
+function cmLinkConfirm() {
+  // Check if "Link to existing case" is selected
+  var existingRadio = document.querySelector('input[name="link-type"][value="existing"]');
+  if (existingRadio && existingRadio.checked) {
+    // Check if a case is selected
+    var selected = document.querySelector('input[name="link-select-case"]:checked');
+    if (!selected) {
+      alert('Please select a case to link to.');
+      return;
+    }
+    // Compare against the case's OWN Account / Symbol fields (not the free-text
+    // search blob, which also contains case name + owner and caused false matches)
+    var selectedRow = selected.closest('tr');
+    var caseAccounts = (selectedRow.getAttribute('data-case-account') || '')
+      .toLowerCase().split(',').map(function (v) { return v.trim(); });
+    var caseSymbols = (selectedRow.getAttribute('data-case-symbol') || '')
+      .toLowerCase().split(',').map(function (v) { return v.trim(); });
+
+    // Get current alert context from the search input hint
+    var currentSymbols = (window._linkAlertSymbol || '').toLowerCase().split(',');
+    var currentAccounts = (window._linkAlertAccount || '').toLowerCase().split(',');
+
+    // Check if alert's symbols/accounts are already covered by the target case
+    var newSymbols = [];
+    var newAccounts = [];
+
+    for (var i = 0; i < currentSymbols.length; i++) {
+      var s = currentSymbols[i].trim();
+      if (s && caseSymbols.indexOf(s) === -1) newSymbols.push(s.toUpperCase());
+    }
+    for (var i = 0; i < currentAccounts.length; i++) {
+      var a = currentAccounts[i].trim();
+      if (a && caseAccounts.indexOf(a) === -1) newAccounts.push(a);
+    }
+    
+    if (newSymbols.length > 0 || newAccounts.length > 0) {
+      // Show validation modal with detected new items
+      var detailHtml = '';
+      if (newAccounts.length > 0) {
+        detailHtml += '<div style="margin-bottom:8px;"><span style="color:#86909c;">New Account ID:</span> <strong style="color:var(--warning);">' + newAccounts.join(', ') + '</strong></div>';
+      }
+      if (newSymbols.length > 0) {
+        detailHtml += '<div><span style="color:#86909c;">New Symbol:</span> <strong style="color:var(--warning);">' + newSymbols.join(', ') + '</strong></div>';
+      }
+      document.getElementById('link-validate-details').innerHTML = detailHtml;
+      
+      // Build checkbox options
+      var checkHtml = '';
+      for (var i = 0; i < newAccounts.length; i++) {
+        checkHtml += '<label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;padding:8px 12px;border:1px solid var(--border);border-radius:4px;"><input type="checkbox" checked> Add <strong>' + newAccounts[i] + '</strong> to case Account IDs</label>';
+      }
+      for (var i = 0; i < newSymbols.length; i++) {
+        checkHtml += '<label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;padding:8px 12px;border:1px solid var(--border);border-radius:4px;"><input type="checkbox" checked> Add <strong>' + newSymbols[i] + '</strong> to case Symbols</label>';
+      }
+      document.getElementById('link-validate-checks').innerHTML = checkHtml;
+      
+      showModal('modal-link-validate');
+    } else {
+      // No mismatch - link directly
+      hideModal('modal-alert-link');
+    }
+  } else {
+    // Add new case flow - just close
+    hideModal('modal-alert-link');
+  }
+}
+
+function cmShowLinkSuccess() {
+  // Could show a success toast - for prototype just alert
+  // In real app this would refresh the alert list and show "Newly Linked" badge
+}
+
+
+/* ==================== CASE DETAIL: view / edit modes ====================
+   One page, two modes. The Manage dialog is gone: the same page turns the
+   Case Overview fields into inputs while the linked alerts, AI report and
+   operation log stay on screen as read-only context. */
+
+function cdText(id) {
+  var el = document.getElementById(id);
+  return el ? el.textContent.trim() : '';
+}
+
+/* Account ID / Symbol are curated lists, so they are edited as removable chips
+   here too — same affordance as Add New Case. */
+var cdChips = { account: [], symbol: [] };
+
+function cdRenderChips(kind) {
+  var el = document.getElementById('cd-' + kind + '-chips');
+  if (!el) return;
+  el.innerHTML = cdChips[kind].map(function (v, i) {
+    return '<span style="background:#e8f3ff;color:#165dff;font-size:11px;padding:2px 8px;border-radius:3px;white-space:nowrap;">' +
+      v + ' <span style="cursor:pointer;" onclick="cdRemoveChip(\'' + kind + '\',' + i + ')">&times;</span></span>';
+  }).join('');
+}
+
+function cdRemoveChip(kind, i) {
+  cdChips[kind].splice(i, 1);
+  cdRenderChips(kind);
+}
+
+function cdChipKey(e, kind) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  var input = document.getElementById('cd-' + kind + '-input');
+  var v = (input.value || '').trim();
+  if (v && cdChips[kind].indexOf(v) === -1) cdChips[kind].push(v);
+  input.value = '';
+  cdRenderChips(kind);
+}
+
+function cdSplit(text) {
+  return text.split(',').map(function (v) { return v.trim(); })
+             .filter(function (v) { return v && v !== '--'; });
+}
+
+// AI report is gated on Manage permission, not on which page you are on.
+function cmApplyDetailPermission(canManage, status) {
+  var isClosed = (status || cdText('cd-status')) === 'Closed';
+  var manageBtn = document.getElementById('cm-detail-manage-btn');
+  var reopenBtn = document.getElementById('cm-detail-reopen-btn');
+  var note = document.getElementById('cm-detail-readonly-note');
+
+  if (manageBtn) manageBtn.style.display = (canManage && !isClosed) ? 'inline-block' : 'none';
+  if (reopenBtn) reopenBtn.style.display = (canManage && isClosed) ? 'inline-block' : 'none';
+  if (note) note.style.display = canManage ? 'none' : 'inline';
+
+  // AI run / record editing is controlled by Manage mode (see aiApplyMode),
+  // and Manage mode is only reachable by the owner — no separate gate needed.
+}
+
+function cmEnterEdit() {
+  // Seed the form from what the view is currently showing
+  document.getElementById('cd-edit-name').value = cdText('cd-name');
+  document.getElementById('cd-edit-owner').value = cdText('cd-owner');
+  document.getElementById('cd-edit-status').value = cdText('cd-status');
+  var tag = cdText('cd-tag');
+  document.getElementById('cd-edit-tag').value = (tag === '--' ? '' : tag);
+
+  var comment = cdText('cd-comment');
+  document.getElementById('cd-edit-comment').value = (comment === '--' ? '' : comment);
+
+  srcSetSources('cd', cdSplit(cdText('cd-source')));
+
+  cdChips.account = cdSplit(cdText('cd-account'));
+  cdChips.symbol = cdSplit(cdText('cd-symbol'));
+  cdRenderChips('account');
+  cdRenderChips('symbol');
+  document.getElementById('cd-account-input').value = '';
+  document.getElementById('cd-symbol-input').value = '';
+
+  var period = cdText('cd-period').replace(' GMT+8', '').split('~');
+  document.getElementById('cd-edit-period-from').value = (period[0] || '').trim();
+  document.getElementById('cd-edit-period-to').value = (period[1] || '').trim();
+
+  document.getElementById('cd-edit-bar-code').textContent = cdText('cd-code');
+
+  cmSetEditMode(true);
+}
+
+function cmSetEditMode(on) {
+  document.getElementById('cd-ov-view').style.display = on ? 'none' : '';
+  document.getElementById('cd-ov-edit').style.display = on ? 'block' : 'none';
+  document.getElementById('cd-edit-bar').style.display = on ? 'block' : 'none';
+  document.getElementById('cm-detail-manage-btn').style.display = on ? 'none' : 'inline-block';
+  var reopen = document.getElementById('cm-detail-reopen-btn');
+  if (on && reopen) reopen.style.display = 'none';
+  // keep the pinned bar from covering the operation log
+  document.getElementById('cm-detail-view').style.paddingBottom = on ? '64px' : '';
+  aiApplyMode(on);
+  if (!on) window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+/* The page-level Save covers the case fields only. An AI run that has not been
+   archived yet lives outside that scope, so warn before it disappears. */
+function cdUnsavedRunOk() {
+  var content = document.getElementById('ai-report-content');
+  if (!content || content.style.display === 'none') return true;
+  return confirm('There is an AI report run that has not been saved as a record. Leaving edit mode discards it. Continue?');
+}
+
+function cmCancelEdit() {
+  if (!cdUnsavedRunOk()) return;
+  cmSetEditMode(false);
+  cmApplyDetailPermission(true);
+}
+
+function cmSaveEdit() {
+  var name = document.getElementById('cd-edit-name').value.trim();
+  if (!name) { alert('Case Name is required.'); return; }
+  if (!cdChips.account.length) { alert('Account ID is required — keep at least one.'); return; }
+  if (!cdUnsavedRunOk()) return;
+
+  var owner = document.getElementById('cd-edit-owner').value;
+  var status = document.getElementById('cd-edit-status').value;
+  var tag = document.getElementById('cd-edit-tag').value || '--';
+  var comment = document.getElementById('cd-edit-comment').value.trim() || '--';
+  var sources = (caseSourceState['cd'] || []).join(', ') || '--';
+  var from = document.getElementById('cd-edit-period-from').value;
+  var to = document.getElementById('cd-edit-period-to').value;
+
+  document.getElementById('cd-name').innerHTML = '<strong>' + name + '</strong>';
+  document.getElementById('cd-owner').innerHTML = '<strong>' + owner + '</strong>';
+  document.getElementById('cd-account').innerHTML = '<strong>' + cdChips.account.join(', ') + '</strong>';
+  document.getElementById('cd-symbol').innerHTML = '<strong>' + (cdChips.symbol.join(', ') || '--') + '</strong>';
+  document.getElementById('cd-status').innerHTML = '<strong>' + status + '</strong>';
+  document.getElementById('cd-tag').innerHTML = '<strong>' + tag + '</strong>';
+  document.getElementById('cd-source').innerHTML = '<strong>' + sources + '</strong>';
+  document.getElementById('cd-comment').textContent = comment;
+  if (from && to) document.getElementById('cd-period').textContent = from + ' ~ ' + to + ' GMT+8';
+
+  cmSetEditMode(false);
+  cmApplyDetailPermission(owner === cmCurrentUser, status);
+}
+
+function cmReopenCase() {
+  document.getElementById('cd-status').innerHTML = '<strong>Processing</strong>';
+  cmApplyDetailPermission(true, 'Processing');
+}
+
+
+/* ==================== AI REPORT: run / save / edit ====================
+   The regulator will not accept an AI report on its own \u2014 there has to be a
+   visible human review step. So a fresh run is ALWAYS read-only: you either
+   discard it or save it as a record. Editing only happens on a saved record,
+   which is what makes the human review auditable. */
+
+var aiCurrentRow = null;    // history row being viewed/edited
+
+/* Each saved version keeps its OWN copy of the report body. Without this the
+   history rows would all render whatever was last on screen, and a new Run
+   would inherit the previous version's human edits. */
+var aiRecords = {};         // version -> body HTML
+var aiTemplate = '';        // pristine "fresh run" body
+
+function aiBody() { return document.getElementById('ai-report-body'); }
+function aiSnapshotBody() { return aiBody().innerHTML; }
+function aiRestoreBody(html) { aiBody().innerHTML = html; }
+
+// Build a variant of the pristine body so the three seeded versions are
+// visibly different when you click through them.
+function aiMakeVariant(mutate) {
+  var tmp = document.createElement('div');
+  tmp.innerHTML = aiTemplate;
+  mutate(tmp);
+  return tmp.innerHTML;
+}
+
+function aiSeedRecords() {
+  if (!aiBody()) return;
+  aiTemplate = aiSnapshotBody();
+
+  // v2 — raw AI output, never reviewed
+  aiRecords['v2'] = aiTemplate;
+
+  // v3 — same run, but a person rewrote sections 2 and 3
+  aiRecords['v3'] = aiMakeVariant(function (root) {
+    var ed = root.querySelectorAll('.ai-editable');
+    ed[0].innerHTML = '<div style="margin-bottom:6px;">Reviewed by zhouyan on 2026-07-30. Confirmed the 3 pairs below are genuine wash trades: matched within 2-7s, opposite sides, near-zero P&amp;L.</div>' +
+      '<div style="margin-bottom:6px;">The shared IP flagged by the model is a shared office network — on its own it is not evidence of common control. Kept as supporting, not primary, evidence.</div>' +
+      '<div>Checked both accounts\' order history outside the alert window: no comparable pattern found, so this looks contained to TROO.</div>';
+    ed[1].innerHTML = 'Human conclusion: wash trading confirmed for 63780800 / 67259000 on TROO between 2026-04-10 and 2026-06-08 (3 pairs, $3,845). Actions taken: &#9312; tagged Further Action; &#9313; FINRA STR submitted 2026-07-30; &#9314; trading restriction assessment raised with Pre-trade. The AI-suggested common-control inference was downgraded after review.';
+  });
+
+  // v1 — an earlier, shorter run window on an older model
+  aiRecords['v1'] = aiMakeVariant(function (root) {
+    var params = root.querySelector('div[style*="monospace"]');
+    if (params) params.innerHTML = params.innerHTML.replace('2026-06-08', '2026-05-31');
+    var total = root.querySelector('div[style*="margin-bottom:8px"] strong[style*="f53f3f"]');
+    if (total) total.textContent = '2';
+    var rows = root.querySelectorAll('table tbody tr');
+    if (rows.length === 3) rows[2].remove();
+    var ed = root.querySelectorAll('.ai-editable');
+    ed[0].innerHTML = '<div style="margin-bottom:6px;">Reviewed by mayimeng on 2026-06-10. Two matched pairs in the 2026-04-10 to 2026-05-31 window; volume is small but the timing is not explainable by normal order flow.</div>' +
+      '<div>Not escalated at this point — asked the desk to keep monitoring instead.</div>';
+    ed[1].innerHTML = 'Human conclusion (2026-06-10): suspicious but insufficient for an STR on 2 pairs alone. Kept the case open and extended monitoring. Superseded by v3 once a third pair appeared.';
+  });
+}
+
+function aiStamp() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') +
+    ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+/* Detail page is read-only: the Run panel and the Edit / Delete actions on
+   saved records belong to Manage mode. In View mode the AI block shows the
+   Report History only, and records can only be viewed. */
+var cdInEditMode = false;
+
+function aiApplyMode(editMode) {
+  cdInEditMode = !!editMode;
+
+  var section = document.getElementById('ai-report-section');
+  if (section) section.style.display = editMode ? '' : 'none';
+
+  var hint = document.getElementById('ai-view-hint');
+  if (hint) hint.style.display = editMode ? 'none' : 'block';
+
+  document.querySelectorAll('.ai-act-manage').forEach(function (el) {
+    el.style.display = editMode ? '' : 'none';
+  });
+
+  var modalEdit = document.getElementById('ai-modal-edit-btn');
+  if (modalEdit) modalEdit.style.display = editMode ? '' : 'none';
+
+  // leaving Manage mode closes any open run output
+  if (!editMode) {
+    var content = document.getElementById('ai-report-content');
+    if (content) content.style.display = 'none';
+  }
+}
+
+function aiApplyEditable(root, editable) {
+  root.querySelectorAll('.ai-editable').forEach(function (el) {
+    el.setAttribute('contenteditable', editable ? 'true' : 'false');
+    el.style.borderStyle = editable ? 'dashed' : 'solid';
+    el.style.borderColor = editable ? '#7c3aed' : '#e5e6eb';
+    el.style.background = editable ? '#fff' : (el.dataset.tint || '');
+  });
+  root.querySelectorAll('.ai-edit-badge').forEach(function (el) {
+    el.style.display = editable ? 'inline-block' : 'none';
+  });
+}
+
+/* ---------- Run panel: shows ONLY the run you just triggered ---------- */
+
+function cmRunAI() {
+  var meta = document.getElementById('ai-report-meta');
+  var content = document.getElementById('ai-report-content');
+  document.getElementById('ai-report-error').style.display = 'none';
+  content.style.display = 'none';
+  meta.textContent = 'Generating report...';
+
+  setTimeout(function () {
+    content.style.display = 'block';
+    aiRestoreBody(aiTemplate);
+
+    // reflect the parameters this run actually used
+    var p = aiInputs();
+    var line = document.getElementById('ai-params-line');
+    if (line) {
+      line.innerHTML = '<strong>accountIdList</strong>: [' +
+        p.accounts.split(',').map(function (a) { return "'" + a.trim() + "'"; }).join(', ') + '] &nbsp; ' +
+        "<strong>symbolList</strong>: ['" + p.symbol + "'] &nbsp; " +
+        '<strong>sinceDate</strong>: ' + p.from + ' &nbsp; <strong>endDate</strong>: ' + p.to +
+        ' &nbsp; <strong>unusualCategory</strong>: ' + p.category + ' &nbsp; <strong>market</strong>: ' + p.market;
+    }
+
+    aiApplyEditable(document.getElementById('ai-report-content'), false);
+    var banner = document.getElementById('ai-state-banner');
+    banner.style.cssText = 'border-radius:4px;padding:8px 12px;font-size:12px;margin-bottom:16px;background:#f3f0fa;border:1px solid #d9d2e9;color:#5b21b6;';
+    banner.innerHTML = '<strong>Raw AI output — read-only.</strong> Save it as a record if you want to review and edit it; otherwise discard it. Discarded runs are not kept.';
+
+    meta.textContent = 'Generated ' + aiStamp() + ' · not saved';
+    document.getElementById('ai-save-status').textContent = '';
+  }, 1500);
+}
+
+function cmDiscardRun() {
+  document.getElementById('ai-report-content').style.display = 'none';
+  document.getElementById('ai-report-meta').textContent = 'Last run discarded, nothing saved.';
+}
+
+var aiVersionSeq = 3; // internal key only, never shown
+
+function cmSaveRunAsRecord() {
+  var stamp = aiStamp();
+  var p = aiInputs();
+  var tbody = document.getElementById('ai-report-history');
+  var version = 'v' + (++aiVersionSeq);
+
+  var row = document.createElement('tr');
+  row.setAttribute('data-version', version);
+  row.setAttribute('data-edited', '0');
+  row.style.background = '#fffef5';
+  row.innerHTML =
+    '<td title="' + p.accounts + '">' + p.accounts + '</td>' +
+    '<td>' + (p.symbol || '--') + '</td>' +
+    '<td>' + p.from + ' ~ ' + p.to + '</td>' +
+    '<td>' + p.market + '</td>' +
+    '<td>' + p.category + '</td>' +
+    '<td>' + stamp + '</td>' +
+    '<td>' + stamp + '</td>' +
+    '<td><span style="color:#ff7d00;" title="No human review recorded yet">--</span></td>' +
+    '<td class="ai-hist-actions">' +
+      '<button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> ' +
+      '<button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> ' +
+      '<button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button>' +
+    '</td>';
+  tbody.insertBefore(row, tbody.firstChild);
+
+  // freeze this run's content under the new version
+  aiRecords[version] = aiSnapshotBody();
+
+  // the run panel's job is done — the record now lives in Report History
+  document.getElementById('ai-report-content').style.display = 'none';
+  document.getElementById('ai-report-meta').textContent =
+    'Saved at ' + stamp + ' — see Report History below. Not reviewed yet.';
+}
+
+// Columns: 0 Accounts, 1 Symbol, 2 Data Period, 3 Market, 4 Category,
+//          5 Generated, 6 Saved, 7 Last Edited By, 8 Action
+function aiRowInfo(row) {
+  var cell = function (i) { return row.children[i] ? row.children[i].textContent.trim() : ''; };
+  return {
+    version: row.getAttribute('data-version'),
+    edited: row.getAttribute('data-edited') === '1',
+    editor: cell(7),
+    label: cell(1) + ' / ' + cell(4) + ' · ' + cell(2),
+    generated: cell(5)
+  };
+}
+
+function aiInputs() {
+  return {
+    accounts: document.getElementById('ai-in-accounts').value.trim(),
+    symbol: document.getElementById('ai-in-symbol').value.trim(),
+    from: document.getElementById('ai-in-from').value,
+    to: document.getElementById('ai-in-to').value,
+    market: document.getElementById('ai-in-market').value,
+    category: document.getElementById('ai-in-category').value
+  };
+}
+
+/* ---------- Saved-record modal: view / edit an archived report ---------- */
+
+function aiModalRender(state) {
+  if (!aiCurrentRow) return;
+  var info = aiRowInfo(aiCurrentRow);
+  var editable = (state === 'edit');
+
+  document.getElementById('ai-modal-title-meta').textContent =
+    info.label + ' · generated ' + info.generated;
+
+  var banner = document.getElementById('ai-modal-banner');
+  if (editable) {
+    banner.style.cssText = 'border-radius:4px;padding:8px 12px;font-size:12px;margin-bottom:14px;background:#fffbe6;border:1px solid #ffe58f;color:#874d00;';
+    banner.innerHTML = 'Recording your own review. Section 1 stays as generated (system data); sections 2 and 3 are yours to rewrite.';
+  } else {
+    banner.style.cssText = 'border-radius:4px;padding:8px 12px;font-size:12px;margin-bottom:14px;background:#f7f8fa;border:1px solid var(--border);color:#4e5969;';
+    banner.innerHTML = info.edited
+      ? 'Reviewed and edited by <strong>' + info.editor + '</strong>.'
+      : '<span style="color:#ff7d00;">Raw AI output — no human review recorded yet.</span> Click Edit to add your analysis.';
+  }
+
+  aiApplyEditable(document.getElementById('ai-modal-body'), editable);
+  document.getElementById('ai-modal-actions-view').style.display = editable ? 'none' : 'flex';
+  document.getElementById('ai-modal-actions-edit').style.display = editable ? 'flex' : 'none';
+}
+
+function aiOpenRecordModal(row, state) {
+  aiCurrentRow = row;
+  var info = aiRowInfo(row);
+  document.getElementById('ai-modal-body').innerHTML = aiRecords[info.version] || '';
+  document.getElementById('ai-modal-status').textContent = '';
+  aiModalRender(state);
+  document.getElementById('modal-ai-record').classList.add('show');
+}
+
+function cmViewRecord(btn) {
+  aiOpenRecordModal(btn.closest('tr'), 'view');
+}
+
+function cmEditRecord(btn) {
+  aiOpenRecordModal(btn.closest('tr'), 'edit');
+}
+
+function cmModalEdit() {
+  aiModalRender('edit');
+}
+
+function cmModalCancelEdit() {
+  if (!aiCurrentRow) return;
+  // drop unsaved edits by reloading the stored version
+  var info = aiRowInfo(aiCurrentRow);
+  document.getElementById('ai-modal-body').innerHTML = aiRecords[info.version] || '';
+  aiModalRender('view');
+}
+
+function cmModalSaveEdit() {
+  if (!aiCurrentRow) return;
+  var stamp = aiStamp();
+  var version = aiCurrentRow.getAttribute('data-version');
+  aiRecords[version] = document.getElementById('ai-modal-body').innerHTML;
+
+  aiCurrentRow.setAttribute('data-edited', '1');
+  aiCurrentRow.children[6].textContent = stamp;          // Saved Time
+  aiCurrentRow.children[7].textContent = cmCurrentUser;  // Last Edited By
+
+  document.getElementById('ai-modal-status').textContent = 'Human review recorded at ' + stamp + '.';
+  aiModalRender('view');
+}
+
+function cmCloseRecordModal() {
+  document.getElementById('modal-ai-record').classList.remove('show');
+  aiCurrentRow = null;
+}
+
+function cmDeleteRecord(btn) {
+  var row = btn.closest('tr');
+  var version = row.getAttribute('data-version');
+  if (!confirm('Delete this report record? This cannot be undone.')) return;
+  delete aiRecords[version];
+  if (aiCurrentRow === row) cmCloseRecordModal();
+  row.remove();
+}
+
+function cmExportReport() {
+  alert('Report exported as Excel.');
+}
+
+function cmRetryAI() {
+  document.getElementById('ai-report-error').style.display = 'none';
+  cmRunAI();
+}
+
+
+function cmDetailTab(el, tabId) {
+  // Update tab styles
+  var tabs = document.querySelectorAll('.cd-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].style.color = '#4e5969';
+    tabs[i].style.fontWeight = 'normal';
+    tabs[i].style.borderBottomColor = 'transparent';
+  }
+  el.style.color = '#FFC107';
+  el.style.fontWeight = '500';
+  el.style.borderBottomColor = '#FFC107';
+  // Toggle panels
+  document.getElementById('cd-tab-alerts').style.display = (tabId === 'cd-tab-alerts') ? 'block' : 'none';
+  document.getElementById('cd-tab-client').style.display = (tabId === 'cd-tab-client') ? 'block' : 'none';
+}
+
 </script>
 
 </body>

@@ -1,0 +1,7 @@
+# Internal material — must not reach this public repo
+docs/
+feishu-images/
+*.json
+*.png
+extract_sheet.js
+write_sheet*.js
