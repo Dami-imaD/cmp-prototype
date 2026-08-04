@@ -777,7 +777,7 @@ input[type="text"] {
   <div class="nav-right">
     <span class="search-icon">&#128269;</span>
     <span class="download-icon">&#8681;</span>
-    <span class="nav-user">zhouyan BJT:CST</span>
+    <span class="nav-user">zhou BJT:CST</span>
   </div>
 </div>
 
@@ -830,7 +830,7 @@ input[type="text"] {
           <col style="width:110px"><col style="width:190px"><col style="width:260px"><col style="width:260px"><col style="width:110px">
         </colgroup>
         <tbody id="rt-group-A">
-          <tr data-rt='{"code":"TS_A001","domain":"TS","cat":"A","num":"001","name":"Possible Wash Trade (A to B)","descEn":"Identifies possible cross trading records for two accounts","descCn":"识别两个账户之间发生的潜在交叉交易记录","active":"Y","logs":["2025-03-20 14:00 admin Created","2025-07-10 09:30 zhouyan Updated name"]}'>
+          <tr data-rt='{"code":"TS_A001","domain":"TS","cat":"A","num":"001","name":"Possible Wash Trade (A to B)","descEn":"Identifies possible cross trading records for two accounts","descCn":"识别两个账户之间发生的潜在交叉交易记录","active":"Y","logs":["2025-03-20 14:00 admin Created","2025-07-10 09:30 zhou Updated name"]}'>
             <td>TS_A001</td>
             <td>Possible Wash Trade (A to B)</td>
             <td>Identifies possible cross trading records for two accounts</td>
@@ -5170,7 +5170,7 @@ function doConfirmCancelQueued(ruleId, btn) {
 
   // Add log entry
   var now = new Date().toISOString().slice(0, 16).replace('T', ' ');
-  d.logs.unshift({time: now, user: 'zhouyan', action: 'Upcoming cancelled', detail: 'Cancelled queued change: ' + d.queued.desc + ' (was effective ' + d.queued.effective + ')'});
+  d.logs.unshift({time: now, user: 'zhou', action: 'Upcoming cancelled', detail: 'Cancelled queued change: ' + d.queued.desc + ' (was effective ' + d.queued.effective + ')'});
 
   // Clear queued
   d.queued = null;
@@ -5668,7 +5668,7 @@ function confirmPublish(btn) {
     var data = JSON.parse(row.getAttribute('data-feat'));
     data.status = 'Testing';
     var now = new Date().toISOString().slice(0, 16).replace('T', ' ');
-    data.logs.push(now + ' zhouyan Published to testing');
+    data.logs.push(now + ' zhou Published to testing');
     row.setAttribute('data-feat', JSON.stringify(data));
   }
 
@@ -6249,7 +6249,7 @@ function submitRuleType() {
 
   if (rtMode === 'create') {
     // Build new row
-    const newData = { code, domain, cat, num: num.padStart(3,'0'), name, descEn, descCn, active: 'Y', logs: [now + ' zhouyan Created'] };
+    const newData = { code, domain, cat, num: num.padStart(3,'0'), name, descEn, descCn, active: 'Y', logs: [now + ' zhou Created'] };
     const tbody = document.getElementById('rt-group-' + cat);
     if (!tbody) {
       alert('Category group not found in page. Please add group ' + cat + ' first.');
@@ -6280,7 +6280,7 @@ function submitRuleType() {
     oldData.name = name;
     oldData.descEn = descEn;
     oldData.descCn = descCn;
-    oldData.logs.push(now + ' zhouyan Updated');
+    oldData.logs.push(now + ' zhou Updated');
     rtEditingRow.setAttribute('data-rt', JSON.stringify(oldData));
     // Update visible cells
     const tds = rtEditingRow.querySelectorAll('td');
@@ -6768,7 +6768,7 @@ WHERE a.dominance_ratio > {ratio}
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px 20px;margin-bottom:16px;">
       <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Alert Tag</div><select style="width:100%;"><option value="">Please select</option><option>Escalated</option><option>In the Inquiry</option></select></div>
       <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Client Tag</div><select style="width:100%;"><option value="">Please select</option></select></div>
-      <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Owner</div><select style="width:100%;"><option value="">Please select</option><option>pamela.wong</option><option>zhouyan</option></select></div>
+      <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Owner</div><select style="width:100%;"><option value="">Please select</option><option>pemela</option><option>zhou</option></select></div>
       <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Risk Level</div><select style="width:100%;"><option value="">Please select</option></select></div>
     </div>
 
@@ -6956,7 +6956,7 @@ WHERE a.dominance_ratio > {ratio}
         <div class="form-group">
           <label><span style="color:red">*</span> Assign to</label>
           <div style="border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:13px;display:flex;align-items:center;">
-            <span>zhouyan</span><span style="margin-left:auto;cursor:pointer;color:#86909c;">&times;</span>
+            <span>zhou</span><span style="margin-left:auto;cursor:pointer;color:#86909c;">&times;</span>
           </div>
         </div>
 
@@ -7040,7 +7040,7 @@ WHERE a.dominance_ratio > {ratio}
             <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="radio" name="link-new-status"> Closed</label>
           </div>
         </div>
-        <div class="form-group"><label><span style="color:red">*</span> Case Owner</label><select style="width:100%;"><option>zhouyan</option><option>pamela.wong</option><option>mayimeng</option></select></div>
+        <div class="form-group"><label><span style="color:red">*</span> Case Owner</label><select style="width:100%;"><option>zhou</option><option>pemela</option><option>yimeng</option></select></div>
       </div>
 
       <!-- Panel: Link to existing case -->
@@ -7067,17 +7067,17 @@ WHERE a.dominance_ratio > {ratio}
             </colgroup>
             <thead style="position:sticky;top:0;background:#fff;z-index:1;"><tr><th></th><th>Case ID</th><th>Case Name</th><th>Case Account</th><th>Case Symbol</th><th>Owner</th><th>Remark</th></tr></thead>
             <tbody class="link-case-tbody">
-              <tr class="link-case-row" data-case-account="4667800" data-case-symbol="AAPL, TSLA, NVDA" data-search="4667800 possible quote stuffing regarding multiple symbols mayimeng aapl tsla nvda"><td><input type="radio" name="link-select-case"></td><td>3043</td><td>4667800 - Possible quote stuffing regarding multiple symbols</td><td title="4667800">4667800</td><td title="AAPL, TSLA, NVDA">AAPL, TSLA, NVDA</td><td>mayimeng</td><td title="TradeUP inquired about client 4667800 regarding quote stuffing across multiple symbols">TradeUP inquired about client 4667800...</td></tr>
-              <tr class="link-case-row" data-case-account="9793000" data-case-symbol="NTDOY" data-search="ntdoy 9793000 possible spoofing mayimeng"><td><input type="radio" name="link-select-case"></td><td>3026</td><td>NTDOY - 9793000 Possible Spoofing</td><td title="9793000">9793000</td><td title="NTDOY">NTDOY</td><td>mayimeng</td><td title="We analyzed after the alert was triggered and found layered orders on the bid side">We analyzed after the alert was...</td></tr>
-              <tr class="link-case-row" data-case-account="5108800, 5109000, 5110200, 5112900, 5119000, 5120400" data-case-symbol="BDMD" data-search="bdmd cross trades mayimeng 5108800 5109000 5110200 5112900 5119000 5120400"><td><input type="radio" name="link-select-case"></td><td>3027</td><td>BDMD - Cross Trades</td><td title="5108800, 5109000, 5110200, 5112900, 5119000, 5120400">5108800, 5109000, 5110200, 5112900, 5119000, 5120400</td><td title="BDMD">BDMD</td><td>mayimeng</td><td title="As confirmed with Edison, 6 clients were involved in the cross trades">As confirmed with Edison, 6 clients...</td></tr>
-              <tr class="link-case-row" data-case-account="666900" data-case-symbol="NVDA 20260320 140.0 C" data-search="666900 possible pre arranged trading option mayimeng nvda 20260320 140.0 c"><td><input type="radio" name="link-select-case"></td><td>3018</td><td>666900 - Possible Pre arranged Trading - Option</td><td title="666900">666900</td><td title="NVDA 20260320 140.0 C">NVDA 20260320 140.0 C</td><td>mayimeng</td><td title="The client was triggered by CMP on pre-arranged option trades">The client was triggered by CMP...</td></tr>
-              <tr class="link-case-row" data-case-account="5232700, 6047200" data-case-symbol="NCTY" data-search="ncty 5232700 6047200 mayimeng"><td><input type="radio" name="link-select-case"></td><td>3036</td><td>NCTY - 5232700, 6047200</td><td title="5232700, 6047200">5232700, 6047200</td><td title="NCTY">NCTY</td><td>mayimeng</td><td title="As confirmed with Edison, the buy and sell orders came from related parties">As confirmed with Edison, the b...</td></tr>
-              <tr class="link-case-row" data-case-account="4946500, 7503400" data-case-symbol="GSUN" data-search="gsun 4946500 7503400 mayimeng"><td><input type="radio" name="link-select-case"></td><td>3033</td><td>GSUN - 4946500, 7503400</td><td title="4946500, 7503400">4946500, 7503400</td><td title="GSUN">GSUN</td><td>mayimeng</td><td title="TradeUP inquired us about the 2 accounts trading GSUN">TradeUP inquired us about the 2...</td></tr>
-              <tr class="link-case-row" data-case-account="2721600" data-case-symbol="02637" data-search="2721600 02637 houyuexuan"><td><input type="radio" name="link-select-case"></td><td>3042</td><td>2721600 - 02637</td><td title="2721600">2721600</td><td title="02637">02637</td><td>houyuexuan</td><td>--</td></tr>
-              <tr class="link-case-row" data-case-account="1277700" data-case-symbol="BQ" data-search="1277700 bq mayimeng"><td><input type="radio" name="link-select-case"></td><td>3041</td><td>1277700 - BQ</td><td title="1277700">1277700</td><td title="BQ">BQ</td><td>mayimeng</td><td title="On October 30, 2025, BQ experienced an abnormal price movement at close">On October 30, 2025, BQ experienced...</td></tr>
-              <tr class="link-case-row" data-case-account="63780800, 67259000" data-case-symbol="TROO" data-search="troo wash trade 63780800 67259000 zhouyan"><td><input type="radio" name="link-select-case"></td><td>1453</td><td>TROO wash trade</td><td title="63780800, 67259000">63780800, 67259000</td><td title="TROO">TROO</td><td>zhouyan</td><td title="Accounts identified trading TROO in wash pattern">Accounts identified trading TROO in wash pattern</td></tr>
-              <tr class="link-case-row" data-case-account="63680300" data-case-symbol="CETY" data-search="cety market dominance 63680300 zhouyan"><td><input type="radio" name="link-select-case"></td><td>1452</td><td>CETY Market Dominance</td><td title="63680300">63680300</td><td title="CETY">CETY</td><td>zhouyan</td><td title="Market dominance at close pattern">Market dominance at close pattern</td></tr>
-              <tr class="link-case-row" data-case-account="61541300" data-case-symbol="01247" data-search="hk volume spike 61541300 01247 mayimeng"><td><input type="radio" name="link-select-case"></td><td>1450</td><td>HK volume spike - 01247</td><td title="61541300">61541300</td><td title="01247">01247</td><td>mayimeng</td><td title="Volume spike detected at open for 01247">Volume spike detected at open for 01247</td></tr>
+              <tr class="link-case-row" data-case-account="4667800" data-case-symbol="AAPL, TSLA, NVDA" data-search="4667800 possible quote stuffing regarding multiple symbols yimeng aapl tsla nvda"><td><input type="radio" name="link-select-case"></td><td>3043</td><td>4667800 - Possible quote stuffing regarding multiple symbols</td><td title="4667800">4667800</td><td title="AAPL, TSLA, NVDA">AAPL, TSLA, NVDA</td><td>yimeng</td><td title="TradeUP inquired about client 4667800 regarding quote stuffing across multiple symbols">TradeUP inquired about client 4667800...</td></tr>
+              <tr class="link-case-row" data-case-account="9793000" data-case-symbol="NTDOY" data-search="ntdoy 9793000 possible spoofing yimeng"><td><input type="radio" name="link-select-case"></td><td>3026</td><td>NTDOY - 9793000 Possible Spoofing</td><td title="9793000">9793000</td><td title="NTDOY">NTDOY</td><td>yimeng</td><td title="We analyzed after the alert was triggered and found layered orders on the bid side">We analyzed after the alert was...</td></tr>
+              <tr class="link-case-row" data-case-account="5108800, 5109000, 5110200, 5112900, 5119000, 5120400" data-case-symbol="BDMD" data-search="bdmd cross trades yimeng 5108800 5109000 5110200 5112900 5119000 5120400"><td><input type="radio" name="link-select-case"></td><td>3027</td><td>BDMD - Cross Trades</td><td title="5108800, 5109000, 5110200, 5112900, 5119000, 5120400">5108800, 5109000, 5110200, 5112900, 5119000, 5120400</td><td title="BDMD">BDMD</td><td>yimeng</td><td title="As confirmed with Edison, 6 clients were involved in the cross trades">As confirmed with Edison, 6 clients...</td></tr>
+              <tr class="link-case-row" data-case-account="666900" data-case-symbol="NVDA 20260320 140.0 C" data-search="666900 possible pre arranged trading option yimeng nvda 20260320 140.0 c"><td><input type="radio" name="link-select-case"></td><td>3018</td><td>666900 - Possible Pre arranged Trading - Option</td><td title="666900">666900</td><td title="NVDA 20260320 140.0 C">NVDA 20260320 140.0 C</td><td>yimeng</td><td title="The client was triggered by CMP on pre-arranged option trades">The client was triggered by CMP...</td></tr>
+              <tr class="link-case-row" data-case-account="5232700, 6047200" data-case-symbol="NCTY" data-search="ncty 5232700 6047200 yimeng"><td><input type="radio" name="link-select-case"></td><td>3036</td><td>NCTY - 5232700, 6047200</td><td title="5232700, 6047200">5232700, 6047200</td><td title="NCTY">NCTY</td><td>yimeng</td><td title="As confirmed with Edison, the buy and sell orders came from related parties">As confirmed with Edison, the b...</td></tr>
+              <tr class="link-case-row" data-case-account="4946500, 7503400" data-case-symbol="GSUN" data-search="gsun 4946500 7503400 yimeng"><td><input type="radio" name="link-select-case"></td><td>3033</td><td>GSUN - 4946500, 7503400</td><td title="4946500, 7503400">4946500, 7503400</td><td title="GSUN">GSUN</td><td>yimeng</td><td title="TradeUP inquired us about the 2 accounts trading GSUN">TradeUP inquired us about the 2...</td></tr>
+              <tr class="link-case-row" data-case-account="2721600" data-case-symbol="02637" data-search="2721600 02637 yuexuan"><td><input type="radio" name="link-select-case"></td><td>3042</td><td>2721600 - 02637</td><td title="2721600">2721600</td><td title="02637">02637</td><td>yuexuan</td><td>--</td></tr>
+              <tr class="link-case-row" data-case-account="1277700" data-case-symbol="BQ" data-search="1277700 bq yimeng"><td><input type="radio" name="link-select-case"></td><td>3041</td><td>1277700 - BQ</td><td title="1277700">1277700</td><td title="BQ">BQ</td><td>yimeng</td><td title="On October 30, 2025, BQ experienced an abnormal price movement at close">On October 30, 2025, BQ experienced...</td></tr>
+              <tr class="link-case-row" data-case-account="63780800, 67259000" data-case-symbol="TROO" data-search="troo wash trade 63780800 67259000 zhou"><td><input type="radio" name="link-select-case"></td><td>1453</td><td>TROO wash trade</td><td title="63780800, 67259000">63780800, 67259000</td><td title="TROO">TROO</td><td>zhou</td><td title="Accounts identified trading TROO in wash pattern">Accounts identified trading TROO in wash pattern</td></tr>
+              <tr class="link-case-row" data-case-account="63680300" data-case-symbol="CETY" data-search="cety market dominance 63680300 zhou"><td><input type="radio" name="link-select-case"></td><td>1452</td><td>CETY Market Dominance</td><td title="63680300">63680300</td><td title="CETY">CETY</td><td>zhou</td><td title="Market dominance at close pattern">Market dominance at close pattern</td></tr>
+              <tr class="link-case-row" data-case-account="61541300" data-case-symbol="01247" data-search="hk volume spike 61541300 01247 yimeng"><td><input type="radio" name="link-select-case"></td><td>1450</td><td>HK volume spike - 01247</td><td title="61541300">61541300</td><td title="01247">01247</td><td>yimeng</td><td title="Volume spike detected at open for 01247">Volume spike detected at open for 01247</td></tr>
             </tbody>
           </table>
         </div>
@@ -7197,7 +7197,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>System + External</td>
             <td style="font-size:11px;">external_2025H2.csv</td>
             <td style="font-size:11px;">P1-01, P1-01, P1-03</td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td></td>
           </tr>
           <tr>
@@ -7210,7 +7210,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>System + External</td>
             <td style="font-size:11px;">external_2025H2.csv</td>
             <td style="font-size:11px;">P1-01, P1-01, P1-03</td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td><button class="btn-link" style="font-size:11px;" onclick="hideModal('modal-cov-history');showCoverageResult()">Detail</button></td>
           </tr>
           <tr>
@@ -7223,7 +7223,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>External</td>
             <td style="font-size:11px;">external_2025H2.csv</td>
             <td style="font-size:11px;">P1-01, P1-01, P1-03</td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td><button class="btn-link" style="font-size:11px;" onclick="hideModal('modal-cov-history');showCoverageResult()">Detail</button></td>
           </tr>
           <tr style="opacity:0.7;">
@@ -7236,7 +7236,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>External</td>
             <td style="font-size:11px;">smarts_B_2025.csv</td>
             <td style="font-size:11px;">P1-01, P1-02, P1-03</td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td></td>
           </tr>
           <tr>
@@ -7249,7 +7249,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>System</td>
             <td style="font-size:11px;color:#86909c;">—</td>
             <td style="font-size:11px;">P1-01, P1-03</td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td><button class="btn-link" style="font-size:11px;" onclick="hideModal('modal-cov-history');showCoverageResult()">Detail</button></td>
           </tr>
         </tbody>
@@ -7328,7 +7328,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>#2004 (V1.2)</td>
             <td><span style="color:#ff7d00;font-weight:600;">87.5%</span></td>
             <td><span style="background:#fff7e8;color:#ff7d00;padding:2px 6px;border-radius:3px;font-size:11px;">Need Adjust</span></td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td><a style="font-size:11px;color:#165dff;cursor:pointer;" onclick="toggleHistoryDetail('h1')">&#9660;</a></td>
           </tr>
           <tr id="history-detail-h1" style="display:none;"><td colspan="7" style="padding:12px;background:#f8fafc;">
@@ -7344,7 +7344,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>#2004 (V1.2)</td>
             <td><span style="color:#ff7d00;font-weight:600;">83.3%</span></td>
             <td><span style="background:#ffece8;color:#f53f3f;padding:2px 6px;border-radius:3px;font-size:11px;">Reject</span></td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td><a style="font-size:11px;color:#165dff;cursor:pointer;" onclick="toggleHistoryDetail('h2')">&#9660;</a></td>
           </tr>
           <tr id="history-detail-h2" style="display:none;"><td colspan="7" style="padding:12px;background:#f8fafc;">
@@ -7360,7 +7360,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>#2004 (V1.2)</td>
             <td><span style="color:#00b42a;font-weight:600;">100%</span></td>
             <td><span style="background:#e8ffea;color:#00b42a;padding:2px 6px;border-radius:3px;font-size:11px;">Pass</span></td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td><a style="font-size:11px;color:#165dff;cursor:pointer;" onclick="toggleHistoryDetail('h3')">&#9660;</a></td>
           </tr>
           <tr id="history-detail-h3" style="display:none;"><td colspan="7" style="padding:12px;background:#f8fafc;">
@@ -7606,7 +7606,7 @@ WHERE a.dominance_ratio > {ratio}
         <div class="form-group" style="min-width:180px;"><label style="font-size:11px;color:#86909c;">Case Name</label><input id="cm-filter-name" type="text" placeholder="Fuzzy search" style="width:100%;"></div>
         <div class="form-group" style="min-width:180px;"><label style="font-size:11px;color:#86909c;">Account ID</label><input id="cm-filter-account" type="text" placeholder="Match any account" style="width:100%;"></div>
         <div class="form-group" style="min-width:180px;"><label style="font-size:11px;color:#86909c;">Symbol</label><input id="cm-filter-symbol" type="text" placeholder="Match any symbol" style="width:100%;"></div>
-        <div class="form-group" style="min-width:160px;" id="cm-owner-filter-group"><label style="font-size:11px;color:#86909c;">Case Owner</label><select id="cm-filter-owner" style="width:100%;" onchange="cmFilterCases()"><option value="">All</option><option value="zhouyan" selected>zhouyan (me)</option><option>pamela.wong</option><option>mayimeng</option><option>miaoqing</option><option>liwen</option></select></div>
+        <div class="form-group" style="min-width:160px;" id="cm-owner-filter-group"><label style="font-size:11px;color:#86909c;">Case Owner</label><select id="cm-filter-owner" style="width:100%;" onchange="cmFilterCases()"><option value="">All</option><option value="zhou" selected>zhou (me)</option><option>pemela</option><option>yimeng</option><option>miaoq</option><option>liwen</option></select></div>
         <div class="form-group" style="display:flex;gap:8px;">
           <button class="btn btn-primary" onclick="cmFilterCases()">查询</button>
           <button class="btn" onclick="cmResetFilters()">重置</button>
@@ -7652,7 +7652,7 @@ WHERE a.dominance_ratio > {ratio}
           <th>Operation</th>
         </tr></thead>
         <tbody style="line-height:1.6;">
-          <tr style="vertical-align:top;" data-owner="zhouyan" data-name="TROO wash trade" data-account="63780800,67259000" data-symbol="TROO" data-status="Processing">
+          <tr style="vertical-align:top;" data-owner="zhou" data-name="TROO wash trade" data-account="63780800,67259000" data-symbol="TROO" data-status="Processing">
             <td>TS_840</td>
             <td>TROO wash trade</td>
             <td>63780800, 67259000</td>
@@ -7661,11 +7661,11 @@ WHERE a.dominance_ratio > {ratio}
             <td>--</td>
             <td>2026-04-10 ~ 2026-06-08</td>
             <td>3</td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td>2026-06-10 11:22:05</td>
             <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" onclick="cmShowDetailEdit()">Manage</button></td>
           </tr>
-          <tr style="vertical-align:top;" data-owner="zhouyan" data-name="CETY Market Dominance" data-account="63680300" data-symbol="CETY" data-status="Escalated">
+          <tr style="vertical-align:top;" data-owner="zhou" data-name="CETY Market Dominance" data-account="63680300" data-symbol="CETY" data-status="Escalated">
             <td>TS_838</td>
             <td>CETY Market Dominance</td>
             <td>63680300</td>
@@ -7674,11 +7674,11 @@ WHERE a.dominance_ratio > {ratio}
             <td>Further Action</td>
             <td>2026-03-15 ~ 2026-05-08</td>
             <td>6</td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td>2026-05-12 09:15:42</td>
             <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" onclick="cmShowDetailEdit()">Manage</button></td>
           </tr>
-          <tr style="vertical-align:top;" data-owner="pamela.wong" data-name="SPXW Option - 1228400" data-account="1228400" data-symbol="SPXW 20250709 6250.0 C" data-status="Closed">
+          <tr style="vertical-align:top;" data-owner="pemela" data-name="SPXW Option - 1228400" data-account="1228400" data-symbol="SPXW 20250709 6250.0 C" data-status="Closed">
             <td>TS_815</td>
             <td>SPXW Option - 1228400</td>
             <td>1228400</td>
@@ -7687,11 +7687,11 @@ WHERE a.dominance_ratio > {ratio}
             <td>No Further Action</td>
             <td>2025-04-03 ~ 2025-07-09</td>
             <td>8</td>
-            <td>pamela.wong</td>
+            <td>pemela</td>
             <td>2025-09-19 19:24:32</td>
             <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" style="display:none;" onclick="cmShowDetailEdit()">Manage</button></td>
           </tr>
-          <tr style="vertical-align:top;" data-owner="zhouyan" data-name="69179" data-account="2377300" data-symbol="69179" data-status="New">
+          <tr style="vertical-align:top;" data-owner="zhou" data-name="69179" data-account="2377300" data-symbol="69179" data-status="New">
             <td>TS_324</td>
             <td>69179</td>
             <td>2377300</td>
@@ -7700,11 +7700,11 @@ WHERE a.dominance_ratio > {ratio}
             <td>--</td>
             <td>2024-02-19 ~ 2024-02-19</td>
             <td>1</td>
-            <td>zhouyan</td>
+            <td>zhou</td>
             <td>2026-06-28 15:01:30</td>
             <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" onclick="cmShowDetailEdit()">Manage</button></td>
           </tr>
-          <tr style="vertical-align:top;" data-owner="mayimeng" data-name="HK volume spike" data-account="61541300" data-symbol="01247" data-status="Pending">
+          <tr style="vertical-align:top;" data-owner="yimeng" data-name="HK volume spike" data-account="61541300" data-symbol="01247" data-status="Pending">
             <td>TS_276</td>
             <td>HK volume spike</td>
             <td>61541300</td>
@@ -7713,7 +7713,7 @@ WHERE a.dominance_ratio > {ratio}
             <td>--</td>
             <td>2026-06-01 ~ 2026-06-08</td>
             <td>2</td>
-            <td>mayimeng</td>
+            <td>yimeng</td>
             <td>2026-06-09 18:50:00</td>
             <td style="white-space:nowrap;"><button class="btn-link" onclick="cmShowDetail()">Detail</button> <button class="btn-link cm-manage-btn" style="display:none;" onclick="cmShowDetailEdit()">Manage</button></td>
           </tr>
@@ -7743,7 +7743,7 @@ WHERE a.dominance_ratio > {ratio}
         <div id="cd-ov-edit" style="display:none;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;">
             <div class="form-group" style="margin:0;"><label><span style="color:red">*</span> Case Name</label><input id="cd-edit-name" type="text" style="width:100%;"></div>
-            <div class="form-group" style="margin:0;"><label><span style="color:red">*</span> Case Owner</label><select id="cd-edit-owner" style="width:100%;"><option>zhouyan</option><option>pamela.wong</option><option>mayimeng</option><option>miaoqing</option><option>liwen</option></select></div>
+            <div class="form-group" style="margin:0;"><label><span style="color:red">*</span> Case Owner</label><select id="cd-edit-owner" style="width:100%;"><option>zhou</option><option>pemela</option><option>yimeng</option><option>miaoq</option><option>liwen</option></select></div>
             <div class="form-group" style="margin:0;">
               <label><span style="color:red">*</span> Account ID</label>
               <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:32px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
@@ -7789,7 +7789,7 @@ WHERE a.dominance_ratio > {ratio}
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 30px;font-size:12px;line-height:2.2;">
           <div><span style="color:#86909c;">Case Name:</span> <strong id="cd-name">TROO wash trade</strong></div>
           <div><span style="color:#86909c;">Case Code:</span> <strong id="cd-code">TS_840</strong></div>
-          <div><span style="color:#86909c;">Case Owner:</span> <strong id="cd-owner">zhouyan</strong></div>
+          <div><span style="color:#86909c;">Case Owner:</span> <strong id="cd-owner">zhou</strong></div>
           <div><span style="color:#86909c;">Account ID:</span> <strong id="cd-account">63780800, 67259000</strong></div>
           <div><span style="color:#86909c;">Symbol:</span> <strong id="cd-symbol">TROO</strong></div>
           <div><span style="color:#86909c;">Case Source:</span> <strong id="cd-source">CMP</strong></div>
@@ -7822,9 +7822,9 @@ WHERE a.dominance_ratio > {ratio}
           <table class="data-table" style="font-size:11px;">
             <thead><tr><th>ID</th><th>System Hit Time</th><th>Account Id</th><th>Symbol</th><th>License</th><th>Rule Name</th><th>Market</th><th>Alert Status</th><th>Alert Tag</th><th>Alert Owner</th><th>Operation</th></tr></thead>
             <tbody>
-              <tr><td>86394 <span style="background:#e8f7ff;color:#165dff;font-size:9px;padding:1px 5px;border-radius:2px;">Newly Linked</span></td><td>2026-05-22 18:38:38</td><td>63780800, 67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhouyan</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
-              <tr><td>84851</td><td>2026-05-08 18:44:30</td><td>63780800</td><td>TROO</td><td>TBHK</td><td>Market Dominance at Close</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhouyan</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
-              <tr><td>83201</td><td>2026-04-15 09:30:12</td><td>67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#86909c;">&#9679; Closed</span></td><td><span style="background:#f6ffed;color:#389e0d;padding:1px 5px;border-radius:3px;font-size:10px;">Cleared</span></td><td>zhouyan</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
+              <tr><td>86394 <span style="background:#e8f7ff;color:#165dff;font-size:9px;padding:1px 5px;border-radius:2px;">Newly Linked</span></td><td>2026-05-22 18:38:38</td><td>63780800, 67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
+              <tr><td>84851</td><td>2026-05-08 18:44:30</td><td>63780800</td><td>TROO</td><td>TBHK</td><td>Market Dominance at Close</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
+              <tr><td>83201</td><td>2026-04-15 09:30:12</td><td>67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#86909c;">&#9679; Closed</span></td><td><span style="background:#f6ffed;color:#389e0d;padding:1px 5px;border-radius:3px;font-size:10px;">Cleared</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
             </tbody>
           </table>
           </div>
@@ -7927,9 +7927,9 @@ WHERE a.dominance_ratio > {ratio}
             </colgroup>
             <thead><tr><th>Accounts</th><th>Symbol</th><th>Data Period</th><th>Market</th><th>Category</th><th>Generated Time</th><th>Saved Time</th><th>Last Edited By</th><th>Action</th></tr></thead>
             <tbody id="ai-report-history">
-              <tr data-version="v3" data-edited="1"><td title="63780800, 67259000">63780800, 67259000</td><td>TROO</td><td>2026-04-10 ~ 2026-06-08</td><td>US</td><td>Wash Trade</td><td>2026-07-30 15:00</td><td>2026-07-30 15:02</td><td>zhouyan</td><td class="ai-hist-actions"><button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> <button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> <button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button></td></tr>
+              <tr data-version="v3" data-edited="1"><td title="63780800, 67259000">63780800, 67259000</td><td>TROO</td><td>2026-04-10 ~ 2026-06-08</td><td>US</td><td>Wash Trade</td><td>2026-07-30 15:00</td><td>2026-07-30 15:02</td><td>zhou</td><td class="ai-hist-actions"><button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> <button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> <button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button></td></tr>
               <tr data-version="v2" data-edited="0"><td title="63780800, 67259000">63780800, 67259000</td><td>TROO</td><td>2026-04-10 ~ 2026-06-08</td><td>US</td><td>Wash Trade</td><td>2026-07-28 10:30</td><td>2026-07-28 10:35</td><td><span style="color:#ff7d00;" title="No human review recorded yet">--</span></td><td class="ai-hist-actions"><button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> <button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> <button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button></td></tr>
-              <tr data-version="v1" data-edited="1"><td title="63780800, 67259000">63780800, 67259000</td><td>TROO</td><td>2026-04-10 ~ 2026-05-31</td><td>US</td><td>Wash Trade</td><td>2026-06-10 11:20</td><td>2026-06-10 11:22</td><td>mayimeng</td><td class="ai-hist-actions"><button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> <button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> <button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button></td></tr>
+              <tr data-version="v1" data-edited="1"><td title="63780800, 67259000">63780800, 67259000</td><td>TROO</td><td>2026-04-10 ~ 2026-05-31</td><td>US</td><td>Wash Trade</td><td>2026-06-10 11:20</td><td>2026-06-10 11:22</td><td>yimeng</td><td class="ai-hist-actions"><button class="btn-link" style="font-size:11px;" onclick="cmViewRecord(this)">View</button> <button class="btn-link ai-act-manage" style="font-size:11px;" onclick="cmEditRecord(this)">Edit</button> <button class="btn-link ai-act-manage" style="font-size:11px;color:#f53f3f;" onclick="cmDeleteRecord(this)">Delete</button></td></tr>
             </tbody>
           </table>
           </div>
@@ -7942,9 +7942,9 @@ WHERE a.dominance_ratio > {ratio}
         <table class="data-table" style="font-size:12px;">
           <thead><tr><th>Operation Time</th><th>Operator</th><th>Operation</th><th>Operation Detail</th></tr></thead>
           <tbody>
-            <tr><td>2026-06-10 11:22:05 GMT+8</td><td>zhouyan</td><td>Manage Task</td><td style="max-width:500px;">Add comment: Accounts 63780800 and 67259000 identified trading TROO in a pattern consistent with wash trading. Escalated for further investigation.</td></tr>
-            <tr><td>2026-05-22 18:40:00 GMT+8</td><td>zhouyan</td><td>Link Alert</td><td style="max-width:500px;">Linked alert #86394 (possible wash trade A to B) to this case.</td></tr>
-            <tr><td>2026-04-15 09:35:00 GMT+8</td><td>zhouyan</td><td>Create Case</td><td style="max-width:500px;">Case created from CMP alert. Initial alert #83201.</td></tr>
+            <tr><td>2026-06-10 11:22:05 GMT+8</td><td>zhou</td><td>Manage Task</td><td style="max-width:500px;">Add comment: Accounts 63780800 and 67259000 identified trading TROO in a pattern consistent with wash trading. Escalated for further investigation.</td></tr>
+            <tr><td>2026-05-22 18:40:00 GMT+8</td><td>zhou</td><td>Link Alert</td><td style="max-width:500px;">Linked alert #86394 (possible wash trade A to B) to this case.</td></tr>
+            <tr><td>2026-04-15 09:35:00 GMT+8</td><td>zhou</td><td>Create Case</td><td style="max-width:500px;">Case created from CMP alert. Initial alert #83201.</td></tr>
           </tbody>
         </table>
       </div>
@@ -7975,7 +7975,7 @@ WHERE a.dominance_ratio > {ratio}
     </div>
     <div class="modal-body">
       <div class="form-group"><label><span style="color:red">*</span> Case Name</label><input type="text" style="width:100%;" placeholder="Please enter Case Name"></div>
-      <div class="form-group"><label><span style="color:red">*</span> Case Owner</label><select style="width:100%;"><option>zhouyan</option><option>pamela.wong</option><option>mayimeng</option><option>liwen</option></select></div>
+      <div class="form-group"><label><span style="color:red">*</span> Case Owner</label><select style="width:100%;"><option>zhou</option><option>pemela</option><option>yimeng</option><option>liwen</option></select></div>
 
       <!-- STEP 1: pick the alerts. Account ID / Symbol below are derived from
            whatever is selected here, so this block comes first. -->
@@ -8130,7 +8130,7 @@ WHERE a.dominance_ratio > {ratio}
 
       <div class="form-group">
         <label><span style="color:red">*</span> Assign to</label>
-        <select style="width:100%;"><option>zhouyan</option><option>pamela.wong</option><option>mayimeng</option><option>houyuexuan</option><option>miaoqing</option></select>
+        <select style="width:100%;"><option>zhou</option><option>pemela</option><option>yimeng</option><option>yuexuan</option><option>miaoq</option></select>
       </div>
 
       <div class="form-group">
@@ -8206,7 +8206,7 @@ WHERE a.dominance_ratio > {ratio}
 
 <script>
 // ==================== CASE MANAGEMENT GLOBAL VARS ====================
-var cmCurrentUser = 'zhouyan';
+var cmCurrentUser = 'zhou';
 
 // ==================== AB TEST V2 FUNCTIONS ====================
 
@@ -9482,7 +9482,7 @@ function aiSeedRecords() {
   // v3 — same run, but a person rewrote sections 2 and 3
   aiRecords['v3'] = aiMakeVariant(function (root) {
     var ed = root.querySelectorAll('.ai-editable');
-    ed[0].innerHTML = '<div style="margin-bottom:6px;">Reviewed by zhouyan on 2026-07-30. Confirmed the 3 pairs below are genuine wash trades: matched within 2-7s, opposite sides, near-zero P&amp;L.</div>' +
+    ed[0].innerHTML = '<div style="margin-bottom:6px;">Reviewed by zhou on 2026-07-30. Confirmed the 3 pairs below are genuine wash trades: matched within 2-7s, opposite sides, near-zero P&amp;L.</div>' +
       '<div style="margin-bottom:6px;">The shared IP flagged by the model is a shared office network — on its own it is not evidence of common control. Kept as supporting, not primary, evidence.</div>' +
       '<div>Checked both accounts\' order history outside the alert window: no comparable pattern found, so this looks contained to TROO.</div>';
     ed[1].innerHTML = 'Human conclusion: wash trading confirmed for 63780800 / 67259000 on TROO between 2026-04-10 and 2026-06-08 (3 pairs, $3,845). Actions taken: &#9312; tagged Further Action; &#9313; FINRA STR submitted 2026-07-30; &#9314; trading restriction assessment raised with Pre-trade. The AI-suggested common-control inference was downgraded after review.';
@@ -9497,7 +9497,7 @@ function aiSeedRecords() {
     var rows = root.querySelectorAll('table tbody tr');
     if (rows.length === 3) rows[2].remove();
     var ed = root.querySelectorAll('.ai-editable');
-    ed[0].innerHTML = '<div style="margin-bottom:6px;">Reviewed by mayimeng on 2026-06-10. Two matched pairs in the 2026-04-10 to 2026-05-31 window; volume is small but the timing is not explainable by normal order flow.</div>' +
+    ed[0].innerHTML = '<div style="margin-bottom:6px;">Reviewed by yimeng on 2026-06-10. Two matched pairs in the 2026-04-10 to 2026-05-31 window; volume is small but the timing is not explainable by normal order flow.</div>' +
       '<div>Not escalated at this point — asked the desk to keep monitoring instead.</div>';
     ed[1].innerHTML = 'Human conclusion (2026-06-10): suspicious but insufficient for an STR on 2 pairs alone. Kept the case open and extended monitoring. Superseded by v3 once a third pair appeared.';
   });
