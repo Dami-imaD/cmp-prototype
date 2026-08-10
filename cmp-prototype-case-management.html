@@ -330,6 +330,29 @@ input[type="text"] {
   padding: 9px 8px;
 }
 
+/* Associated Records tab counters: colour means "there is something here",
+   grey zero means "nothing to open". */
+.cd-tab-count {
+  display: inline-block;
+  min-width: 20px;
+  padding: 1px 6px;
+  margin-left: 4px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+  vertical-align: 1px;
+  background: #e8f3ff;
+  color: #165dff;
+}
+
+.cd-tab-count.is-empty {
+  background: #f2f3f5;
+  color: #a9aeb8;
+  font-weight: 400;
+}
+
 /* Group Header */
 .group-header {
   background: var(--header-bg);
@@ -7730,16 +7753,20 @@ WHERE a.dominance_ratio > {ratio}
         <a class="back-link" onclick="cmHideDetail()" style="margin-bottom:0;">&#8592; Back</a>
         <div style="display:flex;gap:8px;align-items:center;">
           <span id="cm-detail-readonly-note" style="display:none;font-size:11px;color:#86909c;">Read-only — you are not the owner of this case.</span>
-          <button class="btn btn-primary" onclick="cmEnterEdit()" id="cm-detail-manage-btn">Manage</button>
+          <button class="btn btn-primary" onclick="cmEnterManage()" id="cm-detail-manage-btn">Manage</button>
           <button class="btn" onclick="cmReopenCase()" id="cm-detail-reopen-btn" style="display:none;">Reopen</button>
         </div>
       </div>
 
       <!-- ===== Section 1: Case Overview (view / edit modes) ===== -->
       <div style="margin-bottom:24px;" id="cd-overview-section">
-        <div style="font-size:15px;font-weight:600;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--accent);">Case Overview</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--accent);">
+          <span style="font-size:15px;font-weight:600;">Case Overview</span>
+          <!-- Own edit entry: this block saves on its own, independently of the AI report -->
+          <button class="btn" id="cd-ov-edit-btn" style="display:none;font-size:12px;" onclick="cmEnterEdit()">Edit</button>
+        </div>
 
-        <!-- Edit form (hidden in view mode) -->
+        <!-- Edit form (hidden unless this block is being edited) -->
         <div id="cd-ov-edit" style="display:none;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;">
             <div class="form-group" style="margin:0;"><label><span style="color:red">*</span> Case Name</label><input id="cd-edit-name" type="text" style="width:100%;"></div>
@@ -7782,6 +7809,15 @@ WHERE a.dominance_ratio > {ratio}
               <div style="font-size:11px;color:#86909c;margin-top:4px;">Saving overwrites <strong>Last Comment</strong>. Every change is still recorded in the Operation Log below.</div>
             </div>
           </div>
+          <!-- Block-scoped actions: they commit / discard Case Overview only.
+               The AI report has its own save and is untouched by these. -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
+            <span style="font-size:11px;color:#86909c;">Applies to Case Overview only — the AI report is saved separately.</span>
+            <div style="display:flex;gap:8px;">
+              <button class="btn" onclick="cmCancelEdit()">Cancel</button>
+              <button class="btn btn-primary" onclick="cmSaveEdit()">Save</button>
+            </div>
+          </div>
         </div>
 
         <!-- View grid -->
@@ -7811,20 +7847,26 @@ WHERE a.dominance_ratio > {ratio}
       <div style="margin-bottom:24px;">
         <div style="font-size:15px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);">Associated Records</div>
         <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px;">
-          <span class="cd-tab active" onclick="cmDetailTab(this,'cd-tab-alerts')" style="padding:8px 16px;font-size:13px;font-weight:500;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-1px;cursor:pointer;">Linked Alerts</span>
-          <span class="cd-tab" onclick="cmDetailTab(this,'cd-tab-client')" style="padding:8px 16px;font-size:13px;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;">Related Client</span>
+          <span class="cd-tab active" onclick="cmDetailTab(this,'cd-tab-alerts')" style="padding:8px 16px;font-size:13px;font-weight:500;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-1px;cursor:pointer;">Linked Alerts <span class="cd-tab-count" id="cd-count-alerts">0</span></span>
+          <span class="cd-tab" onclick="cmDetailTab(this,'cd-tab-client')" style="padding:8px 16px;font-size:13px;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;">Related Client <span class="cd-tab-count" id="cd-count-client">0</span></span>
         </div>
 
         <!-- Tab: Linked Alerts -->
         <div id="cd-tab-alerts">
-          <div style="font-size:12px;color:#86909c;margin-bottom:8px;">3 Alerts linked to this case</div>
-          <div style="overflow-x:auto;">
+          <div id="cd-alerts-summary" style="font-size:12px;color:#86909c;margin-bottom:8px;">3 Alerts linked to this case</div>
+          <div id="cd-alerts-empty" style="display:none;font-size:12px;color:#86909c;background:#f7f8fa;border-radius:4px;padding:20px;text-align:center;">No alert is linked to this case yet.</div>
+          <!-- Bulk bar: only in Manage mode -->
+          <div id="cd-al-bulkbar" style="display:none;justify-content:space-between;align-items:center;background:#f7f8fa;border:1px solid var(--border);border-radius:4px;padding:7px 10px;margin-bottom:8px;">
+            <span style="font-size:11px;color:#4e5969;"><strong id="cd-al-selcount">0</strong> alert selected</span>
+            <button class="btn" id="cd-al-bulkbtn" style="font-size:12px;" disabled onclick="showModal('modal-bulk-manage')">Bulk Manage Alerts</button>
+          </div>
+          <div id="cd-alerts-wrap" style="overflow-x:auto;">
           <table class="data-table" style="font-size:11px;">
-            <thead><tr><th>ID</th><th>System Hit Time</th><th>Account Id</th><th>Symbol</th><th>License</th><th>Rule Name</th><th>Market</th><th>Alert Status</th><th>Alert Tag</th><th>Alert Owner</th><th>Operation</th></tr></thead>
+            <thead><tr><th class="cd-al-sel" style="width:30px;display:none;"><input type="checkbox" onclick="cdToggleAllAlerts(this)"></th><th style="width:150px;">ID</th><th style="width:132px;">System Hit Time</th><th style="width:118px;">Account Id</th><th style="width:70px;">Symbol</th><th style="width:72px;">License</th><th>Rule Name</th><th style="width:68px;">Market</th><th style="width:100px;">Alert Status</th><th style="width:96px;">Alert Tag</th><th style="width:90px;">Alert Owner</th><th style="width:140px;">Operation</th></tr></thead>
             <tbody>
-              <tr><td>86394 <span style="background:#e8f7ff;color:#165dff;font-size:9px;padding:1px 5px;border-radius:2px;">Newly Linked</span></td><td>2026-05-22 18:38:38</td><td>63780800, 67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
-              <tr><td>84851</td><td>2026-05-08 18:44:30</td><td>63780800</td><td>TROO</td><td>TBHK</td><td>Market Dominance at Close</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
-              <tr><td>83201</td><td>2026-04-15 09:30:12</td><td>67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#86909c;">&#9679; Closed</span></td><td><span style="background:#f6ffed;color:#389e0d;padding:1px 5px;border-radius:3px;font-size:10px;">Cleared</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button></td></tr>
+              <tr><td class="cd-al-sel" style="display:none;"><input type="checkbox" class="cd-al-check" onchange="cdUpdateAlertSel()"></td><td>86394 <span style="background:#e8f7ff;color:#165dff;font-size:9px;padding:1px 5px;border-radius:2px;">Newly Linked</span></td><td>2026-05-22 18:38:38</td><td>63780800, 67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button> <button class="btn-link cd-al-manage" style="display:none;" onclick="showModal('modal-alert-manage')">Manage</button></td></tr>
+              <tr><td class="cd-al-sel" style="display:none;"><input type="checkbox" class="cd-al-check" onchange="cdUpdateAlertSel()"></td><td>84851</td><td>2026-05-08 18:44:30</td><td>63780800</td><td>TROO</td><td>TBHK</td><td>Market Dominance at Close</td><td>US</td><td><span style="color:#165dff;">&#9679; Pending</span></td><td><span style="background:#fff7e8;color:#ff7d00;padding:1px 5px;border-radius:3px;font-size:10px;">Escalated</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button> <button class="btn-link cd-al-manage" style="display:none;" onclick="showModal('modal-alert-manage')">Manage</button></td></tr>
+              <tr><td class="cd-al-sel" style="display:none;"><input type="checkbox" class="cd-al-check" onchange="cdUpdateAlertSel()"></td><td>83201</td><td>2026-04-15 09:30:12</td><td>67259000</td><td>TROO</td><td>TBHK</td><td>possible wash trade (A to B)#V6_1</td><td>US</td><td><span style="color:#86909c;">&#9679; Closed</span></td><td><span style="background:#f6ffed;color:#389e0d;padding:1px 5px;border-radius:3px;font-size:10px;">Cleared</span></td><td>zhou</td><td><button class="btn-link" onclick="showPage(&#39;alertdetail&#39;)">Detail</button> <button class="btn-link cd-al-manage" style="display:none;" onclick="showModal('modal-alert-manage')">Manage</button></td></tr>
             </tbody>
           </table>
           </div>
@@ -7832,8 +7874,9 @@ WHERE a.dominance_ratio > {ratio}
 
         <!-- Tab: Related Client -->
         <div id="cd-tab-client" style="display:none;">
-          <div style="font-size:12px;color:#86909c;margin-bottom:8px;">2 accounts related to this case</div>
-          <table class="data-table" style="font-size:11px;">
+          <div id="cd-client-summary" style="font-size:12px;color:#86909c;margin-bottom:8px;">2 accounts related to this case</div>
+          <div id="cd-client-empty" style="display:none;font-size:12px;color:#86909c;background:#f7f8fa;border-radius:4px;padding:20px;text-align:center;">No related account on this case yet.</div>
+          <table class="data-table" id="cd-client-table" style="font-size:11px;">
             <thead><tr><th>Account ID</th><th>Client Name</th><th>License</th><th>Account Status</th><th>Open Date</th><th>Historical Cases</th><th>Action</th></tr></thead>
             <tbody>
               <tr><td>63780800</td><td>John Smith</td><td>TBHK</td><td><span style="color:#00b42a;">&#9679; Active</span></td><td>2023-08-15</td><td>2</td><td><button class="btn-link" style="font-size:11px;">View Account</button></td></tr>
@@ -7949,17 +7992,6 @@ WHERE a.dominance_ratio > {ratio}
         </table>
       </div>
 
-      <!-- Edit-mode action bar: pinned so Save stays reachable however far you scroll -->
-      <div id="cd-edit-bar" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:900;background:#fff;border-top:1px solid var(--border);box-shadow:0 -2px 8px rgba(0,0,0,0.06);padding:10px 24px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:12px;color:#86909c;">Editing <strong style="color:var(--text);" id="cd-edit-bar-code">TS_840</strong> — Save applies to the whole case. Unsaved changes are lost if you cancel. <span style="color:#a9aeb8;">The AI report is saved separately.</span></span>
-          <div style="display:flex;gap:8px;">
-            <button class="btn" onclick="cmCancelEdit()">Cancel</button>
-            <button class="btn btn-primary" onclick="cmSaveEdit()">Save</button>
-          </div>
-        </div>
-      </div>
-
     </div>
 
     </div>
@@ -8007,12 +8039,13 @@ WHERE a.dominance_ratio > {ratio}
               <colgroup>
                 <col style="width:30px;">
                 <col style="width:140px;">
-                <col style="width:120px;">
+                <col style="width:92px;">
+                <col style="width:118px;">
                 <col style="width:70px;">
                 <col>
                 <col style="width:158px;">
               </colgroup>
-              <thead style="position:sticky;top:0;background:#fff;z-index:1;"><tr><th></th><th>Alert ID</th><th>Account ID</th><th>Symbol</th><th>Rule Name</th><th>Trigger Time</th></tr></thead>
+              <thead style="position:sticky;top:0;background:#fff;z-index:1;"><tr><th></th><th>Alert ID</th><th title="How many cases this alert is already linked to">Linked Cases</th><th>Account ID</th><th>Symbol</th><th>Rule Name</th><th>Trigger Time</th></tr></thead>
               <tbody id="cm-alert-tbody"></tbody>
             </table>
             <div id="cm-alert-empty" style="display:none;padding:18px;text-align:center;font-size:12px;color:#86909c;">No alerts match these filters.</div>
@@ -8849,14 +8882,15 @@ function cmShowDetail() {
   document.getElementById('cm-list-header').style.display = 'none';
   document.getElementById('cm-list-view').style.display = 'none';
   document.getElementById('cm-detail-view').style.display = 'block';
-  cmSetEditMode(false);
+  cmResetDetailModes();
   cmApplyDetailPermission(cdText('cd-owner') === cmCurrentUser);
+  cdUpdateTabCounts();
 }
 
-// List row "Manage" lands on the same page, already in edit mode
+// List row "Manage" lands on the same page, already in Manage mode
 function cmShowDetailEdit() {
   cmShowDetail();
-  cmEnterEdit();
+  cmEnterManage();
 }
 
 function cmShowCaseDetail(code, name, owner, account, symbol, source, alerts, status, tag, created, period) {
@@ -8889,12 +8923,16 @@ function cmShowCaseDetail(code, name, owner, account, symbol, source, alerts, st
   document.getElementById('cm-list-header').style.display = 'none';
   document.getElementById('cm-list-view').style.display = 'none';
   document.getElementById('cm-detail-view').style.display = 'block';
-  cmSetEditMode(false);
-  cmApplyDetailPermission(owner === cmCurrentUser, status);
+  cmResetDetailModes();
+  cmApplyDetailPermission(owner === cmCurrentUser);
+  cdUpdateTabCounts();
 }
 
 function cmHideDetail() {
-  cmSetEditMode(false);
+  // Back is the only way out of Manage mode, so the unsaved warnings live here
+  if (cdOverviewEditing && !confirm('Case Overview has unsaved changes. Leave and discard them?')) return;
+  if (!cdUnsavedRunOk()) return;
+  cmResetDetailModes();
   document.getElementById('cm-list-header').style.display = '';
   document.getElementById('cm-list-view').style.display = 'block';
   document.getElementById('cm-detail-view').style.display = 'none';
@@ -9017,13 +9055,16 @@ function linkFilterCases(query) {
    Account ID / Symbol are auto-filled from them, and can be pruned. Removing
    a chip does NOT unlink the alert: the case-level fields are the subset the
    case actually investigates. Data Period is derived, not typed. */
+// `cases` = case codes this alert is ALREADY linked to. An alert may legitimately
+// belong to several cases, so this is context, not a warning — it tells the
+// investigator there is prior history worth looking at before creating a new case.
 var CM_ALERT_POOL = [
-  { id: 'AL-20260410-0231', account: '63780800',            symbol: 'TROO',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-04-10 09:41:22' },
-  { id: 'AL-20260412-0288', account: '67259000',            symbol: 'TROO',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-04-12 10:02:15' },
-  { id: 'AL-20260508-0412', account: '63680300',            symbol: 'CETY',  rule: 'TS_C001 Market Dominance at Open/Close',      trigger: '2026-05-08 15:58:03' },
-  { id: 'AL-20260521-0533', account: '61541300',            symbol: '01247', rule: 'TS_B001 Pump and Dump',                       trigger: '2026-05-21 09:30:44' },
-  { id: 'AL-20260603-0677', account: '63780800, 70118800',  symbol: 'TROO',  rule: 'TS_A006 Pre-arranged Trading',                trigger: '2026-06-03 11:15:07' },
-  { id: 'AL-20260608-0701', account: '5232700',             symbol: 'NCTY',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-06-08 14:22:51' }
+  { id: 'AL-20260410-0231', account: '63780800',            symbol: 'TROO',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-04-10 09:41:22', cases: ['TS_840'] },
+  { id: 'AL-20260412-0288', account: '67259000',            symbol: 'TROO',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-04-12 10:02:15', cases: [] },
+  { id: 'AL-20260508-0412', account: '63680300',            symbol: 'CETY',  rule: 'TS_C001 Market Dominance at Open/Close',      trigger: '2026-05-08 15:58:03', cases: ['TS_838', 'TS_791'] },
+  { id: 'AL-20260521-0533', account: '61541300',            symbol: '01247', rule: 'TS_B001 Pump and Dump',                       trigger: '2026-05-21 09:30:44', cases: [] },
+  { id: 'AL-20260603-0677', account: '63780800, 70118800',  symbol: 'TROO',  rule: 'TS_A006 Pre-arranged Trading',                trigger: '2026-06-03 11:15:07', cases: ['TS_840'] },
+  { id: 'AL-20260608-0701', account: '5232700',             symbol: 'NCTY',  rule: 'TS_A001 Possible Wash Trade (A to B)',        trigger: '2026-06-08 14:22:51', cases: [] }
 ];
 
 var cmAddSelAlerts = [];
@@ -9081,8 +9122,12 @@ function cmAddRenderAlerts() {
       return;
     }
     shown++;
+    var linked = (a.cases || []).length;
+    var badge = linked
+      ? '<span class="cd-tab-count" style="margin-left:0;" title="Already linked to: ' + a.cases.join(', ') + '">' + linked + '</span>'
+      : '<span class="cd-tab-count is-empty" style="margin-left:0;" title="Not linked to any case yet">0</span>';
     html += '<tr><td><input type="checkbox"' + (picked ? ' checked' : '') + ' onchange="cmAddToggleAlert(\'' + a.id + '\',this.checked)"></td>' +
-      '<td>' + a.id + '</td><td title="' + a.account + '">' + a.account + '</td><td>' + a.symbol + '</td>' +
+      '<td>' + a.id + '</td><td>' + badge + '</td><td title="' + a.account + '">' + a.account + '</td><td>' + a.symbol + '</td>' +
       '<td title="' + a.rule + '">' + a.rule + '</td><td>' + a.trigger + '</td></tr>';
   });
   tbody.innerHTML = html;
@@ -9302,6 +9347,39 @@ function cmShowLinkSuccess() {
    Case Overview fields into inputs while the linked alerts, AI report and
    operation log stay on screen as read-only context. */
 
+/* Tab counters are derived from the rows actually rendered, so the badge, the
+   summary line and the table can never disagree. A zero badge is greyed out
+   and the panel shows an empty state instead of a header-only table. */
+function cdSetTabCount(id, n) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = n;
+  if (n === 0) el.classList.add('is-empty');
+  else el.classList.remove('is-empty');
+}
+
+function cdUpdateTabCounts() {
+  var alerts = document.querySelectorAll('#cd-tab-alerts tbody tr').length;
+  cdSetTabCount('cd-count-alerts', alerts);
+  var aSum = document.getElementById('cd-alerts-summary');
+  if (aSum) aSum.textContent = alerts + (alerts === 1 ? ' Alert linked to this case' : ' Alerts linked to this case');
+  var aWrap = document.getElementById('cd-alerts-wrap');
+  var aEmpty = document.getElementById('cd-alerts-empty');
+  if (aWrap) aWrap.style.display = alerts ? '' : 'none';
+  if (aSum) aSum.style.display = alerts ? '' : 'none';
+  if (aEmpty) aEmpty.style.display = alerts ? 'none' : 'block';
+
+  var clients = document.querySelectorAll('#cd-tab-client tbody tr').length;
+  cdSetTabCount('cd-count-client', clients);
+  var cSum = document.getElementById('cd-client-summary');
+  if (cSum) cSum.textContent = clients + (clients === 1 ? ' account related to this case' : ' accounts related to this case');
+  var cTable = document.getElementById('cd-client-table');
+  var cEmpty = document.getElementById('cd-client-empty');
+  if (cTable) cTable.style.display = clients ? '' : 'none';
+  if (cSum) cSum.style.display = clients ? '' : 'none';
+  if (cEmpty) cEmpty.style.display = clients ? 'none' : 'block';
+}
+
 function cdText(id) {
   var el = document.getElementById(id);
   return el ? el.textContent.trim() : '';
@@ -9340,19 +9418,12 @@ function cdSplit(text) {
              .filter(function (v) { return v && v !== '--'; });
 }
 
-// AI report is gated on Manage permission, not on which page you are on.
-function cmApplyDetailPermission(canManage, status) {
-  var isClosed = (status || cdText('cd-status')) === 'Closed';
-  var manageBtn = document.getElementById('cm-detail-manage-btn');
-  var reopenBtn = document.getElementById('cm-detail-reopen-btn');
+/* Only owns the read-only notice. Which of Manage / Exit Manage / Reopen shows
+   is decided in one place (cmApplyManageChrome) so the two never fight. */
+function cmApplyDetailPermission(canManage) {
   var note = document.getElementById('cm-detail-readonly-note');
-
-  if (manageBtn) manageBtn.style.display = (canManage && !isClosed) ? 'inline-block' : 'none';
-  if (reopenBtn) reopenBtn.style.display = (canManage && isClosed) ? 'inline-block' : 'none';
   if (note) note.style.display = canManage ? 'none' : 'inline';
-
-  // AI run / record editing is controlled by Manage mode (see aiApplyMode),
-  // and Manage mode is only reachable by the owner — no separate gate needed.
+  cmApplyManageChrome();
 }
 
 function cmEnterEdit() {
@@ -9379,36 +9450,114 @@ function cmEnterEdit() {
   document.getElementById('cd-edit-period-from').value = (period[0] || '').trim();
   document.getElementById('cd-edit-period-to').value = (period[1] || '').trim();
 
-  document.getElementById('cd-edit-bar-code').textContent = cdText('cd-code');
-
-  cmSetEditMode(true);
+  cdSetOverviewEdit(true);
 }
 
-function cmSetEditMode(on) {
+/* ---- Two independent layers ----
+   1. Manage mode (page level): unlocks operations. Detail = read-only.
+   2. Case Overview editing (block level): its own Edit / Save / Cancel.
+   Saving Overview does NOT leave Manage mode, so an AI run in progress
+   survives; and the AI report's own save never touches Overview. */
+
+var cdManageMode = false;
+var cdOverviewEditing = false;
+
+function cmEnterManage() {
+  cdManageMode = true;
+  cmApplyManageChrome();
+  aiApplyMode(true);
+  cdApplyRecordsMode(true);
+  cmEnterEdit();          // land straight in the Overview form, saves a click
+}
+
+// Manage mode ends by leaving the page (Back) — no separate exit button.
+function cmApplyManageChrome() {
+  var isClosed = cdText('cd-status') === 'Closed';
+  var canManage = cdText('cd-owner') === cmCurrentUser;
+  var manageBtn = document.getElementById('cm-detail-manage-btn');
+  var reopenBtn = document.getElementById('cm-detail-reopen-btn');
+  var ovEditBtn = document.getElementById('cd-ov-edit-btn');
+
+  if (manageBtn) manageBtn.style.display = (!cdManageMode && canManage && !isClosed) ? 'inline-block' : 'none';
+  if (reopenBtn) reopenBtn.style.display = (!cdManageMode && canManage && isClosed) ? 'inline-block' : 'none';
+  // Overview's own Edit entry: only inside Manage, and only when not already editing
+  if (ovEditBtn) ovEditBtn.style.display = (cdManageMode && !cdOverviewEditing) ? 'inline-block' : 'none';
+}
+
+/* Associated Records is the third independently-operable block: in Manage mode
+   each linked alert gets its own Manage entry plus batch selection. In Detail
+   it stays read-only (Detail button only). */
+function cdApplyRecordsMode(on) {
+  document.querySelectorAll('.cd-al-sel').forEach(function (el) {
+    el.style.display = on ? '' : 'none';
+  });
+  document.querySelectorAll('.cd-al-manage').forEach(function (el) {
+    el.style.display = on ? '' : 'none';
+  });
+  var bar = document.getElementById('cd-al-bulkbar');
+  if (bar) bar.style.display = on ? 'flex' : 'none';
+  if (!on) cdClearAlertSel();
+}
+
+function cdClearAlertSel() {
+  document.querySelectorAll('.cd-al-check').forEach(function (c) { c.checked = false; });
+  var all = document.querySelector('.cd-al-sel input[onclick]');
+  if (all) { all.checked = false; all.indeterminate = false; }
+  cdUpdateAlertSel();
+}
+
+function cdToggleAllAlerts(master) {
+  document.querySelectorAll('.cd-al-check').forEach(function (c) { c.checked = master.checked; });
+  cdUpdateAlertSel();
+}
+
+function cdUpdateAlertSel() {
+  var boxes = document.querySelectorAll('.cd-al-check');
+  var n = 0;
+  boxes.forEach(function (c) { if (c.checked) n++; });
+
+  var label = document.getElementById('cd-al-selcount');
+  if (label) label.textContent = n;
+  var wrap = label && label.parentElement;
+  if (wrap) wrap.innerHTML = '<strong id="cd-al-selcount">' + n + '</strong> alert' + (n === 1 ? '' : 's') + ' selected';
+
+  var btn = document.getElementById('cd-al-bulkbtn');
+  if (btn) btn.disabled = (n === 0);
+
+  var master = document.querySelector('.cd-al-sel input[onclick]');
+  if (master) {
+    master.checked = (n > 0 && n === boxes.length);
+    master.indeterminate = (n > 0 && n < boxes.length);
+  }
+}
+
+// Entering or leaving the detail page always lands in plain read-only Detail
+function cmResetDetailModes() {
+  cdManageMode = false;
+  cdSetOverviewEdit(false);
+  cmApplyManageChrome();
+  aiApplyMode(false);
+  cdApplyRecordsMode(false);
+}
+
+function cdSetOverviewEdit(on) {
+  cdOverviewEditing = !!on;
   document.getElementById('cd-ov-view').style.display = on ? 'none' : '';
   document.getElementById('cd-ov-edit').style.display = on ? 'block' : 'none';
-  document.getElementById('cd-edit-bar').style.display = on ? 'block' : 'none';
-  document.getElementById('cm-detail-manage-btn').style.display = on ? 'none' : 'inline-block';
-  var reopen = document.getElementById('cm-detail-reopen-btn');
-  if (on && reopen) reopen.style.display = 'none';
-  // keep the pinned bar from covering the operation log
-  document.getElementById('cm-detail-view').style.paddingBottom = on ? '64px' : '';
-  aiApplyMode(on);
-  if (!on) window.scrollTo({ top: 0, behavior: 'auto' });
+  cmApplyManageChrome();
 }
 
-/* The page-level Save covers the case fields only. An AI run that has not been
-   archived yet lives outside that scope, so warn before it disappears. */
+/* An AI run that has not been archived yet is outside Overview's scope, so it is
+   only at risk when the whole Manage mode closes. */
 function cdUnsavedRunOk() {
   var content = document.getElementById('ai-report-content');
   if (!content || content.style.display === 'none') return true;
-  return confirm('There is an AI report run that has not been saved as a record. Leaving edit mode discards it. Continue?');
+  return confirm('There is an AI report run that has not been saved as a record. Leaving this case discards it. Continue?');
 }
 
+// Discards Case Overview edits only. Manage mode and the AI panel stay as they are.
 function cmCancelEdit() {
-  if (!cdUnsavedRunOk()) return;
-  cmSetEditMode(false);
-  cmApplyDetailPermission(true);
+  cdSetOverviewEdit(false);
 }
 
 function cmSaveEdit() {
@@ -9435,13 +9584,14 @@ function cmSaveEdit() {
   document.getElementById('cd-comment').textContent = comment;
   if (from && to) document.getElementById('cd-period').textContent = from + ' ~ ' + to + ' GMT+8';
 
-  cmSetEditMode(false);
-  cmApplyDetailPermission(owner === cmCurrentUser, status);
+  cdSetOverviewEdit(false);
+  // owner may have been reassigned — refresh which buttons apply
+  cmApplyDetailPermission(owner === cmCurrentUser);
 }
 
 function cmReopenCase() {
   document.getElementById('cd-status').innerHTML = '<strong>Processing</strong>';
-  cmApplyDetailPermission(true, 'Processing');
+  cmApplyDetailPermission(true);
 }
 
 
