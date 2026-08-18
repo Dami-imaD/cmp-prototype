@@ -2292,7 +2292,7 @@ TS_C001_V1.3_S2  Daily K     [Draft]
         <!-- Top bar: description + history -->
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
         <div style="flex:1;background:#e8f7ff;border:1px solid #b3e0ff;border-radius:6px;padding:12px 16px;font-size:12px;color:#0077cc;line-height:1.6;margin-right:12px;">
-          <strong>Coverage Testing</strong> — 上传外部数据或使用系统数据，评估规则大类对问题账户的整体覆盖率。支持多级匹配维度对比。
+          <strong>Coverage Testing</strong> — Upload external data or use system data to evaluate how well a rule category covers problem accounts. Supports multi-level match dimension comparison.
         </div>
         <button class="btn" style="color:#165dff;border-color:#165dff;white-space:nowrap;" onclick="showCovHistory()">History</button>
         </div>
@@ -2302,8 +2302,8 @@ TS_C001_V1.3_S2  Daily K     [Draft]
           <div style="font-size:13px;font-weight:600;margin-bottom:12px;">1. Baseline Configuration</div>
 
           <div style="display:flex;gap:16px;margin-bottom:14px;">
-            <div style="flex:1;"><div style="font-size:11px;color:#86909c;margin-bottom:4px;">Rule Category <span style="color:#f53f3f;">*</span></div><select id="cov-category-select" style="height:32px;font-size:12px;padding:0 10px;width:100%;" onchange="switchCovCategory(this.value)"><option value="C">C - Marking Open/Close</option><option value="A">A - Wash Trade</option><option value="B">B - Price Driver</option><option value="D">D - Order Manipulation</option><option value="E">E - Insider Trading</option></select><div style="font-size:10px;color:#86909c;margin-top:3px;">用于筛选 baseline 中对应大类的数据</div></div>
-            <div style="flex:1;"><div style="font-size:11px;color:#86909c;margin-bottom:4px;">Period (Month) <span style="color:#f53f3f;">*</span></div><div style="display:flex;gap:6px;align-items:center;"><select id="cov-period-start" style="height:32px;font-size:12px;padding:0 8px;" ><option value="2025-06" selected>2025-06</option><option value="2025-07">2025-07</option><option value="2025-08">2025-08</option><option value="2025-09">2025-09</option></select><span style="color:#86909c;">~</span><select id="cov-period-end" style="height:32px;font-size:12px;padding:0 8px;" ><option value="2025-07">2025-07</option><option value="2025-08">2025-08</option><option value="2025-09" selected>2025-09</option><option value="2025-10">2025-10</option></select></div><div style="font-size:10px;color:#86909c;margin-top:3px;">月份级别，用于筛选 baseline 数据范围</div></div>
+            <div style="flex:1;"><div style="font-size:11px;color:#86909c;margin-bottom:4px;">Rule Category <span style="color:#f53f3f;">*</span></div><select id="cov-category-select" style="height:32px;font-size:12px;padding:0 10px;width:100%;" onchange="switchCovCategory(this.value)"><option value="C">C - Marking Open/Close</option><option value="A">A - Wash Trade</option><option value="B">B - Price Driver</option><option value="D">D - Order Manipulation</option><option value="E">E - Insider Trading</option></select><div style="font-size:10px;color:#86909c;margin-top:3px;">Filters the baseline data for the selected category</div></div>
+            <div style="flex:1;"><div style="font-size:11px;color:#86909c;margin-bottom:4px;">Period (Month) <span style="color:#f53f3f;">*</span></div><div style="display:flex;gap:6px;align-items:center;"><select id="cov-period-start" style="height:32px;font-size:12px;padding:0 8px;" ><option value="2025-06" selected>2025-06</option><option value="2025-07">2025-07</option><option value="2025-08">2025-08</option><option value="2025-09">2025-09</option></select><span style="color:#86909c;">~</span><select id="cov-period-end" style="height:32px;font-size:12px;padding:0 8px;" ><option value="2025-07">2025-07</option><option value="2025-08">2025-08</option><option value="2025-09" selected>2025-09</option><option value="2025-10">2025-10</option></select></div><div style="font-size:10px;color:#86909c;margin-top:3px;">Month-level range used to filter the baseline data</div></div>
           </div>
 
           <!-- Baseline Source -->
@@ -2311,24 +2311,77 @@ TS_C001_V1.3_S2  Daily K     [Draft]
           <div style="display:flex;gap:8px;margin-bottom:14px;" id="cov-baseline-group">
             <label class="baseline-src-option" style="flex:1;" onclick="switchCovBaseline('system')">
               <input type="radio" name="cov-baseline" value="system">
-              <div><strong>System Data</strong><div style="color:#86909c;font-size:11px;">CMP Closed Alerts</div></div>
+              <div><strong>System Data</strong><div style="color:#86909c;font-size:11px;">CMP Alerts</div></div>
             </label>
             <label class="baseline-src-option selected" style="flex:1;" onclick="switchCovBaseline('upload')">
               <input type="radio" name="cov-baseline" value="upload" checked>
-              <div><strong>Excel Upload</strong><div style="color:#86909c;font-size:11px;">外部数据</div></div>
+              <div><strong>Upload Data</strong><div style="color:#86909c;font-size:11px;">External data</div></div>
             </label>
             <label class="baseline-src-option" style="flex:1;" onclick="switchCovBaseline('both')">
               <input type="radio" name="cov-baseline" value="both">
-              <div><strong>Both</strong><div style="color:#86909c;font-size:11px;">合并去重</div></div>
+              <div><strong>Both (System Data + Upload Data)</strong><div style="color:#86909c;font-size:11px;">Merged &amp; deduplicated</div></div>
             </label>
           </div>
 
+          <!-- System Data filters (shown for System / Both) -->
+          <div id="cov-system-panel" style="display:none;border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:14px;background:#fcfcfd;">
+            <div style="display:flex;align-items:center;gap:8px;padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid var(--border);">
+              <span style="width:3px;height:13px;background:#165dff;border-radius:2px;"></span>
+              <span style="font-size:12px;font-weight:600;">System Data</span>
+            </div>
+            <!-- Alert Tag Filter -->
+            <div style="padding:12px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <div style="font-size:11px;font-weight:500;">Alert Tag Filter</div>
+                <div style="font-size:10px;color:#86909c;">Defines which alerts count as a problem &rarr; used for Alert Coverage</div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Escalated</label>
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Reported</label>
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> Potential</label>
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> Cleared</label>
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> False Positive</label>
+              </div>
+            </div>
+            <!-- Client Tag Filter -->
+            <div style="padding:12px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <div style="font-size:11px;font-weight:500;">Client Tag Filter</div>
+                <div style="font-size:10px;color:#86909c;">Defines which accounts must be caught &rarr; used for Account Coverage</div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Restricted</label>
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Terminated</label>
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> In the Watchlist</label>
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> In the Inquiry</label>
+                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> Warned</label>
+              </div>
+            </div>
+            <!-- Condition logic: AND / OR -->
+            <div style="padding:10px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;margin-bottom:14px;">
+              <div style="font-size:11px;font-weight:500;margin-bottom:6px;">Filter Logic (relationship between Alert Tag and Client Tag)</div>
+              <div style="display:flex;gap:12px;">
+                <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;">
+                  <input type="radio" name="cov-filter-logic" value="or" checked>
+                  <strong>OR</strong><span style="color:#86909c;font-size:11px;">&mdash; include if either condition is met</span>
+                </label>
+                <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;">
+                  <input type="radio" name="cov-filter-logic" value="and">
+                  <strong>AND</strong><span style="color:#86909c;font-size:11px;">&mdash; both conditions must be met</span>
+                </label>
+              </div>
+            </div>
+          </div>
           <!-- Upload panel (shown for Upload / Both) -->
-          <div id="cov-upload-panel">
+          <div id="cov-upload-panel" style="border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:14px;background:#fcfcfd;">
+            <div style="display:flex;align-items:center;gap:8px;padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid var(--border);">
+              <span style="width:3px;height:13px;background:#00b42a;border-radius:2px;"></span>
+              <span style="font-size:12px;font-weight:600;">Upload Data</span>
+            </div>
             <div style="border:2px dashed var(--border);border-radius:6px;padding:16px;text-align:center;cursor:pointer;margin-bottom:8px;position:relative;" onmouseover="this.style.borderColor='#FFC107'" onmouseout="this.style.borderColor='#e5e6eb'" onclick="document.getElementById('cov-file-input').click()">
               <input type="file" id="cov-file-input" style="display:none;" accept=".xlsx,.xls,.csv" onchange="handleCovUpload(this)">
               <div style="font-size:20px;margin-bottom:4px;">&#128196;</div>
-              <div style="font-size:12px;font-weight:500;">Click to upload or drag Excel file</div>
+              <div style="font-size:12px;font-weight:500;">Click to upload Excel file</div>
               <div style="font-size:11px;color:#86909c;margin-top:4px;">Required: Account | Symbol | Month | Category</div>
             </div>
             <!-- Upload preview -->
@@ -2349,63 +2402,17 @@ TS_C001_V1.3_S2  Daily K     [Draft]
               </table>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-              <span style="font-size:11px;color:#86909c;">系统根据所选 Rule Category 自动筛选文件中对应行</span>
+              <span style="font-size:11px;color:#86909c;">Rows are filtered automatically by the selected Rule Category</span>
               <a href="#" style="font-size:11px;color:#165dff;text-decoration:none;" onclick="event.preventDefault();downloadCovTemplate()">&#8681; Download Template</a>
             </div>
           </div>
 
-          <!-- System Data filters (shown for System / Both) -->
-          <div id="cov-system-panel" style="display:none;">
-            <!-- Alert Tag Filter -->
-            <div style="padding:12px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;margin-bottom:10px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <div style="font-size:11px;font-weight:500;">Alert Tag Filter</div>
-                <div style="font-size:10px;color:#86909c;">决定哪些 Alert 算作"有问题" → 用于 Alert Coverage 对比</div>
-              </div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Escalated</label>
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Reported</label>
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> Potential</label>
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> Cleared</label>
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> False Positive</label>
-              </div>
-            </div>
-            <!-- Client Tag Filter -->
-            <div style="padding:12px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;margin-bottom:10px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <div style="font-size:11px;font-weight:500;">Client Tag Filter</div>
-                <div style="font-size:10px;color:#86909c;">决定哪些账户算作"必须抓到" → 用于 Account Coverage 对比</div>
-              </div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Restricted</label>
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Terminated</label>
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> In the Watchlist</label>
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> In the Inquiry</label>
-                <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> Warned</label>
-              </div>
-            </div>
-            <!-- Condition logic: AND / OR -->
-            <div style="padding:10px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;margin-bottom:14px;">
-              <div style="font-size:11px;font-weight:500;margin-bottom:6px;">Filter Logic（Alert Tag 与 Client Tag 的关系）</div>
-              <div style="display:flex;gap:12px;">
-                <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;">
-                  <input type="radio" name="cov-filter-logic" value="or" checked>
-                  <strong>OR</strong><span style="color:#86909c;font-size:11px;">— 满足任一条件即纳入</span>
-                </label>
-                <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;">
-                  <input type="radio" name="cov-filter-logic" value="and">
-                  <strong>AND</strong><span style="color:#86909c;font-size:11px;">— 必须同时满足</span>
-                </label>
-              </div>
-            </div>
-            </div>
-          </div>
         </div>
 
         <!-- Step 2: Match Dimensions -->
         <div style="border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:16px;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">2. Match Dimensions（对比维度）</div>
-          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">选择用哪些维度组合做覆盖率匹配，系统会分别计算各维度的匹配率</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">2. Match Dimensions</div>
+          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">Choose which dimension combinations to match on; the match rate is calculated for each</div>
           <div style="display:flex;gap:12px;">
             <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:4px;"><input type="checkbox" checked disabled> Account</label>
             <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:4px;"><input type="checkbox" id="cov-dim-symbol" checked> + Symbol</label>
@@ -2416,14 +2423,14 @@ TS_C001_V1.3_S2  Daily K     [Draft]
         <!-- Load Step 3 button -->
         <div style="text-align:center;margin-bottom:16px;" id="cov-load-step3-btn">
           <button class="btn btn-primary" onclick="loadCovStep3()">Load Pinned Test IDs →</button>
-          <div style="font-size:11px;color:#86909c;margin-top:4px;">根据上方配置加载匹配的 📌 测试记录</div>
+          <div style="font-size:11px;color:#86909c;margin-top:4px;">Load the 📌 pinned test records matching the configuration above</div>
         </div>
 
         <!-- Step 3: Select Test IDs (dynamic by category, hidden until loaded) -->
         <div id="cov-step3-panel" style="display:none;">
         <div style="border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:16px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:4px;" id="cov-step3-title">3. Select Test IDs (<span id="cov-step3-cat">Category C</span>)</div>
-          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">仅展示被 &#128204; 标记的测试记录。每条规则只能选一组参数。测试时间需在 Step 1 所选月份范围内。</div>
+          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">Only &#128204; pinned test records are shown. One parameter set per rule. Test time must fall within the month range selected in Step 1.</div>
           <div id="cov-test-id-list" style="border:1px solid var(--border);border-radius:6px;overflow:hidden;">
 
             <!-- TS_C001 (multi-version example, radio per sub per version) -->
@@ -2675,7 +2682,7 @@ TS_C001_V1.3_S2  Daily K     [Draft]
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;" onclick="toggleABTestOption(this)">
           <input type="checkbox" id="ab-test-checkbox" onchange="toggleABTestOption(this)">
           <strong>Enable A/B Comparison</strong>
-          <span style="font-size:11px;color:#86909c;">— 测试完成后自动与线上规则对比</span>
+          <span style="font-size:11px;color:#86909c;">&mdash; automatically compares with the online rule once the test finishes</span>
         </label>
         <!-- Online rule info (shown when checked) -->
         <div id="ab-test-info" style="display:none;margin-top:12px;padding:10px 12px;background:#f8fafc;border-radius:4px;">
@@ -2690,9 +2697,9 @@ TS_C001_V1.3_S2  Daily K     [Draft]
           <!-- Tag filters for AB comparison -->
           <div style="margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:4px;">
             <div style="font-size:11px;font-weight:500;margin-bottom:4px;">Comparison Filters</div>
-            <div style="font-size:10px;color:#86909c;margin-bottom:8px;">请选择您认为必须命中的严重问题标签。系统将以所选标签作为严重问题样本，计算规则对严重问题的覆盖率。</div>
+            <div style="font-size:10px;color:#86909c;margin-bottom:8px;">Select the tags you consider must-catch serious issues. They will be used as the serious-issue sample set for calculating rule coverage.</div>
             <div style="margin-bottom:8px;">
-              <div style="font-size:10px;color:#86909c;margin-bottom:4px;">Alert Tag — 用于 Alert Coverage</div>
+              <div style="font-size:10px;color:#86909c;margin-bottom:4px;">Alert Tag &mdash; used for Alert Coverage</div>
               <div style="display:flex;gap:4px;flex-wrap:wrap;">
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Escalated</label>
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Reported</label>
@@ -2701,7 +2708,7 @@ TS_C001_V1.3_S2  Daily K     [Draft]
               </div>
             </div>
             <div>
-              <div style="font-size:10px;color:#86909c;margin-bottom:4px;">Client Tag — 用于 Account Coverage</div>
+              <div style="font-size:10px;color:#86909c;margin-bottom:4px;">Client Tag &mdash; used for Account Coverage</div>
               <div style="display:flex;gap:4px;flex-wrap:wrap;">
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Restricted</label>
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Terminated</label>
@@ -2710,7 +2717,6 @@ TS_C001_V1.3_S2  Daily K     [Draft]
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox"> Warned</label>
               </div>
             </div>
-            <div style="font-size:10px;color:#86909c;margin-top:6px;">默认勾选最严重的标签。各牌照可根据自身标注习惯调整。</div>
           </div>
         </div>
       </div>
@@ -7240,7 +7246,7 @@ WHERE a.dominance_ratio > {ratio}
       <div style="text-align:center;padding:16px;margin-bottom:14px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(135deg,#fffdf0 0%,#fff8f0 100%);">
         <div id="cov-result-rate" style="font-size:36px;font-weight:700;color:#00b42a;">91.7%</div>
         <div id="cov-result-rate-label" style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Coverage Rate (Account)</div>
-        <div id="cov-result-rate-sub" style="font-size:11px;color:#86909c;margin-top:2px;">Baseline 12 组 Account，测试命中 11 组</div>
+        <div id="cov-result-rate-sub" style="font-size:11px;color:#86909c;margin-top:2px;">Baseline 12 Account groups, 11 matched by the test</div>
       </div>
 
       <!-- Matched list -->
@@ -7282,7 +7288,7 @@ WHERE a.dominance_ratio > {ratio}
     </div>
     <div class="modal-body">
       <div style="font-size:12px;color:#86909c;margin-bottom:4px;">Record: <strong style="color:var(--text);">P1-01</strong> | HKEX | STK | 2025-09-01 ~ 09-15</div>
-      <div style="font-size:11px;color:#86909c;margin-bottom:12px;">该条测试记录的所有历史对比结果</div>
+      <div style="font-size:11px;color:#86909c;margin-bottom:12px;">All historical comparison results for this test record</div>
       <table class="data-table" style="font-size:12px;">
         <colgroup><col style="width:130px"><col style="width:180px"><col style="width:100px"><col style="width:85px"><col style="width:80px"><col style="width:80px"><col style="width:50px"></colgroup>
         <thead><tr><th>Compare Time</th><th>Sub Config</th><th>vs Online Rule</th><th>Coverage</th><th>Conclusion</th><th>Operator</th><th></th></tr></thead>
@@ -7301,7 +7307,7 @@ WHERE a.dominance_ratio > {ratio}
             <div style="font-size:11px;margin-bottom:8px;"><strong>Missed:</strong> <span style="color:#f53f3f;">Account 63780800 + TROO — Escalated, Restricted</span></div>
             <div style="font-size:11px;margin-bottom:8px;"><strong>New Detections:</strong> 6 (3 TP, 2 FP, 1 unmarked)</div>
             <div style="font-size:11px;margin-bottom:8px;"><strong>Volume:</strong> Test 21 vs Online 15 (+6)</div>
-            <div style="font-size:11px;border-top:1px dashed #e0e0e0;padding-top:6px;margin-top:6px;"><strong>Comment:</strong> TROO 标的漏检，需将 tickInterval 从 100 调为 80 后重测。</div>
+            <div style="font-size:11px;border-top:1px dashed #e0e0e0;padding-top:6px;margin-top:6px;"><strong>Comment:</strong> TROO was missed; retest after changing tickInterval from 100 to 80.</div>
           </td></tr>
           <tr>
             <td>2026-06-22 15:40</td>
@@ -7317,7 +7323,7 @@ WHERE a.dominance_ratio > {ratio}
             <div style="font-size:11px;margin-bottom:8px;"><strong>Missed:</strong> <span style="color:#f53f3f;">Account 63780800 + TROO — Escalated, Restricted</span></div>
             <div style="font-size:11px;margin-bottom:8px;"><strong>New Detections:</strong> 3 (1 TP, 2 FP)</div>
             <div style="font-size:11px;margin-bottom:8px;"><strong>Volume:</strong> Test 14 vs Online 15 (-1)</div>
-            <div style="font-size:11px;border-top:1px dashed #e0e0e0;padding-top:6px;margin-top:6px;"><strong>Comment:</strong> 单独 Sub-1 覆盖不足，必须合并 Sub-2。</div>
+            <div style="font-size:11px;border-top:1px dashed #e0e0e0;padding-top:6px;margin-top:6px;"><strong>Comment:</strong> Sub-1 alone gives insufficient coverage; Sub-2 must be combined.</div>
           </td></tr>
           <tr>
             <td>2026-06-20 09:15</td>
@@ -7333,7 +7339,7 @@ WHERE a.dominance_ratio > {ratio}
             <div style="font-size:11px;margin-bottom:8px;"><strong>Missed:</strong> <span style="color:#00b42a;">None</span></div>
             <div style="font-size:11px;margin-bottom:8px;"><strong>New Detections:</strong> 4 (3 TP, 1 FP)</div>
             <div style="font-size:11px;margin-bottom:8px;"><strong>Volume:</strong> Test 19 vs Online 15 (+4)</div>
-            <div style="font-size:11px;border-top:1px dashed #e0e0e0;padding-top:6px;margin-top:6px;"><strong>Comment:</strong> 全部覆盖，新增 3 个有效发现。可以上线。</div>
+            <div style="font-size:11px;border-top:1px dashed #e0e0e0;padding-top:6px;margin-top:6px;"><strong>Comment:</strong> Fully covered, with 3 valid new detections. Ready to go online.</div>
           </td></tr>
         </tbody>
       </table>
@@ -7374,20 +7380,20 @@ WHERE a.dominance_ratio > {ratio}
         </div>
 
         <!-- 2. Baseline Source -->
-        <div style="font-size:12px;font-weight:600;margin-bottom:8px;">Baseline Source（对比基准数据来源）</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;">Baseline Source</div>
         <div style="border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">
           <span style="color:#00b42a;">&#10003;</span>
-          <span>System Data — CMP Closed Alerts（按 Test 记录的 Condition + Period 自动过滤）</span>
+          <span>System Data &mdash; CMP Closed Alerts (auto-filtered by the test record&rsquo;s Condition + Period)</span>
         </div>
       </div>
       <div class="modal-body" style="border-top:1px solid var(--border);padding-top:16px;">
         <!-- Multi-rule selector -->
         <div style="margin-bottom:16px;">
           <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Select Test Results to Combine</div>
-          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">线上规则可能覆盖多个 Sub 逻辑，建议将相关 Sub 的测试结果合并后对比。每个 Sub 只能选一组参数。</div>
+          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">An online rule may cover several Sub logics. Combining the related Subs before comparing is recommended. Only one parameter set per Sub.</div>
           <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;">
             <!-- Section: Same Feature SubTypes -->
-            <div style="padding:6px 12px;background:#f7f8fa;border-bottom:1px solid var(--border);font-size:11px;font-weight:500;color:var(--text-secondary);">Same Feature (TS_C001_V1.3) — 建议全选覆盖完整逻辑</div>
+            <div style="padding:6px 12px;background:#f7f8fa;border-bottom:1px solid var(--border);font-size:11px;font-weight:500;color:var(--text-secondary);">Same Feature (TS_C001_V1.3) &mdash; selecting all is recommended for full logic coverage</div>
             <!-- Current Sub (locked) -->
             <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fffdf0;border-bottom:1px solid var(--border);">
               <input type="checkbox" checked disabled>
@@ -7412,8 +7418,8 @@ WHERE a.dominance_ratio > {ratio}
             </div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-            <span style="font-size:11px;color:#86909c;" id="combine-summary">已选 Sub-1 + Sub-2，合并后对比线上 (UNION 去重)</span>
-            <span style="font-size:11px;color:#ff7d00;">&#9432; 每个 Sub 仅限 1 组参数</span>
+            <span style="font-size:11px;color:#86909c;" id="combine-summary">Sub-1 + Sub-2 selected &mdash; combined and compared against online (UNION, deduplicated)</span>
+            <span style="font-size:11px;color:#ff7d00;">&#9432; One parameter set per Sub</span>
           </div>
         </div>
 
@@ -7438,12 +7444,12 @@ WHERE a.dominance_ratio > {ratio}
         <div style="text-align:center;padding:16px;margin-bottom:16px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(135deg,#fffdf0 0%,#fff8f0 100%);">
           <div style="font-size:36px;font-weight:700;color:#ff7d00;letter-spacing:-1px;">87.5%</div>
           <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Alert Coverage vs Online</div>
-          <div style="font-size:11px;color:#86909c;margin-top:2px;">Hits 命中的严重问题 Alert 数量 / 线上严重问题 Alert 总数（以最近一次标记为准）= 7/8</div>
+          <div style="font-size:11px;color:#86909c;margin-top:2px;">Serious-issue alerts caught by Hits / total serious-issue alerts online (based on the latest tag) = 7/8</div>
         </div>
 
         <div style="background:#f7f8fa;border:1px solid var(--border);border-radius:4px;padding:8px 14px;font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;margin-bottom:14px;">
           <span style="color:#00b42a;">&#10003;</span>
-          <span>线上 Alerts Status=Closed，筛选 Condition=HKEX|STK 且 Last Trigger Time 在 2025-09-01 ~ 09-15 内的记录：<strong style="color:var(--text);">15 条</strong>（Escalated: 6 | Reported: 2 | Clear: 4 | FP: 3）</span>
+          <span>Online alerts with Status=Closed, filtered by Condition=HKEX|STK and Last Trigger Time within 2025-09-01 ~ 09-15: <strong style="color:var(--text);">15 records</strong> (Escalated: 6 | Reported: 2 | Clear: 4 | FP: 3)</span>
         </div>
 
         <!-- Alert Coverage Results (Alert Tag detail) -->
@@ -7482,7 +7488,7 @@ WHERE a.dominance_ratio > {ratio}
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="color:#165dff;font-size:14px;">+</span>
               <strong style="font-size:13px;color:#165dff;">New Detections (6)</strong>
-              <span style="font-size:11px;color:#86909c;">— Test 抓到但线上没有的（需人工确认）</span>
+              <span style="font-size:11px;color:#86909c;">&mdash; caught by the test but not online (needs manual confirmation)</span>
             </div>
           </div>
           <div style="padding:0;">
@@ -7498,20 +7504,20 @@ WHERE a.dominance_ratio > {ratio}
                 <tr><td>90078</td><td>2025-09-12 16:05</td><td>63973700</td><td>0388.HK</td><td>TBHK</td><td><div style="display:flex;gap:3px;"><button class="btn" style="height:22px;font-size:10px;padding:0 6px;border-color:#00b42a;color:#00b42a;" onclick="markND(this,'tp')">TP</button><button class="btn" style="height:22px;font-size:10px;padding:0 6px;border-color:#f53f3f;color:#f53f3f;" onclick="markND(this,'fp')">FP</button></div></td></tr>
               </tbody>
             </table>
-            <div style="padding:8px 14px;font-size:11px;color:#86909c;border-top:1px solid var(--border);">这些账户+标的在线上规则同时段内未触发 Alert，需合规人工确认是否为有效发现。</div>
+            <div style="padding:8px 14px;font-size:11px;color:#86909c;border-top:1px solid var(--border);">These account + symbol pairs did not trigger any alert under the online rule in the same period. Compliance needs to confirm whether they are valid findings.</div>
           </div>
         </div>
         <!-- Restricted Account Coverage -->
         <div style="text-align:center;padding:16px;margin-bottom:14px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(135deg,#fff8f0 0%,#fffdf8 100%);">
           <div style="font-size:36px;font-weight:700;color:#ff7d00;letter-spacing:-1px;">66.7%</div>
           <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Restricted Account Coverage vs Online</div>
-          <div style="font-size:11px;color:#86909c;margin-top:2px;">Hits 命中的严重问题账户数 / 线上严重问题的账户总数（以最近一次标记为准）= 2/3</div>
+          <div style="font-size:11px;color:#86909c;margin-top:2px;">Serious-issue accounts caught by Hits / total serious-issue accounts online (based on the latest tag) = 2/3</div>
         </div>
         <div style="border:1px solid var(--border);border-radius:6px;margin-bottom:14px;overflow:hidden;">
           <div style="padding:10px 14px;background:#f7f8fa;border-bottom:1px solid var(--border);">
             <div style="font-size:11px;color:#86909c;line-height:1.6;">
-              筛选范围：测试时间（2025-09-01 ~ 09-15）内，TS_C001 线上 Closed Alerts 中 Client Tag 为限制状态（Restricted/Terminated）的去重 Account = <strong style="color:var(--text);">3</strong><br>
-              计算方式：这 5 个 Account 是否出现在本次测试 Hits 中（不分 Symbol，只看 Account）
+              Scope: within the test period (2025-09-01 ~ 09-15), deduplicated Accounts from TS_C001 online Closed Alerts whose Client Tag is a restricted status (Restricted/Terminated) = <strong style="color:var(--text);">3</strong><br>
+              Method: whether these Accounts appear in this test&rsquo;s Hits (Account only, Symbol ignored)
             </div>
           </div>
           <div style="padding:12px 14px;">
@@ -7619,9 +7625,9 @@ function updateCombineSummary() {
   var el = document.getElementById('combine-summary');
   if (el) {
     if (subs.length <= 1) {
-      el.textContent = '仅 Sub-1 参与对比（未合并其他 Sub）';
+      el.textContent = 'Only Sub-1 included in the comparison (other Subs not combined)';
     } else {
-      el.textContent = '已选 ' + subs.join(' + ') + '，合并后对比线上 (UNION 去重)';
+      el.textContent = subs.join(' + ') + ' selected \u2014 combined and compared against online (UNION, deduplicated)';
     }
   }
 }
@@ -7675,7 +7681,7 @@ function loadCovStep3() {
   }
 
   document.getElementById('cov-step3-panel').style.display = '';
-  document.getElementById('cov-load-step3-btn').innerHTML = '<button class="btn" style="border-color:#165dff;color:#165dff;" onclick="reloadCovStep3()">&#8635; Reload</button><div style="font-size:11px;color:#86909c;margin-top:4px;">修改了上方配置后，点击重新加载</div>';
+  document.getElementById('cov-load-step3-btn').innerHTML = '<button class="btn" style="border-color:#165dff;color:#165dff;" onclick="reloadCovStep3()">&#8635; Reload</button><div style="font-size:11px;color:#86909c;margin-top:4px;">Click to reload after changing the configuration above</div>';
 
   // Clear selections and validate time
   document.querySelectorAll('.cov-test-row input[type=checkbox]').forEach(function(cb) {
@@ -7742,7 +7748,7 @@ function switchCovCategory(cat) {
   document.getElementById('cov-step3-cat').textContent = 'Category ' + cat;
   // Hide Step 3, show Load button again
   document.getElementById('cov-step3-panel').style.display = 'none';
-  document.getElementById('cov-load-step3-btn').innerHTML = '<button class="btn btn-primary" onclick="loadCovStep3()">Load Pinned Test IDs \u2192</button><div style="font-size:11px;color:#86909c;margin-top:4px;">根据上方配置加载匹配的 \ud83d\udccc 测试记录</div>';
+  document.getElementById('cov-load-step3-btn').innerHTML = '<button class="btn btn-primary" onclick="loadCovStep3()">Load Pinned Test IDs \u2192</button><div style="font-size:11px;color:#86909c;margin-top:4px;">Load the \ud83d\udccc pinned test records matching the configuration above</div>';
 }
 
 // Category-specific test ID data
@@ -7803,17 +7809,17 @@ function showCoverageResult() {
     dimLabel = 'Account + Symbol + Month';
     rate = '80%'; baseCount = 15; matchCount = 12;
     matchedHtml = '<thead><tr><th>Account</th><th>Symbol</th><th>Month</th><th>Source</th></tr></thead><tbody><tr><td>61541300</td><td>01247</td><td>2025-09</td><td>System</td></tr><tr><td>68488800</td><td>NTCL</td><td>2025-08</td><td>External</td></tr><tr><td>63680300</td><td>CETY</td><td>2025-08</td><td>System</td></tr><tr><td>62479100</td><td>0700.HK</td><td>2025-07</td><td>External</td></tr><tr><td>62554800</td><td>9988.HK</td><td>2025-07</td><td>System</td></tr><tr style="color:#86909c;"><td colspan="4" style="text-align:center;">...+7 more</td></tr></tbody>';
-    unmatchedHtml = '<div style="font-size:12px;font-weight:500;color:#f53f3f;margin-bottom:6px;">Baseline 有，测试未抓到 (1)</div><table class="data-table" style="font-size:11px;margin-bottom:12px;"><thead><tr><th>Account</th><th>Symbol</th><th>Month</th></tr></thead><tbody><tr style="background:#fff5f5;"><td>63780800</td><td>TROO</td><td>2025-08</td></tr></tbody></table><div style="font-size:12px;font-weight:500;color:#165dff;margin-bottom:6px;">测试新抓到，Baseline 无 (2)</div><table class="data-table" style="font-size:11px;margin-bottom:0;"><thead><tr><th>Account</th><th>Symbol</th><th>Month</th></tr></thead><tbody><tr><td>62479100</td><td>0941.HK</td><td>2025-09</td></tr><tr><td>62890400</td><td>6618.HK</td><td>2025-09</td></tr></tbody></table>';
+    unmatchedHtml = '<div style="font-size:12px;font-weight:500;color:#f53f3f;margin-bottom:6px;">In baseline, missed by the test (1)</div><table class="data-table" style="font-size:11px;margin-bottom:12px;"><thead><tr><th>Account</th><th>Symbol</th><th>Month</th></tr></thead><tbody><tr style="background:#fff5f5;"><td>63780800</td><td>TROO</td><td>2025-08</td></tr></tbody></table><div style="font-size:12px;font-weight:500;color:#165dff;margin-bottom:6px;">Newly caught by the test, not in baseline (2)</div><table class="data-table" style="font-size:11px;margin-bottom:0;"><thead><tr><th>Account</th><th>Symbol</th><th>Month</th></tr></thead><tbody><tr><td>62479100</td><td>0941.HK</td><td>2025-09</td></tr><tr><td>62890400</td><td>6618.HK</td><td>2025-09</td></tr></tbody></table>';
   } else if (hasSymbol) {
     dimLabel = 'Account + Symbol';
     rate = '86.7%'; baseCount = 15; matchCount = 13;
     matchedHtml = '<thead><tr><th>Account</th><th>Symbol</th><th>Source</th></tr></thead><tbody><tr><td>61541300</td><td>01247</td><td>System</td></tr><tr><td>68488800</td><td>NTCL</td><td>External</td></tr><tr><td>63680300</td><td>CETY</td><td>System</td></tr><tr><td>62479100</td><td>0700.HK</td><td>External</td></tr><tr><td>62554800</td><td>9988.HK</td><td>System</td></tr><tr style="color:#86909c;"><td colspan="3" style="text-align:center;">...+8 more</td></tr></tbody>';
-    unmatchedHtml = '<div style="font-size:12px;font-weight:500;color:#f53f3f;margin-bottom:6px;">Baseline 有，测试未抓到 (1)</div><table class="data-table" style="font-size:11px;margin-bottom:12px;"><thead><tr><th>Account</th><th>Symbol</th></tr></thead><tbody><tr style="background:#fff5f5;"><td>63780800</td><td>TROO</td></tr></tbody></table><div style="font-size:12px;font-weight:500;color:#165dff;margin-bottom:6px;">测试新抓到，Baseline 无 (1)</div><table class="data-table" style="font-size:11px;margin-bottom:0;"><thead><tr><th>Account</th><th>Symbol</th></tr></thead><tbody><tr><td>62479100</td><td>0941.HK</td></tr></tbody></table>';
+    unmatchedHtml = '<div style="font-size:12px;font-weight:500;color:#f53f3f;margin-bottom:6px;">In baseline, missed by the test (1)</div><table class="data-table" style="font-size:11px;margin-bottom:12px;"><thead><tr><th>Account</th><th>Symbol</th></tr></thead><tbody><tr style="background:#fff5f5;"><td>63780800</td><td>TROO</td></tr></tbody></table><div style="font-size:12px;font-weight:500;color:#165dff;margin-bottom:6px;">Newly caught by the test, not in baseline (1)</div><table class="data-table" style="font-size:11px;margin-bottom:0;"><thead><tr><th>Account</th><th>Symbol</th></tr></thead><tbody><tr><td>62479100</td><td>0941.HK</td></tr></tbody></table>';
   } else {
     dimLabel = 'Account';
     rate = '91.7%'; baseCount = 12; matchCount = 11;
     matchedHtml = '<thead><tr><th>Account</th><th>Source</th></tr></thead><tbody><tr><td>61541300</td><td>System</td></tr><tr><td>68488800</td><td>External</td></tr><tr><td>63680300</td><td>System</td></tr><tr><td>62479100</td><td>External</td></tr><tr><td>62554800</td><td>System</td></tr><tr><td>63112800</td><td>External</td></tr><tr><td>62045200</td><td>System</td></tr><tr style="color:#86909c;"><td colspan="2" style="text-align:center;">...+4 more</td></tr></tbody>';
-    unmatchedHtml = '<div style="font-size:12px;font-weight:500;color:#f53f3f;margin-bottom:6px;">Baseline 有，测试未抓到 (1)</div><table class="data-table" style="font-size:11px;margin-bottom:12px;"><thead><tr><th>Account</th><th>Source</th></tr></thead><tbody><tr style="background:#fff5f5;"><td>63780800</td><td>External</td></tr></tbody></table><div style="font-size:12px;font-weight:500;color:#165dff;margin-bottom:6px;">测试新抓到，Baseline 无 (2)</div><table class="data-table" style="font-size:11px;margin-bottom:0;"><thead><tr><th>Account</th><th>Source</th></tr></thead><tbody><tr><td>62890400</td><td>Test</td></tr><tr><td>61234500</td><td>Test</td></tr></tbody></table>';
+    unmatchedHtml = '<div style="font-size:12px;font-weight:500;color:#f53f3f;margin-bottom:6px;">In baseline, missed by the test (1)</div><table class="data-table" style="font-size:11px;margin-bottom:12px;"><thead><tr><th>Account</th><th>Source</th></tr></thead><tbody><tr style="background:#fff5f5;"><td>63780800</td><td>External</td></tr></tbody></table><div style="font-size:12px;font-weight:500;color:#165dff;margin-bottom:6px;">Newly caught by the test, not in baseline (2)</div><table class="data-table" style="font-size:11px;margin-bottom:0;"><thead><tr><th>Account</th><th>Source</th></tr></thead><tbody><tr><td>62890400</td><td>Test</td></tr><tr><td>61234500</td><td>Test</td></tr></tbody></table>';
   }
 
   var rateColor = parseFloat(rate) >= 90 ? '#00b42a' : '#ff7d00';
@@ -7823,7 +7829,7 @@ function showCoverageResult() {
   document.getElementById('cov-result-rate').textContent = rate;
   document.getElementById('cov-result-rate').style.color = rateColor;
   document.getElementById('cov-result-rate-label').textContent = 'Coverage Rate (' + dimLabel + ')';
-  document.getElementById('cov-result-rate-sub').textContent = 'Baseline ' + baseCount + ' 组 ' + dimLabel + '，测试命中 ' + matchCount + ' 组';
+  document.getElementById('cov-result-rate-sub').textContent = 'Baseline ' + baseCount + ' ' + dimLabel + ' groups, ' + matchCount + ' matched by the test';
   document.getElementById('cov-result-matched-count').textContent = 'Matched (' + matchCount + ')';
   document.getElementById('cov-result-matched-table').innerHTML = matchedHtml;
   document.getElementById('cov-result-unmatched-count').textContent = 'Unmatched (' + unmatchedCount + ')';
@@ -7856,7 +7862,7 @@ function handleRunTest() {
   var abEnabled = document.getElementById('ab-test-checkbox').checked;
   if (abEnabled) {
     // Show confirm modal for A/B Test
-    document.getElementById('run-test-ab-status').innerHTML = '<div style="padding:10px 12px;background:#e8f7ff;border:1px solid #b3e0ff;border-radius:4px;font-size:12px;color:#0077cc;display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#10003;</span><span><strong>A/B Test Enabled</strong> — 测试完成后将自动与 Online Rule #2004 对比</span></div>';
+    document.getElementById('run-test-ab-status').innerHTML = '<div style="padding:10px 12px;background:#e8f7ff;border:1px solid #b3e0ff;border-radius:4px;font-size:12px;color:#0077cc;display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#10003;</span><span><strong>A/B Test Enabled</strong> &mdash; will automatically compare with Online Rule #2004 once the test finishes</span></div>';
     document.getElementById('modal-run-test-confirm').classList.add('show');
   } else {
     // No A/B Test, just submit directly
@@ -7895,13 +7901,13 @@ function validateABPeriod() {
     el.style.background = '#e8f7ff';
     el.style.border = '1px solid #b3e0ff';
     el.style.color = '#0077cc';
-    el.innerHTML = '&#10003; Testing Period ('+periodStart.value+') 在线上生效时间 (2026-04-15) 之后，对比有效。';
+    el.innerHTML = '&#10003; Testing Period ('+periodStart.value+') is after the online effective time (2026-04-15). Comparison is valid.';
     if (btn) { btn.style.opacity=''; btn.style.cursor=''; btn.disabled=false; }
   } else {
     el.style.background = '#ffece8';
     el.style.border = '1px solid #ffccc7';
     el.style.color = '#f53f3f';
-    el.innerHTML = '&#9888; Testing Period ('+periodStart.value+') 在线上生效时间 (2026-04-15) <strong>之前</strong>，对比无意义！请调整 Period。';
+    el.innerHTML = '&#9888; Testing Period ('+periodStart.value+') is <strong>before</strong> the online effective time (2026-04-15). Comparison is not meaningful &mdash; please adjust the Period.';
     if (btn) { btn.style.opacity='0.5'; btn.style.cursor='not-allowed'; btn.disabled=true; }
   }
 }
