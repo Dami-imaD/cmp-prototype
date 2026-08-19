@@ -2303,7 +2303,7 @@ TS_C001_V1.3_S2  Daily K     [Draft]
 
           <div style="display:flex;gap:16px;margin-bottom:14px;">
             <div style="flex:1;"><div style="font-size:11px;color:#86909c;margin-bottom:4px;">Rule Category <span style="color:#f53f3f;">*</span></div><select id="cov-category-select" style="height:32px;font-size:12px;padding:0 10px;width:100%;" onchange="switchCovCategory(this.value)"><option value="C">C - Marking Open/Close</option><option value="A">A - Wash Trade</option><option value="B">B - Price Driver</option><option value="D">D - Order Manipulation</option><option value="E">E - Insider Trading</option></select><div style="font-size:10px;color:#86909c;margin-top:3px;">Filters the baseline data for the selected category</div></div>
-            <div style="flex:1;"><div style="font-size:11px;color:#86909c;margin-bottom:4px;">Period (Month) <span style="color:#f53f3f;">*</span></div><div style="display:flex;gap:6px;align-items:center;"><select id="cov-period-start" style="height:32px;font-size:12px;padding:0 8px;" ><option value="2025-06" selected>2025-06</option><option value="2025-07">2025-07</option><option value="2025-08">2025-08</option><option value="2025-09">2025-09</option></select><span style="color:#86909c;">~</span><select id="cov-period-end" style="height:32px;font-size:12px;padding:0 8px;" ><option value="2025-07">2025-07</option><option value="2025-08">2025-08</option><option value="2025-09" selected>2025-09</option><option value="2025-10">2025-10</option></select></div><div style="font-size:10px;color:#86909c;margin-top:3px;">Month-level range used to filter the baseline data</div></div>
+            <div style="flex:1;"><div style="font-size:11px;color:#86909c;margin-bottom:4px;">Period (Month) <span style="color:#f53f3f;">*</span></div><div style="display:flex;gap:6px;align-items:center;"><select id="cov-period-start" style="height:32px;font-size:12px;padding:0 8px;" onchange="covUpdateUploadSummary()"><option value="2025-06" selected>2025-06</option><option value="2025-07">2025-07</option><option value="2025-08">2025-08</option><option value="2025-09">2025-09</option></select><span style="color:#86909c;">~</span><select id="cov-period-end" style="height:32px;font-size:12px;padding:0 8px;" onchange="covUpdateUploadSummary()"><option value="2025-07">2025-07</option><option value="2025-08">2025-08</option><option value="2025-09" selected>2025-09</option><option value="2025-10">2025-10</option></select></div><div style="font-size:10px;color:#86909c;margin-top:3px;">Month-level range used to filter the baseline data</div></div>
           </div>
 
           <!-- Baseline Source -->
@@ -2331,10 +2331,7 @@ TS_C001_V1.3_S2  Daily K     [Draft]
             </div>
             <!-- Alert Tag Filter -->
             <div style="padding:12px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;margin-bottom:10px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <div style="font-size:11px;font-weight:500;">Alert Tag Filter</div>
-                <div style="font-size:10px;color:#86909c;">Defines which alerts count as a problem &rarr; used for Alert Coverage</div>
-              </div>
+              <div style="font-size:11px;font-weight:500;margin-bottom:6px;">Alert Tag Filter</div>
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Escalated</label>
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Reported</label>
@@ -2345,10 +2342,7 @@ TS_C001_V1.3_S2  Daily K     [Draft]
             </div>
             <!-- Client Tag Filter -->
             <div style="padding:12px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;margin-bottom:10px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <div style="font-size:11px;font-weight:500;">Client Tag Filter</div>
-                <div style="font-size:10px;color:#86909c;">Defines which accounts must be caught &rarr; used for Account Coverage</div>
-              </div>
+              <div style="font-size:11px;font-weight:500;margin-bottom:6px;">Client Tag Filter</div>
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Restricted</label>
                 <label style="font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:3px;"><input type="checkbox" checked> Terminated</label>
@@ -2378,27 +2372,22 @@ TS_C001_V1.3_S2  Daily K     [Draft]
               <span style="width:3px;height:13px;background:#00b42a;border-radius:2px;"></span>
               <span style="font-size:12px;font-weight:600;">Upload Data</span>
             </div>
-            <div style="border:2px dashed var(--border);border-radius:6px;padding:16px;text-align:center;cursor:pointer;margin-bottom:8px;position:relative;" onmouseover="this.style.borderColor='#FFC107'" onmouseout="this.style.borderColor='#e5e6eb'" onclick="document.getElementById('cov-file-input').click()">
-              <input type="file" id="cov-file-input" style="display:none;" accept=".xlsx,.xls,.csv" onchange="handleCovUpload(this)">
+            <input type="file" id="cov-file-input" style="display:none;" accept=".xlsx,.xls,.csv" onchange="handleCovUpload(this)">
+            <!-- Empty state: drop zone -->
+            <div id="cov-dropzone" style="border:2px dashed var(--border);border-radius:6px;padding:16px;text-align:center;cursor:pointer;margin-bottom:8px;" onmouseover="this.style.borderColor='#FFC107'" onmouseout="this.style.borderColor='#e5e6eb'" onclick="covPickFile()">
               <div style="font-size:20px;margin-bottom:4px;">&#128196;</div>
               <div style="font-size:12px;font-weight:500;">Click to upload file</div>
             </div>
-            <!-- Upload preview -->
-            <div id="cov-upload-preview" style="display:none;border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:8px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <span style="font-size:12px;font-weight:500;color:#00b42a;">&#10003; <span id="cov-upload-filename">external_baseline_2025H2.xlsx</span></span>
-                <button class="btn-link" style="font-size:11px;color:#f53f3f;" onclick="removeCovUpload()">Remove</button>
+            <!-- Uploaded state: file card -->
+            <div id="cov-upload-preview" style="display:none;border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:8px;background:#fff;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:18px;line-height:1;">&#128196;</span>
+                <div style="flex:1;min-width:0;">
+                  <a href="#" id="cov-upload-filename" style="font-size:12px;font-weight:500;color:#165dff;text-decoration:none;" title="Open the uploaded file" onclick="event.preventDefault();openCovFile()">external_baseline_2025H2.xlsx &#8599;</a>
+                  <div id="cov-upload-summary" style="font-size:11px;color:#86909c;margin-top:3px;">&#10003; 8 rows matched</div>
+                </div>
+                <button class="btn" style="font-size:11px;height:26px;padding:0 10px;color:#f53f3f;border-color:#f5c2c2;" onclick="removeCovUpload()">Remove</button>
               </div>
-              <div style="font-size:11px;color:#86909c;margin-bottom:6px;">8 rows matched Category C in selected period</div>
-              <table class="data-table" style="font-size:11px;">
-                <thead><tr><th>Account</th><th>Symbol</th><th>Month</th><th>Category</th></tr></thead>
-                <tbody>
-                  <tr><td>63780800</td><td>TROO</td><td>2025-08</td><td>C</td></tr>
-                  <tr><td>62479100</td><td>0700.HK</td><td>2025-07</td><td>C</td></tr>
-                  <tr><td>68488800</td><td>NTCL</td><td>2025-08</td><td>C</td></tr>
-                  <tr style="color:#86909c;"><td colspan="4" style="text-align:center;">...+5 rows (total: 8)</td></tr>
-                </tbody>
-              </table>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
               <span style="font-size:11px;color:#86909c;">Rows are filtered automatically by the selected Rule Category</span>
@@ -2411,7 +2400,7 @@ TS_C001_V1.3_S2  Daily K     [Draft]
         <!-- Step 2: Match Dimensions -->
         <div style="border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:16px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:8px;">2. Match Dimensions</div>
-          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">Choose which dimension combinations to match on; the match rate is calculated for each</div>
+          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">Match and calculate based on the selected dimensions.</div>
           <div style="display:flex;gap:12px;">
             <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:4px;"><input type="checkbox" checked disabled> Account</label>
             <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:4px;"><input type="checkbox" id="cov-dim-symbol" checked> + Symbol</label>
@@ -2422,14 +2411,13 @@ TS_C001_V1.3_S2  Daily K     [Draft]
         <!-- Load Step 3 button -->
         <div style="text-align:center;margin-bottom:16px;" id="cov-load-step3-btn">
           <button class="btn btn-primary" onclick="loadCovStep3()">Load Pinned Test IDs →</button>
-          <div style="font-size:11px;color:#86909c;margin-top:4px;">Load the 📌 pinned test records matching the configuration above</div>
         </div>
 
         <!-- Step 3: Select Test IDs (dynamic by category, hidden until loaded) -->
         <div id="cov-step3-panel" style="display:none;">
         <div style="border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:16px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:4px;" id="cov-step3-title">3. Select Test IDs (<span id="cov-step3-cat">Category C</span>)</div>
-          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">Only &#128204; pinned test records are shown. One parameter set per rule. Test time must fall within the month range selected in Step 1.</div>
+          <div style="font-size:11px;color:#86909c;margin-bottom:10px;">Only &#128204; pinned test records are shown. Test time must fall within the month range selected in Step 1.</div>
           <div id="cov-test-id-list" style="border:1px solid var(--border);border-radius:6px;overflow:hidden;">
 
             <!-- TS_C001 (multi-version example, radio per sub per version) -->
@@ -7745,9 +7733,8 @@ function switchCovVersion(ver) {
 // When category changes, reset Step 3 to require reload
 function switchCovCategory(cat) {
   document.getElementById('cov-step3-cat').textContent = 'Category ' + cat;
-  // Hide Step 3, show Load button again
-  document.getElementById('cov-step3-panel').style.display = 'none';
-  document.getElementById('cov-load-step3-btn').innerHTML = '<button class="btn btn-primary" onclick="loadCovStep3()">Load Pinned Test IDs \u2192</button><div style="font-size:11px;color:#86909c;margin-top:4px;">Load the \ud83d\udccc pinned test records matching the configuration above</div>';
+  resetCovStep3();
+  covUpdateUploadSummary();
 }
 
 // Category-specific test ID data
@@ -7760,22 +7747,123 @@ var covCatData = {
 };
 var covDefaultCHtml = null; // will store C's original HTML on first load
 
+var covBaselineSrc = 'upload';          // matches the option pre-selected in the markup
+var covSystemPanelDefaultHtml = null;   // pristine System Data filters, for reset
+
 function switchCovBaseline(src) {
+  // Snapshot the untouched System Data filters on the first switch, which always
+  // happens before the panel can be edited (Upload Data is the default source).
+  if (covSystemPanelDefaultHtml === null) {
+    covSystemPanelDefaultHtml = document.getElementById('cov-system-panel').innerHTML;
+  }
+
   document.querySelectorAll('#cov-baseline-group .baseline-src-option').forEach(function(el){ el.classList.remove('selected'); });
   event.currentTarget.classList.add('selected');
+
+  if (src !== covBaselineSrc) {
+    var had = { system: covBaselineSrc!=='upload', upload: covBaselineSrc!=='system' };
+    var keeps = { system: src!=='upload', upload: src!=='system' };
+    var cleared = [];
+    // Drop whatever belonged to a source that just went out of scope — it was
+    // configured against the old baseline and must not silently carry over.
+    if (had.upload && !keeps.upload && covUploadUrl) { removeCovUpload(); cleared.push('uploaded file'); }
+    if (had.system && !keeps.system) { resetCovSystemPanel(); cleared.push('System Data filters'); }
+    resetCovStep3();
+    covBaselineSrc = src;
+    if (cleared.length) covToast('Baseline source changed — ' + cleared.join(' and ') + ' cleared');
+  }
+
   document.getElementById('cov-upload-panel').style.display = (src==='upload'||src==='both') ? '' : 'none';
   document.getElementById('cov-system-panel').style.display = (src==='system'||src==='both') ? '' : 'none';
 }
 
-function handleCovUpload(input) {
-  if (input.files.length > 0) {
-    document.getElementById('cov-upload-filename').textContent = input.files[0].name;
-    document.getElementById('cov-upload-preview').style.display = '';
+function resetCovSystemPanel() {
+  if (covSystemPanelDefaultHtml !== null) {
+    document.getElementById('cov-system-panel').innerHTML = covSystemPanelDefaultHtml;
   }
 }
 
+// Any Step 1 change invalidates the loaded test records, so send Step 3 back to
+// its "not loaded yet" state.
+function resetCovStep3() {
+  document.getElementById('cov-step3-panel').style.display = 'none';
+  document.getElementById('cov-load-step3-btn').innerHTML = '<button class="btn btn-primary" onclick="loadCovStep3()">Load Pinned Test IDs →</button>';
+}
+
+function covToast(msg) {
+  var prev = document.getElementById('cov-toast');
+  if (prev) prev.remove(); // rapid switches shouldn't stack toasts on top of each other
+  var toast = document.createElement('div');
+  toast.id = 'cov-toast';
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1d2129;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:9999;';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.remove(); }, 2600);
+}
+
+var covUploadUrl = null;   // object URL of the uploaded file, so it can be opened
+var covUploadRows = 0;     // matched row count reported back to the user
+
+// Used by both the empty drop zone and the Replace button. Clearing the value
+// first means picking the same file again still fires onchange.
+function covPickFile() {
+  var input = document.getElementById('cov-file-input');
+  input.value = '';
+  input.click();
+}
+
+function handleCovUpload(input) {
+  if (!input.files.length) return;
+  var file = input.files[0];
+
+  if (covUploadUrl) URL.revokeObjectURL(covUploadUrl);
+  covUploadUrl = URL.createObjectURL(file);
+
+  document.getElementById('cov-upload-filename').innerHTML = file.name + ' &#8599;';
+  document.getElementById('cov-dropzone').style.display = 'none';
+  document.getElementById('cov-upload-preview').style.display = '';
+
+  // Row count only — the column layout is validated on the backend, so the
+  // prototype never mirrors the template fields.
+  if (/\.(csv|txt)$/i.test(file.name)) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var rows = String(e.target.result).split(/\r?\n/).filter(function(l){ return l.trim() !== ''; });
+      covUploadRows = Math.max(rows.length - 1, 0); // drop the header row
+      covUpdateUploadSummary();
+    };
+    reader.readAsText(file);
+  } else {
+    covUploadRows = 8; // mock: binary Excel isn't parsed in the prototype
+    covUpdateUploadSummary();
+  }
+}
+
+function covUpdateUploadSummary() {
+  var el = document.getElementById('cov-upload-summary');
+  if (!el || document.getElementById('cov-upload-preview').style.display === 'none') return;
+  var cat = document.getElementById('cov-category-select').value;
+  var from = document.getElementById('cov-period-start').value;
+  var to = document.getElementById('cov-period-end').value;
+  if (covUploadRows > 0) {
+    el.style.color = '#00b42a';
+    el.innerHTML = '&#10003; ' + covUploadRows + ' row' + (covUploadRows > 1 ? 's' : '') +
+      ' matched <span style="color:#86909c;">Category ' + cat + ' &middot; ' + from + ' ~ ' + to + '</span>';
+  } else {
+    el.style.color = '#f53f3f';
+    el.innerHTML = '&#9888; No rows matched Category ' + cat + ' &middot; ' + from + ' ~ ' + to;
+  }
+}
+
+function openCovFile() {
+  if (covUploadUrl) window.open(covUploadUrl, '_blank');
+}
+
 function removeCovUpload() {
+  if (covUploadUrl) { URL.revokeObjectURL(covUploadUrl); covUploadUrl = null; }
+  covUploadRows = 0;
   document.getElementById('cov-upload-preview').style.display = 'none';
+  document.getElementById('cov-dropzone').style.display = '';
   document.getElementById('cov-file-input').value = '';
 }
 
