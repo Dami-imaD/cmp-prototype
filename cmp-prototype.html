@@ -7233,7 +7233,7 @@ WHERE a.dominance_ratio > {ratio}
       <div style="text-align:center;padding:16px;margin-bottom:14px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(135deg,#fffdf0 0%,#fff8f0 100%);">
         <div id="cov-result-rate" style="font-size:36px;font-weight:700;color:#00b42a;">91.7%</div>
         <div id="cov-result-rate-label" style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Coverage Rate (Account)</div>
-        <div id="cov-result-rate-sub" style="font-size:11px;color:#86909c;margin-top:2px;">Baseline 12 Account groups, 11 matched by the test</div>
+        <div id="cov-result-rate-sub" style="font-size:11px;color:#86909c;margin-top:2px;">12 baseline Account groups, 11 matched by the test.</div>
       </div>
 
       <!-- Matched list -->
@@ -7916,7 +7916,7 @@ function showCoverageResult() {
   document.getElementById('cov-result-rate').textContent = rate;
   document.getElementById('cov-result-rate').style.color = rateColor;
   document.getElementById('cov-result-rate-label').textContent = 'Coverage Rate (' + dimLabel + ')';
-  document.getElementById('cov-result-rate-sub').textContent = 'Baseline ' + baseCount + ' ' + dimLabel + ' groups, ' + matchCount + ' matched by the test';
+  document.getElementById('cov-result-rate-sub').textContent = baseCount + ' baseline ' + dimLabel + ' groups, ' + matchCount + ' matched by the test.';
   document.getElementById('cov-result-matched-count').textContent = 'Matched (' + matchCount + ')';
   document.getElementById('cov-result-matched-table').innerHTML = matchedHtml;
   document.getElementById('cov-result-unmatched-count').textContent = 'Unmatched (' + unmatchedCount + ')';
