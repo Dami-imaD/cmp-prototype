@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOS - Alert Viewer / AUTO_PARSED</title>
+<style>
+:root {
+  --accent: #FFC107;
+  --accent-hover: #e6ad00;
+  --bg: #ffffff;
+  --text: #1d2129;
+  --text-secondary: #4e5969;
+  --border: #e5e6eb;
+  --header-bg: #f7f8fa;
+  --row-hover: #fafbfc;
+  --success: #00b42a;
+  --warning: #ff7d00;
+  --info: #165dff;
+  --gray: #86909c;
+  --ai: #722ed1;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  min-width: 1400px;
+}
+
+/* Top Navigation */
+.top-nav {
+  height: 48px; background: #fff; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px;
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo { font-weight: 700; font-size: 14px; margin-right: 24px; cursor: pointer; white-space: nowrap; }
+.nav-items { display: flex; align-items: center; gap: 4px; flex: 1; }
+.nav-item { padding: 6px 12px; cursor: pointer; border-radius: 4px; white-space: nowrap; font-size: 13px; color: var(--text); position: relative; }
+.nav-item:hover { background: var(--header-bg); }
+.nav-item.active { background: var(--accent); color: #000; font-weight: 500; }
+.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; white-space: nowrap; }
+.nav-right .search-icon, .nav-right .download-icon { cursor: pointer; padding: 4px; }
+.nav-user { font-size: 12px; color: var(--text-secondary); }
+
+.dropdown-menu {
+  position: absolute; top: 100%; left: 0; background: #fff;
+  border: 1px solid var(--border); border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-width: 180px; z-index: 200;
+  display: none; padding: 4px 0;
+}
+.dropdown-menu.show { display: block; }
+.dropdown-item { padding: 8px 16px; cursor: pointer; font-size: 13px; }
+.dropdown-item:hover { background: var(--header-bg); }
+
+.breadcrumb { padding: 12px 24px; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+.breadcrumb span { margin: 0 4px; }
+
+.page-container { padding: 20px 24px; display: none; }
+.page-container.active { display: block; }
+
+/* Form controls */
+select, input[type="text"], input[type="date"] {
+  height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: 4px;
+  font-size: 13px; color: var(--text); background: #fff; outline: none;
+}
+select:focus, input[type="text"]:focus { border-color: var(--accent); }
+input[type="text"] { width: 240px; }
+
+.btn { height: 32px; padding: 0 16px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; cursor: pointer; background: #fff; color: var(--text); display: inline-flex; align-items: center; gap: 4px; }
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 500; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-link { border: none; background: none; color: var(--info); padding: 0 4px; height: auto; font-size: 13px; cursor: pointer; }
+.btn-link:hover { color: #4080ff; }
+.btn-link:disabled { color: #c9cdd4; cursor: not-allowed; }
+
+/* Tables */
+.data-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); table-layout: fixed; }
+.data-table th { background: var(--header-bg); padding: 10px 10px; text-align: left; font-weight: 500; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; overflow: hidden; }
+.data-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.data-table td:hover { white-space: normal; overflow: visible; }
+.data-table tr:hover td { background: var(--row-hover); }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; display: none; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 8px; width: 560px; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; }
+.modal-close { cursor: pointer; font-size: 18px; color: var(--gray); }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+.form-group input[type="text"], .form-group select, .form-group textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px;
+  font-size: 13px; font-family: inherit; line-height: 1.5; height: 38px; background: #fff; color: var(--text);
+}
+.form-group input[type="text"]:disabled, .form-group select:disabled, .form-group textarea:disabled {
+  background: #f5f5f5; color: #86909c; cursor: not-allowed; border-color: #e5e6eb;
+}
+.form-group textarea { min-height: 80px; resize: vertical; height: auto; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+.req { color: #f53f3f; }
+
+.back-link { display: inline-flex; align-items: center; gap: 4px; color: var(--text-secondary); font-size: 13px; cursor: pointer; margin-bottom: 16px; text-decoration: none; }
+.back-link:hover { color: var(--text); }
+.section-title { font-size: 15px; font-weight: 700; margin: 24px 0 12px; padding-bottom: 8px;
+                 border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+/* Basic Info / Workflow Info / Attachments —— same size & weight */
+.sub-head { font-size: 13px; font-weight: 600; color: var(--text); margin: 16px 0 8px; }
+.sub-head-note { font-size: 11px; font-weight: 400; color: var(--gray); margin-left: 4px; }
+.desc-box { margin-top:6px; padding:10px 12px; border:1px solid var(--border);
+            border-radius:4px; background:#fafbfc; line-height:1.8; }
+
+/* 就地编辑：仅作用于 Alert Detail 模块 */
+.form-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:0 20px; }
+.fg { margin-bottom:14px; }
+.fg label { display:block; margin-bottom:5px; font-size:12px; color:var(--text-secondary); font-weight:500; }
+.fg input[type="text"], .fg select, .fg textarea {
+  width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:4px;
+  font-size:13px; font-family:inherit; line-height:1.5; height:34px; background:#fff; color:var(--text);
+}
+.fg textarea { min-height:78px; height:auto; resize:vertical; }
+.fg input:disabled, .fg select:disabled, .fg textarea:disabled {
+  background:#f5f5f5; color:#86909c; cursor:not-allowed;
+}
+.edit-hint { background:#e8f3ff; border:1px solid #bedaff; border-radius:6px; padding:9px 12px;
+             font-size:12px; color:var(--text-secondary); margin-bottom:6px; }
+.edit-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px;
+                padding-top:14px; border-top:1px solid var(--border); }
+
+/* 字段溯源标签：AI 解析 / 人工调整 */
+.prov-tag { display:inline-block; padding:1px 6px; border-radius:3px; font-size:10px;
+            font-weight:700; vertical-align:1px; white-space:nowrap; cursor:default; }
+.prov-ai     { background:#f5f0ff; color:var(--ai); }
+.prov-edited { background:#fff7e8; color:#c47b00; }
+.conf-edited { background:#fff7e8; color:#c47b00; }
+
+/* 可点来源标签 */
+.badge-clickable { cursor:pointer; }
+.badge-clickable:hover { background:#e9d5ff; }
+
+/* 判类依据弹窗 */
+.cr-verdict { display:flex; align-items:center; gap:10px; background:#f6ffed; border:1px solid #b7eb8f;
+              border-radius:6px; padding:12px 14px; margin-bottom:16px; }
+.cr-verdict .crv { font-size:15px; font-weight:700; color:#00b42a; }
+.cr-sec { font-size:13px; font-weight:600; margin:18px 0 8px; }
+.cr-sec:first-of-type { margin-top:0; }
+.cr-ev { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; line-height:1.7;
+         background:#fafbfc; border:1px solid var(--border); border-radius:3px; padding:5px 7px;
+         display:block; white-space:pre-wrap; word-break:break-word; color:#1d2129; }
+.cr-excl { font-size:12px; line-height:2; color:var(--text-secondary); }
+.cr-excl li { margin-left:18px; }
+.cr-note { background:#fafbfc; border:1px solid var(--border); border-radius:6px;
+           padding:11px 13px; font-size:12px; line-height:1.9; }
+
+/* AI 解析来源：字段标记 + JSON 抽屉 */
+.src-bar { display:flex; align-items:center; gap:12px; background:#faf7ff; border:1px solid #e3d2fa;
+           border-radius:6px; padding:8px 12px; font-size:12px; color:var(--text-secondary); margin-bottom:14px; }
+.src-bar > span { flex:1; }
+.src-chip { display:inline-block; margin-left:6px; padding:1px 6px; border-radius:3px; background:#f5f0ff;
+            color:var(--ai); font-size:10px; font-weight:700; cursor:pointer; vertical-align:1px; }
+.src-chip:hover { background:#e9d5ff; }
+.conf { display:inline-block; margin-left:4px; padding:1px 5px; border-radius:3px; font-size:10px; font-weight:600; vertical-align:1px; }
+.conf-high   { background:#e8ffea; color:#00b42a; }
+.conf-medium { background:#fff7e8; color:#c47b00; }
+.conf-low    { background:#ffece8; color:#f53f3f; }
+.fg.fg-active { background:#faf7ff; border-radius:6px; box-shadow:0 0 0 2px #d3adf7; }
+
+.json-drawer { position:fixed; top:0; right:0; bottom:0; width:440px; background:#fff; z-index:500;
+               border-left:1px solid var(--border); box-shadow:-4px 0 18px rgba(0,0,0,.08);
+               transform:translateX(100%); transition:transform .22s ease; display:flex; flex-direction:column; }
+.json-drawer.open { transform:translateX(0); }
+.jd-head { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center;
+           gap:8px; font-size:14px; font-weight:700; }
+.jd-close { margin-left:auto; cursor:pointer; color:var(--gray); font-size:18px; }
+.jd-hint { padding:9px 16px; background:#faf7ff; border-bottom:1px solid #e3d2fa;
+           font-size:11px; color:var(--ai); line-height:1.7; }
+.jd-body { flex:1; overflow-y:auto; padding:12px 14px 40px; }
+.jb { border:1px solid transparent; border-radius:5px; padding:6px 8px; margin-bottom:2px; cursor:pointer; }
+.jb:hover { background:#fafbfc; }
+.jb.jb-active { background:#faf7ff; border-color:#d3adf7; }
+.jb pre { margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px;
+          line-height:1.75; white-space:pre-wrap; word-break:break-word; color:#1d2129; }
+.jb .jk { color:#722ed1; font-weight:600; }
+.jb .jv { color:#0b7285; }
+.jb .jn { color:#c9cdd4; }
+.jb-tag { display:inline-block; margin-left:6px; padding:0 5px; border-radius:3px; background:#f2f3f5;
+          color:var(--gray); font-size:10px; font-weight:600; }
+
+/* Market Visualizer */
+.mv-legend { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--accent);
+             border-radius:4px; padding:5px 12px; font-size:12px; margin-bottom:10px; }
+.mv-dot { width:11px; height:11px; border-radius:50%; display:inline-block; }
+.mv-chart { border:1px solid var(--border); border-radius:6px; padding:8px 4px; background:#fff; }
+
+/* Parsing Summary —— AUTO_PARSED 的邮件解析要素 */
+.ps-box { border:1px solid var(--border); border-radius:6px; background:#fafbfc; padding:4px 14px; }
+.ps-row { display:flex; gap:16px; padding:9px 0; border-bottom:1px solid #eef0f3; font-size:12px; line-height:1.85; }
+.ps-row:last-child { border-bottom:none; }
+.ps-k { color:var(--gray); min-width:120px; flex:none; }
+.ps-v { flex:1; }
+
+/* Manage 弹窗 — Alert Comment 模板区 */
+.tpl-box { border:1px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:12px; }
+.tpl-head { padding:11px 14px; background:var(--header-bg); font-size:13px; font-weight:500;
+            cursor:pointer; display:flex; align-items:center; gap:8px; }
+.tpl-head .tri { font-size:10px; display:inline-block; transition:transform .2s; }
+.tpl-box.closed .tri { transform:rotate(-90deg); }
+.tpl-box.closed .tpl-body { display:none; }
+.tpl-body { padding:12px 14px 14px; }
+.tpl-group { font-size:13px; font-weight:700; margin-bottom:9px; }
+.tpl-item { display:flex; align-items:center; gap:8px; font-size:13px; padding:3px 0; cursor:pointer; }
+.tpl-warn { background:#fffbe6; border:1px solid #ffe58f; border-radius:6px; padding:12px 14px;
+            display:flex; gap:10px; align-items:flex-start; font-size:13px; margin-bottom:12px; }
+.tpl-warn .tw-icon { width:18px; height:18px; border-radius:50%; background:#fa8c16; color:#fff;
+                     font-size:12px; font-weight:700; display:flex; align-items:center;
+                     justify-content:center; flex:none; margin-top:1px; }
+.pagination { display: flex; align-items: center; justify-content: flex-end; padding: 12px 0; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+.pagination span { padding: 4px 8px; border: 1px solid var(--border); border-radius: 3px; cursor: pointer; }
+.pagination span.current { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 500; }
+
+/* ---------- NEW: Alert Source badges ---------- */
+.src-badge { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 11px; font-weight: 600; letter-spacing: .2px; white-space: nowrap; }
+.src-rule   { background: #e8f3ff; color: #165dff; }
+.src-manual { background: #fff7e8; color: #c47b00; }
+.src-auto   { background: #f5f0ff; color: var(--ai); }
+
+.score-ok   { display:inline-block; padding:1px 7px; border:1px solid #00b42a; color:#00b42a; border-radius:3px; font-size:12px; }
+.score-high { display:inline-block; padding:1px 7px; border:1px solid #f53f3f; color:#f53f3f; border-radius:3px; font-size:12px; }
+
+/* Owner = System / unassigned */
+.owner-system { display:inline-flex; align-items:center; gap:4px; padding:2px 7px; border-radius:3px; background:#f2f3f5; color:#86909c; font-size:11px; font-weight:600; }
+
+/* AI Anomaly Assessment（线上已有模块，位于 Alert Detail 上方） */
+.aa-wrap { border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:22px; }
+.aa-wrap.is-disabled .aa-head, .aa-wrap.is-disabled .aa-params { opacity:.65; }
+.aa-head { display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border); }
+.aa-badge { padding:2px 8px; border-radius:4px; background:#e8f3ff; color:#165dff; font-size:12px; font-weight:700; }
+.aa-title { font-size:15px; font-weight:700; }
+.aa-help { color:var(--gray); cursor:pointer; font-size:12px; }
+.aa-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.aa-lang { display:inline-flex; border:1px solid var(--border); border-radius:4px; }
+.aa-lang span { padding:4px 13px; font-size:12px; cursor:pointer; color:var(--text-secondary); }
+.aa-lang span.on { background:#fffbe6; color:#c47b00; font-weight:600; border:1px solid var(--accent); border-radius:4px; margin:-1px; }
+.aa-gen { font-size:12px; color:var(--text-secondary); }
+.aa-params { display:flex; gap:48px; padding:13px 16px; background:var(--header-bg); border-bottom:1px solid var(--border); font-size:13px; }
+.aa-params .k { color:var(--text-secondary); }
+.aa-body { padding:16px; display:flex; gap:16px; align-items:stretch; }
+.aa-score { width:160px; min-width:160px; border:1px solid #b7eb8f; background:#f6ffed; border-radius:6px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; padding:26px 0; }
+.aa-score .n { font-size:40px; font-weight:700; color:#00b42a; line-height:1; }
+.aa-score .l { font-size:12px; color:#00b42a; margin-top:10px; }
+.aa-verdict { flex:1; border:1px solid #b7eb8f; background:#f6ffed; border-radius:6px; padding:16px 18px; }
+.aa-verdict .vt { font-size:15px; font-weight:700; color:#00b42a; margin-bottom:10px; }
+.aa-verdict .vp { font-size:13px; line-height:1.85; }
+.aa-collapse { margin:0 16px 16px; border:1px solid var(--border); border-radius:6px; }
+.aa-ch { padding:12px 16px; background:var(--header-bg); font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; }
+.aa-ch .tri { font-size:10px; display:inline-block; transition:transform .2s; }
+.aa-collapse.closed .tri { transform:rotate(-90deg); }
+.aa-collapse.closed .aa-cb { display:none; }
+.aa-cb { padding:14px 18px; }
+.aa-sub { font-size:13px; font-weight:700; color:#165dff; margin:12px 0 6px; }
+.aa-sub:first-child { margin-top:0; }
+.aa-cb ul { margin:0 0 4px 18px; }
+.aa-cb li { font-size:13px; line-height:1.95; }
+
+/* Attachments */
+.attach-drop {
+  border: 1px dashed var(--border); border-radius: 6px; padding: 26px;
+  text-align: center; color: var(--gray); cursor: pointer; background: #fafbfc; font-size: 13px;
+}
+.attach-drop:hover { border-color: var(--accent); }
+.attach-drop .ad-hint { font-size: 11px; color: #b0b4bd; margin-top: 6px; }
+.attach-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  border: 1px solid var(--border); border-radius: 4px; margin-bottom: 8px; font-size: 12px;
+}
+.attach-item .ai-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attach-item .ai-meta { color: var(--gray); font-size: 11px; white-space: nowrap; }
+.attach-from-email { background: #faf7ff; border-color: #e3d2fa; }
+
+/* 顶部状态概览：等宽卡片，点击即按状态筛选 */
+/* 顶部状态筛选器：紧凑单行卡片，宽度按内容固定、整体靠左 */
+.stat-strip { display:grid; grid-template-columns:repeat(5,126px); gap:8px;
+              justify-content:start; margin-bottom:14px; }
+.stat-cell { border:1px solid var(--border); border-radius:5px; padding:6px 11px;
+             cursor:pointer; background:#fff; display:flex; align-items:center; gap:8px;
+             transition:border-color .15s, background .15s; }
+.stat-cell:hover { border-color:var(--accent); background:#fffdf5; }
+.stat-cell.on { border-color:var(--accent); background:#fffbe6; }
+.stat-cell .sc-k { font-size:12px; color:var(--text-secondary); display:flex;
+                   align-items:center; gap:6px; flex:1; white-space:nowrap; }
+.stat-cell.on .sc-k { color:var(--text); font-weight:500; }
+.stat-cell .sc-dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex:none; }
+.stat-cell .sc-v { font-size:15px; font-weight:700; line-height:1.2; }
+
+.filter-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 20px; margin-bottom:12px; }
+.filter-row .fl { font-size:12px; color:var(--text-secondary); margin-bottom:4px; }
+.filter-row textarea { width:100%; height:32px; resize:none; border:1px solid var(--border); border-radius:4px; padding:6px 10px; font-size:12px; font-family:inherit; }
+.filter-row select { width:100%; }
+
+.kv-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px 40px; font-size:12px; line-height:2; }
+.kv-grid .k { color:var(--gray); }
+
+/* 空态 + 信息提示条 */
+.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:42px 0; }
+.empty-state .es-text { font-size:13px; margin-top:10px; color:#a9aeb8; }
+.empty-box { border:1px solid var(--border); border-radius:4px; }
+.empty-box .eb-head { height:40px; background:var(--header-bg); border-bottom:1px solid var(--border); }
+.info-banner { background:#e8f3ff; border:1px solid #bedaff; border-radius:6px; padding:14px 16px; display:flex; gap:12px; margin:22px 0; }
+.info-banner .ib-icon { width:20px; height:20px; border-radius:50%; background:#165dff; color:#fff; font-size:12px;
+                        font-weight:700; display:flex; align-items:center; justify-content:center; flex:none; margin-top:2px; }
+.info-banner .ib-t { font-size:14px; font-weight:600; margin-bottom:5px; }
+.info-banner .ib-d { font-size:12px; line-height:1.85; color:var(--text-secondary); }
+.tbl-tools { display:flex; justify-content:flex-end; gap:14px; color:var(--gray); font-size:13px; margin:12px 0 8px; }
+
+</style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<div class="top-nav">
+  <div class="nav-logo">BOS &#9660;</div>
+  <div class="nav-items">
+    <div class="nav-item">Policy &#9660;</div>
+    <div class="nav-item">Rule Management &#9660;</div>
+    <div class="nav-item">Data Analysis &#9660;</div>
+    <div class="nav-item active" id="nav-compliance" onclick="toggleDropdown('compliance-dropdown')">
+      Compliance Monitoring &#9660;
+      <div class="dropdown-menu" id="compliance-dropdown">
+        <div class="dropdown-item" onclick="showPage('alertmgmt')">Alert Viewer</div>
+        <div class="dropdown-item">Case Management</div>
+        <div class="dropdown-item">WatchList Viewer</div>
+      </div>
+    </div>
+    <div class="nav-item">Accounts &#9660;</div>
+    <div class="nav-item">Employee Track &#9660;</div>
+    <div class="nav-item">更多</div>
+  </div>
+  <div class="nav-right">
+    <span class="search-icon">&#128269;</span>
+    <span class="download-icon">&#8681;</span>
+    <span class="nav-user">zhou BJT:CST</span>
+  </div>
+</div>
+
+
+<!-- ==================================================================== -->
+<!-- PAGE: Alert Viewer (list)                                            -->
+<!-- ==================================================================== -->
+<div class="page-container active" id="page-alertmgmt">
+  <div class="breadcrumb">合规管理 <span>&gt;</span> Compliance Monitoring <span>&gt;</span> Alert Viewer</div>
+  <div style="padding:20px 24px;">
+
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;">
+      <span style="padding:8px 16px;font-size:14px;font-weight:500;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-2px;">TS Alerts</span>
+      <span style="padding:8px 16px;font-size:14px;color:var(--text-secondary);">TM Alerts</span>
+    </div>
+
+    <!-- Stat strip: the Unassigned cell is the entry point for AUTO_PARSED triage -->
+    <div class="stat-strip" id="stat-strip"></div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <div><div class="fl">ID</div><textarea placeholder="Bulk queries separated by line breaks or &quot;,&quot;, up to 100"></textarea></div>
+      <div><div class="fl">Account ID</div><textarea placeholder="Bulk queries separated by line breaks or &quot;,&quot;, up to 100"></textarea></div>
+      <div><div class="fl">Symbol</div><textarea placeholder="Bulk queries separated by line breaks or &quot;,&quot;, up to 100"></textarea></div>
+      <!-- NEW filter: Alert Source -->
+      <div><div class="fl">Alert Source <span class="src-badge src-auto" style="font-size:10px;">NEW</span></div>
+        <select id="f-alert-source" onchange="renderAlertRows()">
+          <option value="">All</option>
+          <option value="RULE_BASED">RULE_BASED</option>
+          <option value="MANUAL">MANUAL</option>
+          <option value="AUTO_PARSED">AUTO_PARSED</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-row">
+      <div><div class="fl">License</div><select><option value="">Please select</option><option>TBHK</option><option>TBSG</option><option>TBNZ</option></select></div>
+      <div><div class="fl">Rule Name</div><select><option value="">Please select</option><option>Market Dominance at Close</option><option>Possible Wash Trade</option><option>Pump and Dump</option></select></div>
+      <div><div class="fl">Market</div><select><option value="">Please select</option><option>HK</option><option>US</option><option>SG</option><option>AU</option></select></div>
+      <div><div class="fl">System Hit Time</div>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <input type="text" placeholder="Start Date" style="width:45%;height:32px;padding:0 8px;font-size:12px;">
+          <span style="color:#86909c;">→</span>
+          <input type="text" placeholder="End Date" style="width:45%;height:32px;padding:0 8px;font-size:12px;">
+        </div>
+      </div>
+    </div>
+    <div class="filter-row">
+      <div><div class="fl">Alert Tag</div><select><option value="">Please select</option><option>Escalated</option><option>In the Inquiry</option><option>Regulator Inquiry</option></select></div>
+      <div><div class="fl">Owner</div>
+        <select id="f-owner" onchange="renderAlertRows()">
+          <option value="">Please select</option>
+          <option value="--">-- (Unassigned)</option>
+          <option value="pemela">pemela</option>
+          <option value="zhou">zhou</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn btn-primary" style="border-radius:20px;padding:0 16px;">&#128269; 查询</button>
+      <button class="btn" style="border-radius:20px;">重 置</button>
+      <button class="btn" style="border-radius:20px;">Export</button>
+      <button class="btn" style="border-radius:20px;" onclick="showModal('modal-create-manual-alert')">+ Manual Alert</button>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:13px;color:var(--text-secondary);">0 Alerts selected, <strong id="alert-total">6</strong> Alerts in total</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="bulk-action-select" style="height:30px;font-size:12px;padding:0 8px;min-width:150px;">
+          <option value="manage">Bulk Manage Alerts</option>
+          <option value="link">Bulk Link Cases</option>
+        </select>
+        <button class="btn" style="height:30px;font-size:12px;">Execute</button>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+    <table class="data-table" style="min-width:1480px;">
+      <thead><tr>
+        <th style="width:30px;"><input type="checkbox"></th>
+        <th style="width:66px;">ID</th>
+        <th style="width:112px;">Alert Source</th>
+        <th style="width:86px;">System Risk Score</th>
+        <th style="width:70px;">AI Risk Score</th>
+        <th style="width:112px;">System Hit Time</th>
+        <th style="width:92px;">Account Id</th>
+        <th style="width:66px;">Symbol</th>
+        <th style="width:56px;">License</th>
+        <th style="width:150px;">Rule Name</th>
+        <th style="width:64px;">Status</th>
+        <th style="width:110px;">Alert Tag</th>
+        <th style="width:92px;">Owner</th>
+        <th style="width:74px;">Case Code</th>
+        <th style="width:168px;">Operation</th>
+      </tr></thead>
+      <tbody id="alert-tbody"></tbody>
+    </table>
+    </div>
+    <div class="pagination"><span>&#8249;</span><span class="current">1</span><span>2</span><span>3</span><span>&#8250;</span><span style="border:none;margin-left:8px;">Total 6 items</span></div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- PAGE: Alert Detail — AUTO_PARSED                                     -->
+<!-- ==================================================================== -->
+<div class="page-container" id="page-alertdetail-auto">
+  <div class="breadcrumb">CMP <span>&gt;</span> Compliance Monitoring <span>&gt;</span> Alert Viewer <span>&gt;</span> Detail</div>
+  <div style="padding:20px 24px;">
+    <a class="back-link" onclick="showPage('alertmgmt')">&#8592; Back</a>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:17px;font-weight:700;">4363712</span>
+        <span class="src-badge src-auto badge-clickable" onclick="showModal('modal-classify-reason')"
+              title="查看判类依据：为什么这封邮件被并入问询 Alert">AUTO_PARSED &#9432;</span>
+      </div>
+      <button class="btn" id="auto-edit-btn" style="height:30px;font-size:13px;" onclick="detailEdit('auto',true)">Edit</button>
+    </div>
+
+        <!-- ============ Alert Detail ============ -->
+    <div class="section-title">Alert Detail</div>
+
+    <div id="auto-detail-view">
+<div class="sub-head">Basic Info</div>
+    <div class="kv-grid">
+      <div><span class="k">Account ID：</span><strong id="vv-client_identifiers">60015200</strong></div>
+      <div><span class="k">Symbol：</span><strong id="vv-symbols">NTCL</strong></div>
+      <div><span class="k">Client Tag：</span>--</div>
+
+      <div><span class="k">Alert Status：</span><strong style="color:var(--warning);">New</strong></div>
+      <div><span class="k">Alert Source：</span><span class="src-badge src-auto">AUTO_PARSED</span></div>
+      <div><span class="k">Rule Category：</span><strong>Ramping</strong></div>
+
+      <div><span class="k">System Hit Time：</span>2026-08-13 09:24:11 GMT+8</div>
+      <div><span class="k">Last Trigger Time：</span><span id="vv-last_trigger_date">2026-08-08 15:59:22 GMT+8</span></div>
+      <div><span class="k">Alert Tag：</span>Regulator Inquiry</div>
+
+      <div><span class="k">Risk Level：</span>--</div>
+      <div><span class="k">System Risk Score：</span>--</div>
+      <div><span class="k">License：</span><strong>TBNZ</strong></div>
+
+      <div><span class="k">Market：</span><strong>HK</strong></div>
+      <div><span class="k">External Source Tag：</span><strong>Upstream Broker</strong></div>
+      <div><span class="k">Source Reference：</span>TDHK-INQ-2026-0813-07</div>
+    </div>
+
+    <div class="sub-head">Workflow Info</div>
+    <div class="kv-grid">
+      <div><span class="k">Alert Owner：</span><span style="color:#c9cdd4;">--</span></div>
+      <div><span class="k">Assign Time：</span>--</div>
+      <div></div>
+
+      <div><span class="k">Linked Case Code：</span>--</div>
+      <div><span class="k">Linked Case Name：</span>--</div>
+      <div><span class="k">Linked Case Owner：</span>--</div>
+
+      <div><span class="k">Last Operation Time：</span>--</div>
+      <div></div>
+      <div></div>
+    </div>
+    <div style="font-size:12px;margin-top:12px;">
+      <span class="k" style="color:var(--gray);">Description：</span>
+      <div class="desc-box" style="color:var(--gray);">--</div>
+    </div>
+
+    <div class="sub-head">Parsing Summary</div>
+    <div class="ps-box">
+      <div class="ps-row"><span class="ps-k">From</span><span class="ps-v">surveillance@broker-hk.example.com</span></div>
+      <div class="ps-row"><span class="ps-k">To</span><span class="ps-v">compliance-nz@broker-nz.example.com</span></div>
+      <div class="ps-row"><span class="ps-k">Subject</span><span class="ps-v">[Inquiry] Trading activity review – NTCL – SUB-8841200</span></div>
+      <div class="ps-row"><span class="ps-k">Reply Deadline</span><span class="ps-v"><strong id="vv-reply_deadline" style="color:#f53f3f;">2026-08-20</strong></span></div>
+      <div class="ps-row"><span class="ps-k">Content</span><span class="ps-v"><span id="vv-description">Upstream broker requests a review of trading activity in NTCL between 2026-07-28 and 2026-08-08 for client identifier SUB-8841200. Suspected ramping ahead of the close. Order and trade detail requested, together with the client's stated trading strategy.</span></span></div>
+    </div>
+
+    <div class="sub-head">Attachments <span class="sub-head-note">3 files</span></div>
+    <div class="attach-item attach-from-email">
+      <span>&#128206;</span>
+      <span class="ai-name">Inquiry_NTCL_SUB-8841200.eml</span>
+      <span class="src-badge src-auto">FROM EMAIL</span>
+      <span class="ai-meta">148 KB · 2026-08-13 09:24</span>
+      <button class="btn-link" style="font-size:12px;">Download</button>
+    </div>
+    <div class="attach-item attach-from-email">
+      <span>&#128206;</span>
+      <span class="ai-name">NTCL_trade_list_20260728_20260808.xlsx</span>
+      <span class="src-badge src-auto">FROM EMAIL</span>
+      <span class="ai-meta">62 KB · 2026-08-13 09:24</span>
+      <button class="btn-link" style="font-size:12px;">Download</button>
+    </div>
+    <div class="attach-item">
+      <span>&#128206;</span>
+      <span class="ai-name">internal_review_screenshot.png</span>
+      <span class="ai-meta">Uploaded by pemela · 210 KB · 2026-08-13 14:02</span>
+      <button class="btn-link" style="font-size:12px;">Download</button>
+    </div>
+    <div style="font-size:11px;color:var(--gray);margin-top:6px;">
+      Email attachments (including the .eml original) are ingested automatically.
+      All attachments can be added or removed in Edit.
+    </div>
+
+    </div>
+
+<div id="auto-detail-edit" style="display:none;">
+      <div class="edit-hint">Editing <strong>Alert Detail</strong> only. Other modules on this page are unaffected. Save or cancel below.</div>
+
+      <div class="src-bar">
+        <span>标记 <span class="prov-tag prov-ai">PARSED</span> 的字段由 AI 从来源邮件解析得出，人工改动保存后变为 <span class="prov-tag prov-edited">人工调整</span>；点击 <span class="src-chip">来源</span> 可定位到解析结果原文</span>
+        <button class="btn" style="height:28px;font-size:12px;" onclick="toggleJson()">&#128269; AI Extraction JSON</button>
+      </div>
+
+      <div class="sub-head">Basic Info</div>
+      <div class="form-grid-3">
+        <div class="fg" id="fg-client_identifiers"><label><span class="req">*</span> Account ID<span class="src-chip" onclick="showSrc('client_identifiers')" title="查看 AI 解析来源">来源</span><span id="eb-client_identifiers"><span class="prov-tag prov-ai">PARSED</span></span></label><input id="ei-client_identifiers" oninput="markDirty('client_identifiers')" type="text" value="60015200"></div>
+        <div class="fg" id="fg-symbols"><label><span class="req">*</span> Symbol<span class="src-chip" onclick="showSrc('symbols')" title="查看 AI 解析来源">来源</span><span id="eb-symbols"><span class="prov-tag prov-ai">PARSED</span></span></label><input id="ei-symbols" oninput="markDirty('symbols')" type="text" value="NTCL"></div>
+        <div class="fg"><label>Client Tag</label><select><option>--</option><option>VIP</option><option>Institutional</option></select></div>
+        <div class="fg"><label>Alert Status</label><input type="text" value="New" disabled></div>
+        <div class="fg"><label>Alert Source</label><input type="text" value="AUTO_PARSED" disabled></div>
+        <div class="fg"><label><span class="req">*</span> Rule Category</label><select><option>Ramping</option><option>Spoofing</option><option>Market Dominance at Close</option><option>Possible Wash Trade</option><option>Pump and Dump</option><option>Possible Insider Trading</option><option>Other</option></select></div>
+        <div class="fg"><label>System Hit Time</label><input type="text" value="2026-08-13 09:24:11 GMT+8" disabled></div>
+        <div class="fg" id="fg-last_trigger_date"><label><span class="req">*</span> Last Trigger Time<span class="src-chip" onclick="showSrc('last_trigger_date')" title="查看 AI 解析来源">来源</span><span id="eb-last_trigger_date"><span class="prov-tag prov-ai">PARSED</span></span></label><input id="ei-last_trigger_date" oninput="markDirty('last_trigger_date')" type="text" value="2026-08-08 15:59:22 GMT+8"></div>
+        <div class="fg"><label>Alert Tag</label><input type="text" value="Regulator Inquiry" disabled></div>
+        <div class="fg"><label>Risk Level</label><select><option>--</option><option>Low</option><option>Medium</option><option>High</option></select></div>
+        <div class="fg"><label>System Risk Score</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label><span class="req">*</span> License</label><select><option>TBNZ</option><option>TBHK</option><option>TBSG</option></select></div>
+        <div class="fg"><label><span class="req">*</span> Market</label><select><option>HK</option><option>US</option><option>SG</option><option>AU</option></select></div>
+        <div class="fg"><label><span class="req">*</span> External Source Tag</label><select><option>Upstream Broker</option><option>Exchange / Regulator</option><option>FINRA</option><option>SFC</option><option>Internal Referral</option></select></div>
+        <div class="fg"><label>Source Reference</label><input type="text" value="TDHK-INQ-2026-0813-07"></div>
+      </div>
+
+      <div class="sub-head">Workflow Info</div>
+      <div class="form-grid-3">
+        <div class="fg"><label>Alert Owner</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label>Assign Time</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label>Last Operation Time</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label>Linked Case Code</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label>Linked Case Name</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label>Linked Case Owner</label><input type="text" value="--" disabled></div>
+      </div>
+      <div class="fg" style="margin-top:4px;">
+        <label>Description</label>
+        <textarea placeholder="Please enter"></textarea>
+      </div>
+
+      <div class="sub-head">Parsing Summary</div>
+      <div class="form-grid-3">
+        <div class="fg"><label>From</label><input type="text" value="surveillance@broker-hk.example.com" disabled></div>
+        <div class="fg"><label>To</label><input type="text" value="compliance-nz@broker-nz.example.com" disabled></div>
+        <div class="fg" id="fg-reply_deadline"><label>Reply Deadline<span class="src-chip" onclick="showSrc('reply_deadline')" title="查看 AI 解析来源">来源</span><span id="eb-reply_deadline"><span class="prov-tag prov-ai">PARSED</span></span></label><input id="ei-reply_deadline" oninput="markDirty('reply_deadline')" type="text" value="2026-08-20"></div>
+      </div>
+      <div class="fg"><label>Subject</label><input type="text" value="[Inquiry] Trading activity review – NTCL – SUB-8841200" disabled></div>
+      <div class="fg" id="fg-description"><label>Content<span class="src-chip" onclick="showSrc('description')" title="查看 AI 解析来源">来源</span><span id="eb-description"><span class="prov-tag prov-ai">PARSED</span></span></label><textarea id="ei-description" oninput="markDirty('description')" style="min-height:92px;">Upstream broker requests a review of trading activity in NTCL between 2026-07-28 and 2026-08-08 for client identifier SUB-8841200. Suspected ramping ahead of the close. Order and trade detail requested, together with the client's stated trading strategy.</textarea></div>
+
+      <div class="sub-head">Attachments</div>
+      <div class="attach-item attach-from-email"><span>&#128206;</span><span class="ai-name">Inquiry_NTCL_SUB-8841200.eml</span><span class="src-badge src-auto">FROM EMAIL</span><span class="ai-meta">148 KB</span><button class="btn-link" style="font-size:12px;">Download</button><button class="btn-link" style="font-size:12px;color:#f53f3f;">Delete</button></div>
+      <div class="attach-item attach-from-email"><span>&#128206;</span><span class="ai-name">NTCL_trade_list_20260728_20260808.xlsx</span><span class="src-badge src-auto">FROM EMAIL</span><span class="ai-meta">62 KB</span><button class="btn-link" style="font-size:12px;">Download</button><button class="btn-link" style="font-size:12px;color:#f53f3f;">Delete</button></div>
+      <div class="attach-item"><span>&#128206;</span><span class="ai-name">internal_review_screenshot.png</span><span class="ai-meta">210 KB</span><button class="btn-link" style="font-size:12px;">Download</button><button class="btn-link" style="font-size:12px;color:#f53f3f;">Delete</button></div>
+      <div class="attach-drop" style="margin-top:10px;" onclick="alert('File picker — multi-select supported.')">
+        &#128206;<br>Click to upload evidence files
+        <div class="ad-hint">Multi-select · PDF/PNG/JPG/CSV/XLSX · &le;10MB each</div>
+      </div>
+
+      <div class="edit-actions">
+        <button class="btn" onclick="detailEdit('auto',false)">Cancel</button>
+        <button class="btn btn-primary" onclick="detailSave('auto')">Save</button>
+      </div>
+    </div>
+<!-- ============ AI Anomaly Assessment (unavailable for non-rule-based) ============ -->
+    <div class="section-title">AI Anomaly Assessment</div>
+    <div class="aa-wrap is-disabled">
+      <div class="aa-head">
+        <span class="aa-badge">AI</span>
+        <span class="aa-title">Anomaly Assessment</span>
+        <span class="aa-help">&#9432;</span>
+        </div>
+      <div class="aa-params">
+        <div><span class="k">Accounts：</span></div>
+        <div><span class="k">Symbol：</span></div>
+        <div><span class="k">From：</span></div>
+        <div><span class="k">To：</span></div>
+        <div><span class="k">Market：</span></div>
+      </div>
+      <div class="empty-state">
+        <svg width="58" height="40" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+          <path d="M6 25 L17 8 H47 L58 25 V35 A3 3 0 0 1 55 38 H9 A3 3 0 0 1 6 35 Z" fill="#FAFBFC" stroke="#E5E6EB" stroke-width="1.6"/>
+          <path d="M6 25 H21 a2 2 0 0 1 2 2 v1 a3 3 0 0 0 3 3 h12 a3 3 0 0 0 3-3 v-1 a2 2 0 0 1 2-2 h15" stroke="#E5E6EB" stroke-width="1.6" fill="none"/>
+        </svg>
+        <div class="es-text" style="max-width:720px;text-align:center;line-height:1.8;">
+          Unavailable for non-rule-based alerts. These alerts do not contain sufficient structured data for
+          AI-generated risk assessment. Please proceed with manual review.
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ Trigger Fields ============ -->
+    <div class="section-title">Trigger Fields</div>
+    <div class="empty-state">
+      <svg width="58" height="40" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+        <path d="M6 25 L17 8 H47 L58 25 V35 A3 3 0 0 1 55 38 H9 A3 3 0 0 1 6 35 Z" fill="#FAFBFC" stroke="#E5E6EB" stroke-width="1.6"/>
+        <path d="M6 25 H21 a2 2 0 0 1 2 2 v1 a3 3 0 0 0 3 3 h12 a3 3 0 0 0 3-3 v-1 a2 2 0 0 1 2-2 h15" stroke="#E5E6EB" stroke-width="1.6" fill="none"/>
+      </svg>
+      <div class="es-text">No Data</div>
+    </div>
+
+    <!-- ============ Alert-related Data ============ -->
+    <div class="section-title">Alert-related Data &#9432;</div>
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);">
+      <span style="padding:6px 16px;font-size:13px;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-2px;cursor:pointer;">Orders</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Trade</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Order Operation Log</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Events</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Related Accounts</span>
+      <div style="margin-left:auto;font-size:12px;color:var(--info);cursor:pointer;align-self:center;">&#8681; download</div>
+    </div>
+    <div class="tbl-tools"><span>&#9096;</span><span>&#9881;</span><span>&#8942;</span><span>&#10530;</span></div>
+    <div class="empty-box">
+      <div class="eb-head"></div>
+      <div class="empty-state">
+        <svg width="58" height="40" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+          <path d="M6 25 L17 8 H47 L58 25 V35 A3 3 0 0 1 55 38 H9 A3 3 0 0 1 6 35 Z" fill="#FAFBFC" stroke="#E5E6EB" stroke-width="1.6"/>
+          <path d="M6 25 H21 a2 2 0 0 1 2 2 v1 a3 3 0 0 0 3 3 h12 a3 3 0 0 0 3-3 v-1 a2 2 0 0 1 2-2 h15" stroke="#E5E6EB" stroke-width="1.6" fill="none"/>
+        </svg>
+        <div class="es-text">No Data</div>
+      </div>
+    </div>
+
+    <!-- ============ Market Visualizer ============ -->
+    <div class="section-title">Market Visualizer</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+      <input type="text" value="2026-07-28" style="width:120px;height:32px;font-size:12px;">
+      <span style="color:#86909c;">→</span>
+      <input type="text" value="2026-08-08" style="width:120px;height:32px;font-size:12px;">
+    </div>
+    <div class="empty-state">
+      <svg width="58" height="40" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+        <path d="M6 25 L17 8 H47 L58 25 V35 A3 3 0 0 1 55 38 H9 A3 3 0 0 1 6 35 Z" fill="#FAFBFC" stroke="#E5E6EB" stroke-width="1.6"/>
+        <path d="M6 25 H21 a2 2 0 0 1 2 2 v1 a3 3 0 0 0 3 3 h12 a3 3 0 0 0 3-3 v-1 a2 2 0 0 1 2-2 h15" stroke="#E5E6EB" stroke-width="1.6" fill="none"/>
+      </svg>
+      <div class="es-text">No Data</div>
+    </div>
+
+    <!-- ============ Alert Operation Log ============ -->
+    <div class="section-title">Alert Operation Log</div>
+    <table class="data-table" style="font-size:12px;">
+      <thead><tr><th style="width:230px;">Operation Time</th><th style="width:170px;">Operator</th><th style="width:150px;">Operation</th><th>Operation Detail</th></tr></thead>
+      <tbody id="auto-oplog">
+        <tr>
+          <td>2026-08-13 14:02:30 GMT+8</td><td>pemela</td><td>Edit</td>
+          <td style="white-space:normal;line-height:1.8;">
+            Assign to: pemela (Owner changed from System)<br>
+            Edit field: Account ID (AI value: empty → 60015200)<br>
+            Add attachment: internal_review_screenshot.png
+          </td>
+        </tr>
+        <tr>
+          <td>2026-08-13 09:24:11 GMT+8</td><td>System</td><td>Create</td>
+          <td style="white-space:normal;line-height:1.8;">
+            Alert Source: AUTO_PARSED<br>
+            Source email Message-ID: &lt;CAF9x2..@mail.example&gt;<br>
+            Ingest attachment: 2 files from email<br>
+            Assign to: System (unassigned)
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pagination"><span>&#8249;</span><span class="current">1</span><span>&#8250;</span><span style="border:none;margin-left:8px;">20 / page</span></div>
+  </div>
+</div>
+
+
+<!-- ==================================================================== -->
+<!-- PAGE: Alert Detail — RULE_BASED                                      -->
+<!-- ==================================================================== -->
+<div class="page-container" id="page-alertdetail">
+  <div class="breadcrumb">CMP <span>&gt;</span> Compliance Monitoring <span>&gt;</span> Alert Viewer <span>&gt;</span> Detail</div>
+  <div style="padding:20px 24px;">
+    <a class="back-link" onclick="showPage('alertmgmt')">&#8592; Back</a>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:17px;font-weight:700;">4363639</span>
+        <span class="src-badge src-rule">RULE_BASED</span>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <button class="btn-link" style="font-size:13px;">Export</button>
+        <button class="btn-link" style="font-size:13px;" onclick="openManage('RULE_BASED')">Manage</button>
+        <button class="btn-link" style="font-size:13px;" onclick="showModal('modal-alert-link')">Link</button>
+      </div>
+    </div>
+
+    <div class="section-title">Alert Detail</div>
+
+    <div class="sub-head">Basic Info</div>
+    <div class="kv-grid">
+      <div><span class="k">Account ID：</span><strong>23535100</strong></div>
+      <div><span class="k">Symbol：</span><strong>01536</strong></div>
+      <div><span class="k">Client Tag：</span>--</div>
+
+      <div><span class="k">Alert Status：</span><strong style="color:var(--warning);">New</strong></div>
+      <div><span class="k">Alert Source：</span><span class="src-badge src-rule">RULE_BASED</span></div>
+      <div><span class="k">Rule Name：</span><strong>Possible Insider Trading before Sensitive Announcement</strong></div>
+
+      <div><span class="k">System Hit Time：</span>2026-09-16 11:20:04 GMT+8</div>
+      <div><span class="k">Last Trigger Time：</span>2026-09-14 13:06:01 GMT+8</div>
+      <div><span class="k">Alert Tag：</span>--</div>
+
+      <div><span class="k">Risk Level：</span>--</div>
+      <div><span class="k">System Risk Score：</span><span class="score-ok">2.53</span></div>
+      <div></div>
+    </div>
+    <div style="font-size:11px;color:var(--gray);margin-top:10px;">
+      RULE_BASED alerts have no External Source Tag / Source Reference and no Attachments —
+      those belong to MANUAL / AUTO_PARSED only.
+    </div>
+
+    <div class="sub-head">Workflow Info</div>
+    <div class="kv-grid">
+      <div><span class="k">Alert Owner：</span><span style="color:#c9cdd4;">--</span></div>
+      <div><span class="k">Assign Time：</span>--</div>
+      <div></div>
+
+      <div><span class="k">Linked Case Code：</span>--</div>
+      <div><span class="k">Linked Case Name：</span>--</div>
+      <div><span class="k">Linked Case Owner：</span>--</div>
+
+      <div><span class="k">Last Operation Time：</span>--</div>
+      <div></div>
+      <div></div>
+    </div>
+    <div style="font-size:12px;margin-top:12px;">
+      <span class="k" style="color:var(--gray);">Description：</span> --
+    </div>
+
+    <div class="section-title">AI Anomaly Assessment</div>
+    <div class="aa-wrap">
+      <div class="aa-head">
+        <span class="aa-badge">AI</span>
+        <span class="aa-title">Anomaly Assessment</span>
+        <span class="aa-help">&#9432;</span>
+        <div class="aa-right">
+          <div class="aa-lang"><span class="on">EN</span><span>CN</span></div>
+          <span class="aa-gen">Generated 2026-09-16 11:30:00 GMT+8</span>
+          <button class="btn" style="height:30px;font-size:12px;" disabled>&#8635; Rerun</button>
+          <button class="btn" style="height:30px;font-size:12px;">&#128337; Last Result</button>
+          <button class="btn" style="height:30px;font-size:12px;">&#8635; Refresh</button>
+        </div>
+      </div>
+      <div class="aa-params">
+        <div><span class="k">Accounts：</span>23535100</div>
+        <div><span class="k">Symbol：</span>01536</div>
+        <div><span class="k">From：</span>2026-09-09</div>
+        <div><span class="k">To：</span>2026-09-14</div>
+        <div><span class="k">Market：</span>HK</div>
+      </div>
+      <div class="aa-body">
+        <div class="aa-score"><div class="n">1</div><div class="l">Anomaly Score</div></div>
+        <div class="aa-verdict">
+          <div class="vt">No obvious anomalous behavior detected - Insider Trading</div>
+          <div class="vp">
+            Overall data summary: The account accumulated 01536 across 2026-09-09 to 2026-09-14, ahead of a
+            shareholding-disclosure announcement dated 2026-09-15. All orders were limit buy-to-open with no
+            cancellations. The account's share of market volume over the window was 9.5%, and no position was
+            reduced after the announcement, which is inconsistent with a typical information-advantage pattern.
+          </div>
+        </div>
+      </div>
+      <div class="aa-collapse" id="aa-collapse-rule" onclick="toggleAA('aa-collapse-rule')">
+        <div class="aa-ch"><span class="tri">&#9660;</span> Data Analysis</div>
+        <div class="aa-cb">
+          <div class="aa-sub">Order Features</div>
+          <ul>
+            <li>All orders were BUY (buy), Open (open position), Long (long position), order type LMT (limit order).</li>
+            <li>All orders were fully executed (filledQuantity equals totalQuantity), with no cancellation or modification records.</li>
+            <li>No sell order was placed in the five trading days following the announcement date.</li>
+          </ul>
+          <div class="aa-sub">Conclusion</div>
+          <ul>
+            <li>No pattern consistent with trading on a sensitive announcement was identified.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ Trigger Fields ============ -->
+    <div class="section-title">Trigger Fields</div>
+    <div style="overflow-x:auto;">
+    <table class="data-table" style="font-size:12px;min-width:1320px;">
+      <thead><tr><th style="width:90px;">Account</th><th style="width:70px;">Symbol</th><th style="width:60px;">action</th><th style="width:90px;">Quantity</th><th style="width:90px;">Amount</th><th style="width:110px;">Market Volume</th><th style="width:150px;">Hight Low Amplitude</th><th style="width:160px;">Close Price Movement</th><th style="width:130px;">Announcement Date</th><th>newsTitle</th></tr></thead>
+      <tbody>
+        <tr><td>23535100</td><td>01536</td><td>BUY</td><td>1840000</td><td>1102400</td><td>19460000</td><td>0.6923076923076923</td><td>0.0714285714285714</td><td>20260915</td><td>港股股权披露 晟通集团控股有限公司</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============ Alert-related Data ============ -->
+    <div class="section-title">Alert-related Data &#9432;</div>
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);">
+      <span style="padding:6px 16px;font-size:13px;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-2px;cursor:pointer;">Orders</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Trade</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Order Operation Log</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Events</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Related Accounts</span>
+      <div style="margin-left:auto;font-size:12px;color:var(--info);cursor:pointer;align-self:center;">&#8681; download</div>
+    </div>
+    <div class="tbl-tools"><span>&#9096;</span><span>&#9881;</span><span>&#8942;</span><span>&#10530;</span></div>
+    <div style="overflow-x:auto;">
+    <table class="data-table" style="font-size:12px;min-width:1500px;">
+      <thead><tr><th>Account ID</th><th>License</th><th>Master Account</th><th>Symbol</th><th>Security Type</th><th>Market</th><th>Executing Broker</th><th>Submit Time</th><th>Status Update Time</th><th>Order ID</th><th>Order Type</th><th>Action</th><th>Open / Close</th><th>Long / Short</th><th>Order Duration</th></tr></thead>
+      <tbody>
+        <tr><td>23535100</td><td>TBNZ</td><td>--</td><td>01536</td><td>STK</td><td>HK</td><td>TBHK</td><td>2026-09-14 13:06:01</td><td>2026-09-14 13:06:13</td><td>90210034500118200</td><td>LMT</td><td>BUY</td><td>Open</td><td>Long</td><td>DAY</td></tr>
+        <tr><td>23535100</td><td>TBNZ</td><td>--</td><td>01536</td><td>STK</td><td>HK</td><td>TBHK</td><td>2026-09-11 13:17:46</td><td>2026-09-11 13:17:45</td><td>90210031200774300</td><td>LMT</td><td>BUY</td><td>Open</td><td>Long</td><td>DAY</td></tr>
+        <tr><td>23535100</td><td>TBNZ</td><td>--</td><td>01536</td><td>STK</td><td>HK</td><td>TBHK</td><td>2026-09-11 11:04:58</td><td>2026-09-11 11:10:50</td><td>90210030600521900</td><td>LMT</td><td>BUY</td><td>Open</td><td>Long</td><td>DAY</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============ Market Visualizer ============ -->
+    <div class="section-title">Market Visualizer</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+      <input type="text" value="2026-09-09" style="width:120px;height:32px;font-size:12px;">
+      <span style="color:#86909c;">→</span>
+      <input type="text" value="2026-09-14" style="width:120px;height:32px;font-size:12px;">
+    </div>
+    <div class="mv-legend">
+      Buy <span class="mv-dot" style="background:#2f7ff0;"></span>
+      Sell <span class="mv-dot" style="background:#f5601a;"></span>
+      [23535100] Trades: [186] &nbsp;Volume: [7540000] &nbsp;Value: [4.12M]
+    </div>
+    <div class="mv-chart"><svg viewBox="0 0 1160 340" width="100%" style="display:block;">
+  <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#4a9bff" stop-opacity=".30"/>
+    <stop offset="100%" stop-color="#4a9bff" stop-opacity=".02"/>
+  </linearGradient></defs>
+  <text x="52" y="235" font-size="10" fill="#f5601a" text-anchor="end">0.494</text><line x1="60" y1="232" x2="1130" y2="232" stroke="#f2f3f5" stroke-width="1"/><text x="52" y="180" font-size="10" fill="#f5601a" text-anchor="end">0.511</text><line x1="60" y1="177" x2="1130" y2="177" stroke="#f2f3f5" stroke-width="1"/><text x="52" y="125" font-size="10" fill="#f5601a" text-anchor="end">0.527</text><line x1="60" y1="122" x2="1130" y2="122" stroke="#f2f3f5" stroke-width="1"/><text x="52" y="70" font-size="10" fill="#f5601a" text-anchor="end">0.544</text><line x1="60" y1="67" x2="1130" y2="67" stroke="#f2f3f5" stroke-width="1"/><text x="52" y="15" font-size="10" fill="#f5601a" text-anchor="end">0.560</text><line x1="60" y1="12" x2="1130" y2="12" stroke="#f2f3f5" stroke-width="1"/>
+  <polygon points="60.0,232.0 60.0,177.0 69.0,185.2 78.0,190.3 87.0,192.2 96.0,175.4 105.0,174.6 113.9,184.9 122.9,173.9 131.9,188.2 140.9,178.8 149.9,184.2 158.9,188.5 167.9,175.9 176.9,187.2 185.9,181.6 194.9,165.3 203.9,159.1 212.9,168.8 221.8,157.3 230.8,157.9 239.8,168.4 248.8,165.3 257.8,149.1 266.8,142.6 275.8,130.9 284.8,145.6 293.8,138.3 302.8,133.2 311.8,134.3 320.8,123.7 329.7,128.4 338.7,144.2 347.7,157.5 356.7,143.8 365.7,129.1 374.7,135.7 383.7,137.1 392.7,152.1 401.7,158.6 410.7,154.8 419.7,143.0 428.7,153.3 437.6,151.8 446.6,140.5 455.6,137.1 464.6,149.6 473.6,131.5 482.6,146.3 491.6,135.9 500.6,143.2 509.6,157.6 518.6,145.7 527.6,134.4 536.6,128.3 545.5,110.1 554.5,93.1 563.5,91.3 572.5,88.7 581.5,88.9 590.5,89.4 599.5,90.1 608.5,101.0 617.5,89.9 626.5,74.4 635.5,89.9 644.5,75.1 653.4,60.2 662.4,54.2 671.4,67.0 680.4,63.3 689.4,78.1 698.4,59.2 707.4,61.2 716.4,75.9 725.4,71.3 734.4,62.8 743.4,76.2 752.4,70.1 761.3,52.8 770.3,70.2 779.3,73.2 788.3,63.4 797.3,57.6 806.3,51.8 815.3,68.6 824.3,79.2 833.3,95.1 842.3,103.3 851.3,90.5 860.3,86.6 869.2,94.2 878.2,95.0 887.2,108.1 896.2,107.4 905.2,108.8 914.2,97.8 923.2,114.7 932.2,132.1 941.2,133.4 950.2,145.7 959.2,142.2 968.2,153.7 977.1,150.5 986.1,136.4 995.1,123.2 1004.1,136.0 1013.1,152.3 1022.1,139.2 1031.1,135.8 1040.1,143.3 1049.1,129.3 1058.1,111.7 1067.1,97.9 1076.1,107.8 1085.0,124.5 1094.0,126.1 1103.0,131.9 1112.0,113.4 1121.0,116.1 1130.0,97.8 1130.0,232.0" fill="url(#pg)"/>
+  <polyline points="60.0,177.0 69.0,185.2 78.0,190.3 87.0,192.2 96.0,175.4 105.0,174.6 113.9,184.9 122.9,173.9 131.9,188.2 140.9,178.8 149.9,184.2 158.9,188.5 167.9,175.9 176.9,187.2 185.9,181.6 194.9,165.3 203.9,159.1 212.9,168.8 221.8,157.3 230.8,157.9 239.8,168.4 248.8,165.3 257.8,149.1 266.8,142.6 275.8,130.9 284.8,145.6 293.8,138.3 302.8,133.2 311.8,134.3 320.8,123.7 329.7,128.4 338.7,144.2 347.7,157.5 356.7,143.8 365.7,129.1 374.7,135.7 383.7,137.1 392.7,152.1 401.7,158.6 410.7,154.8 419.7,143.0 428.7,153.3 437.6,151.8 446.6,140.5 455.6,137.1 464.6,149.6 473.6,131.5 482.6,146.3 491.6,135.9 500.6,143.2 509.6,157.6 518.6,145.7 527.6,134.4 536.6,128.3 545.5,110.1 554.5,93.1 563.5,91.3 572.5,88.7 581.5,88.9 590.5,89.4 599.5,90.1 608.5,101.0 617.5,89.9 626.5,74.4 635.5,89.9 644.5,75.1 653.4,60.2 662.4,54.2 671.4,67.0 680.4,63.3 689.4,78.1 698.4,59.2 707.4,61.2 716.4,75.9 725.4,71.3 734.4,62.8 743.4,76.2 752.4,70.1 761.3,52.8 770.3,70.2 779.3,73.2 788.3,63.4 797.3,57.6 806.3,51.8 815.3,68.6 824.3,79.2 833.3,95.1 842.3,103.3 851.3,90.5 860.3,86.6 869.2,94.2 878.2,95.0 887.2,108.1 896.2,107.4 905.2,108.8 914.2,97.8 923.2,114.7 932.2,132.1 941.2,133.4 950.2,145.7 959.2,142.2 968.2,153.7 977.1,150.5 986.1,136.4 995.1,123.2 1004.1,136.0 1013.1,152.3 1022.1,139.2 1031.1,135.8 1040.1,143.3 1049.1,129.3 1058.1,111.7 1067.1,97.9 1076.1,107.8 1085.0,124.5 1094.0,126.1 1103.0,131.9 1112.0,113.4 1121.0,116.1 1130.0,97.8" fill="none" stroke="#2f7ff0" stroke-width="1.4"/>
+  <polyline points="60.0,177.0 69.0,181.1 78.0,184.2 87.0,186.2 96.0,184.0 105.0,182.4 113.9,182.8 122.9,181.7 131.9,182.4 140.9,182.0 149.9,182.8 158.9,183.1 167.9,181.7 176.9,181.2 185.9,181.8 194.9,180.9 203.9,178.3 212.9,177.8 221.8,174.7 230.8,172.6 239.8,171.0 248.8,168.7 257.8,166.0 266.8,161.5 275.8,156.5 284.8,154.5 293.8,152.4 302.8,148.9 311.8,146.6 320.8,143.1 329.7,139.1 338.7,137.0 347.7,137.9 356.7,138.0 365.7,137.8 374.7,136.8 383.7,136.7 392.7,138.6 401.7,141.0 410.7,144.1 419.7,145.6 428.7,146.5 437.6,145.9 446.6,145.6 455.6,146.4 464.6,147.8 473.6,147.3 482.6,146.7 491.6,144.4 500.6,143.2 509.6,144.7 518.6,143.9 527.6,142.2 536.6,141.0 545.5,138.3 554.5,132.6 563.5,128.6 572.5,122.8 581.5,118.1 590.5,112.8 599.5,106.0 608.5,101.5 617.5,97.1 626.5,91.7 635.5,89.7 644.5,87.9 653.4,84.8 662.4,81.3 671.4,79.1 680.4,76.5 689.4,75.3 698.4,71.1 707.4,68.3 716.4,68.4 725.4,66.6 734.4,65.3 743.4,66.9 752.4,68.5 761.3,67.1 770.3,67.8 779.3,67.3 788.3,67.7 797.3,67.4 806.3,65.0 815.3,64.7 824.3,66.3 833.3,68.2 842.3,71.5 851.3,75.3 860.3,77.0 869.2,79.0 878.2,82.2 887.2,87.3 896.2,92.8 905.2,96.8 914.2,98.7 923.2,100.7 932.2,103.5 941.2,107.8 950.2,113.7 959.2,118.5 968.2,124.4 977.1,128.6 986.1,131.5 995.1,133.0 1004.1,136.8 1013.1,140.5 1022.1,141.2 1031.1,141.5 1040.1,141.2 1049.1,140.0 1058.1,135.8 1067.1,130.5 1076.1,127.6 1085.0,127.8 1094.0,126.8 1103.0,124.7 1112.0,122.2 1121.0,120.2 1130.0,115.7" fill="none" stroke="#f5a623" stroke-width="1.3"/>
+  <circle cx="113.9" cy="184.9" r="5.5" fill="#2f7ff0" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="176.9" cy="187.2" r="5.4" fill="#f5601a" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="239.8" cy="168.4" r="5.3" fill="#f5601a" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="365.7" cy="129.1" r="4.2" fill="#2f7ff0" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="428.7" cy="153.3" r="4.4" fill="#2f7ff0" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="491.6" cy="135.9" r="4.7" fill="#f5601a" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="554.5" cy="93.1" r="6.8" fill="#f5601a" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="617.5" cy="89.9" r="6.1" fill="#2f7ff0" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="680.4" cy="63.3" r="4.8" fill="#f5601a" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="806.3" cy="51.8" r="5.8" fill="#f5601a" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="869.2" cy="94.2" r="5.8" fill="#f5601a" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="932.2" cy="132.1" r="4.6" fill="#2f7ff0" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="995.1" cy="123.2" r="6.8" fill="#f5601a" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="1058.1" cy="111.7" r="4.9" fill="#2f7ff0" stroke="#fff" stroke-width="1.6" opacity=".9"/>
+  <line x1="60" y1="232" x2="1130" y2="232" stroke="#e5e6eb"/>
+  <rect x="58.0" y="292.6" width="3" height="39.4" fill="#26a69a" opacity=".62"/><rect x="67.0" y="283.6" width="3" height="48.4" fill="#ef5350" opacity=".62"/><rect x="76.0" y="307.0" width="3" height="25.0" fill="#26a69a" opacity=".62"/><rect x="85.0" y="259.9" width="3" height="72.1" fill="#26a69a" opacity=".62"/><rect x="94.0" y="295.9" width="3" height="36.1" fill="#26a69a" opacity=".62"/><rect x="103.0" y="298.7" width="3" height="33.3" fill="#26a69a" opacity=".62"/><rect x="111.9" y="300.1" width="3" height="31.9" fill="#26a69a" opacity=".62"/><rect x="120.9" y="325.5" width="3" height="6.5" fill="#26a69a" opacity=".62"/><rect x="129.9" y="324.0" width="3" height="8.0" fill="#26a69a" opacity=".62"/><rect x="138.9" y="302.2" width="3" height="29.8" fill="#26a69a" opacity=".62"/><rect x="147.9" y="311.4" width="3" height="20.6" fill="#26a69a" opacity=".62"/><rect x="156.9" y="286.1" width="3" height="45.9" fill="#26a69a" opacity=".62"/><rect x="165.9" y="327.9" width="3" height="4.1" fill="#26a69a" opacity=".62"/><rect x="174.9" y="312.9" width="3" height="19.1" fill="#ef5350" opacity=".62"/><rect x="183.9" y="318.5" width="3" height="13.5" fill="#ef5350" opacity=".62"/><rect x="192.9" y="326.3" width="3" height="5.7" fill="#26a69a" opacity=".62"/><rect x="201.9" y="273.2" width="3" height="58.8" fill="#26a69a" opacity=".62"/><rect x="210.9" y="254.5" width="3" height="77.5" fill="#26a69a" opacity=".62"/><rect x="219.8" y="281.5" width="3" height="50.5" fill="#ef5350" opacity=".62"/><rect x="228.8" y="258.1" width="3" height="73.9" fill="#ef5350" opacity=".62"/><rect x="237.8" y="313.1" width="3" height="18.9" fill="#ef5350" opacity=".62"/><rect x="246.8" y="325.6" width="3" height="6.4" fill="#26a69a" opacity=".62"/><rect x="255.8" y="326.3" width="3" height="5.7" fill="#ef5350" opacity=".62"/><rect x="264.8" y="317.0" width="3" height="15.0" fill="#26a69a" opacity=".62"/><rect x="273.8" y="310.5" width="3" height="21.5" fill="#26a69a" opacity=".62"/><rect x="282.8" y="309.8" width="3" height="22.2" fill="#26a69a" opacity=".62"/><rect x="291.8" y="317.7" width="3" height="14.3" fill="#26a69a" opacity=".62"/><rect x="300.8" y="296.1" width="3" height="35.9" fill="#26a69a" opacity=".62"/><rect x="309.8" y="268.1" width="3" height="63.9" fill="#ef5350" opacity=".62"/><rect x="318.8" y="315.4" width="3" height="16.6" fill="#ef5350" opacity=".62"/><rect x="327.7" y="291.2" width="3" height="40.8" fill="#ef5350" opacity=".62"/><rect x="336.7" y="319.8" width="3" height="12.2" fill="#26a69a" opacity=".62"/><rect x="345.7" y="321.1" width="3" height="10.9" fill="#26a69a" opacity=".62"/><rect x="354.7" y="324.5" width="3" height="7.5" fill="#26a69a" opacity=".62"/><rect x="363.7" y="321.8" width="3" height="10.2" fill="#ef5350" opacity=".62"/><rect x="372.7" y="315.1" width="3" height="16.9" fill="#26a69a" opacity=".62"/><rect x="381.7" y="327.6" width="3" height="4.4" fill="#26a69a" opacity=".62"/><rect x="390.7" y="323.1" width="3" height="8.9" fill="#26a69a" opacity=".62"/><rect x="399.7" y="321.4" width="3" height="10.6" fill="#ef5350" opacity=".62"/><rect x="408.7" y="314.0" width="3" height="18.0" fill="#26a69a" opacity=".62"/><rect x="417.7" y="313.5" width="3" height="18.5" fill="#ef5350" opacity=".62"/><rect x="426.7" y="319.4" width="3" height="12.6" fill="#26a69a" opacity=".62"/><rect x="435.6" y="323.4" width="3" height="8.6" fill="#26a69a" opacity=".62"/><rect x="444.6" y="293.3" width="3" height="38.7" fill="#ef5350" opacity=".62"/><rect x="453.6" y="321.6" width="3" height="10.4" fill="#26a69a" opacity=".62"/><rect x="462.6" y="279.0" width="3" height="53.0" fill="#26a69a" opacity=".62"/><rect x="471.6" y="302.8" width="3" height="29.2" fill="#26a69a" opacity=".62"/><rect x="480.6" y="263.7" width="3" height="68.3" fill="#ef5350" opacity=".62"/><rect x="489.6" y="309.8" width="3" height="22.2" fill="#ef5350" opacity=".62"/><rect x="498.6" y="313.5" width="3" height="18.5" fill="#26a69a" opacity=".62"/><rect x="507.6" y="311.9" width="3" height="20.1" fill="#ef5350" opacity=".62"/><rect x="516.6" y="308.9" width="3" height="23.1" fill="#ef5350" opacity=".62"/><rect x="525.6" y="306.9" width="3" height="25.1" fill="#ef5350" opacity=".62"/><rect x="534.6" y="302.8" width="3" height="29.2" fill="#ef5350" opacity=".62"/><rect x="543.5" y="287.5" width="3" height="44.5" fill="#26a69a" opacity=".62"/><rect x="552.5" y="310.3" width="3" height="21.7" fill="#ef5350" opacity=".62"/><rect x="561.5" y="303.4" width="3" height="28.6" fill="#26a69a" opacity=".62"/><rect x="570.5" y="284.0" width="3" height="48.0" fill="#ef5350" opacity=".62"/><rect x="579.5" y="300.7" width="3" height="31.3" fill="#26a69a" opacity=".62"/><rect x="588.5" y="281.2" width="3" height="50.8" fill="#26a69a" opacity=".62"/><rect x="597.5" y="324.8" width="3" height="7.2" fill="#ef5350" opacity=".62"/><rect x="606.5" y="317.4" width="3" height="14.6" fill="#ef5350" opacity=".62"/><rect x="615.5" y="320.9" width="3" height="11.1" fill="#26a69a" opacity=".62"/><rect x="624.5" y="295.8" width="3" height="36.2" fill="#26a69a" opacity=".62"/><rect x="633.5" y="325.8" width="3" height="6.2" fill="#26a69a" opacity=".62"/><rect x="642.5" y="308.4" width="3" height="23.6" fill="#26a69a" opacity=".62"/><rect x="651.4" y="325.2" width="3" height="6.8" fill="#ef5350" opacity=".62"/><rect x="660.4" y="280.4" width="3" height="51.6" fill="#ef5350" opacity=".62"/><rect x="669.4" y="310.9" width="3" height="21.1" fill="#26a69a" opacity=".62"/><rect x="678.4" y="286.7" width="3" height="45.3" fill="#26a69a" opacity=".62"/><rect x="687.4" y="324.1" width="3" height="7.9" fill="#26a69a" opacity=".62"/><rect x="696.4" y="316.0" width="3" height="16.0" fill="#ef5350" opacity=".62"/><rect x="705.4" y="326.7" width="3" height="5.3" fill="#ef5350" opacity=".62"/><rect x="714.4" y="286.3" width="3" height="45.7" fill="#ef5350" opacity=".62"/><rect x="723.4" y="321.5" width="3" height="10.5" fill="#ef5350" opacity=".62"/><rect x="732.4" y="327.1" width="3" height="4.9" fill="#26a69a" opacity=".62"/><rect x="741.4" y="274.6" width="3" height="57.4" fill="#26a69a" opacity=".62"/><rect x="750.4" y="283.7" width="3" height="48.3" fill="#26a69a" opacity=".62"/><rect x="759.3" y="302.4" width="3" height="29.6" fill="#ef5350" opacity=".62"/><rect x="768.3" y="304.0" width="3" height="28.0" fill="#26a69a" opacity=".62"/><rect x="777.3" y="325.9" width="3" height="6.1" fill="#26a69a" opacity=".62"/><rect x="786.3" y="298.4" width="3" height="33.6" fill="#ef5350" opacity=".62"/><rect x="795.3" y="323.0" width="3" height="9.0" fill="#26a69a" opacity=".62"/><rect x="804.3" y="311.2" width="3" height="20.8" fill="#26a69a" opacity=".62"/><rect x="813.3" y="288.8" width="3" height="43.2" fill="#26a69a" opacity=".62"/><rect x="822.3" y="295.0" width="3" height="37.0" fill="#26a69a" opacity=".62"/><rect x="831.3" y="275.3" width="3" height="56.7" fill="#26a69a" opacity=".62"/><rect x="840.3" y="319.9" width="3" height="12.1" fill="#ef5350" opacity=".62"/><rect x="849.3" y="326.1" width="3" height="5.9" fill="#26a69a" opacity=".62"/><rect x="858.3" y="318.3" width="3" height="13.7" fill="#ef5350" opacity=".62"/><rect x="867.2" y="320.6" width="3" height="11.4" fill="#26a69a" opacity=".62"/><rect x="876.2" y="307.6" width="3" height="24.4" fill="#ef5350" opacity=".62"/><rect x="885.2" y="312.8" width="3" height="19.2" fill="#26a69a" opacity=".62"/><rect x="894.2" y="317.7" width="3" height="14.3" fill="#ef5350" opacity=".62"/><rect x="903.2" y="322.9" width="3" height="9.1" fill="#26a69a" opacity=".62"/><rect x="912.2" y="323.6" width="3" height="8.4" fill="#26a69a" opacity=".62"/><rect x="921.2" y="305.5" width="3" height="26.5" fill="#ef5350" opacity=".62"/><rect x="930.2" y="314.7" width="3" height="17.3" fill="#26a69a" opacity=".62"/><rect x="939.2" y="311.9" width="3" height="20.1" fill="#26a69a" opacity=".62"/><rect x="948.2" y="303.9" width="3" height="28.1" fill="#26a69a" opacity=".62"/><rect x="957.2" y="327.8" width="3" height="4.2" fill="#26a69a" opacity=".62"/><rect x="966.2" y="310.1" width="3" height="21.9" fill="#26a69a" opacity=".62"/><rect x="975.1" y="318.6" width="3" height="13.4" fill="#ef5350" opacity=".62"/><rect x="984.1" y="311.8" width="3" height="20.2" fill="#ef5350" opacity=".62"/><rect x="993.1" y="308.5" width="3" height="23.5" fill="#ef5350" opacity=".62"/><rect x="1002.1" y="326.7" width="3" height="5.3" fill="#26a69a" opacity=".62"/><rect x="1011.1" y="315.3" width="3" height="16.7" fill="#ef5350" opacity=".62"/><rect x="1020.1" y="327.6" width="3" height="4.4" fill="#26a69a" opacity=".62"/><rect x="1029.1" y="327.8" width="3" height="4.2" fill="#26a69a" opacity=".62"/><rect x="1038.1" y="296.2" width="3" height="35.8" fill="#26a69a" opacity=".62"/><rect x="1047.1" y="306.1" width="3" height="25.9" fill="#ef5350" opacity=".62"/><rect x="1056.1" y="326.1" width="3" height="5.9" fill="#ef5350" opacity=".62"/><rect x="1065.1" y="306.1" width="3" height="25.9" fill="#26a69a" opacity=".62"/><rect x="1074.1" y="325.6" width="3" height="6.4" fill="#ef5350" opacity=".62"/><rect x="1083.0" y="282.3" width="3" height="49.7" fill="#26a69a" opacity=".62"/><rect x="1092.0" y="305.4" width="3" height="26.6" fill="#ef5350" opacity=".62"/><rect x="1101.0" y="328.0" width="3" height="4.0" fill="#ef5350" opacity=".62"/><rect x="1110.0" y="324.8" width="3" height="7.2" fill="#26a69a" opacity=".62"/><rect x="1119.0" y="312.6" width="3" height="19.4" fill="#ef5350" opacity=".62"/><rect x="1128.0" y="310.9" width="3" height="21.1" fill="#26a69a" opacity=".62"/>
+  <text x="52" y="332" font-size="10" fill="#86909c" text-anchor="end">shares</text>
+  <text x="330" y="342" font-size="10" fill="#86909c" text-anchor="middle">09/10</text>
+  <text x="734" y="342" font-size="10" fill="#86909c" text-anchor="middle">09/12</text>
+</svg></div>
+
+    <!-- ============ Alert Operation Log ============ -->
+    <div class="section-title">Alert Operation Log</div>
+    <table class="data-table" style="font-size:12px;">
+      <thead><tr><th style="width:230px;">Operation Time</th><th style="width:170px;">Operator</th><th style="width:150px;">Operation</th><th>Operation Detail</th></tr></thead>
+      <tbody>
+        <tr><td>2026-09-16 11:20:04 GMT+8</td><td>System</td><td>Create</td><td>Alert Source: RULE_BASED; Rule: Possible Insider Trading before Sensitive Announcement</td></tr>
+      </tbody>
+    </table>
+    <div class="pagination"><span>&#8249;</span><span class="current">1</span><span>&#8250;</span><span style="border:none;margin-left:8px;">20 / page</span></div>
+  </div>
+</div>
+
+
+<!-- ==================================================================== -->
+<!-- PAGE: Alert Detail — MANUAL                                          -->
+<!-- ==================================================================== -->
+<div class="page-container" id="page-alertdetail-manual">
+  <div class="breadcrumb">CMP <span>&gt;</span> Compliance Monitoring <span>&gt;</span> Alert Viewer <span>&gt;</span> Detail</div>
+  <div style="padding:20px 24px;">
+    <a class="back-link" onclick="showPage('alertmgmt')">&#8592; Back</a>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:17px;font-weight:700;">4363640</span>
+        <span class="src-badge src-manual">MANUAL</span>
+      </div>
+      <button class="btn" id="manual-edit-btn" style="height:30px;font-size:13px;" onclick="detailEdit('manual',true)">Edit</button>
+    </div>
+
+    <!-- ============ Alert Detail ============ -->
+    <div class="section-title">Alert Detail</div>
+
+    <div id="manual-detail-view">
+<div class="sub-head">Basic Info</div>
+    <div class="kv-grid">
+      <div><span class="k">Account ID：</span><strong>60015200</strong></div>
+      <div><span class="k">Symbol：</span><strong>APPL</strong></div>
+      <div><span class="k">Client Tag：</span>--</div>
+
+      <div><span class="k">Alert Status：</span><strong style="color:var(--warning);">New</strong></div>
+      <div><span class="k">Alert Source：</span><span class="src-badge src-manual">MANUAL</span></div>
+      <div><span class="k">Rule Category：</span><strong>Spoofing</strong></div>
+
+      <div><span class="k">System Hit Time：</span>2026-09-11 00:00:00 GMT+8</div>
+      <div><span class="k">Last Trigger Time：</span>2026-09-10 15:42:08 GMT+8</div>
+      <div><span class="k">Alert Tag：</span>--</div>
+
+      <div><span class="k">Risk Level：</span>--</div>
+      <div><span class="k">System Risk Score：</span>--</div>
+      <div><span class="k">License：</span><strong>TBNZ</strong></div>
+
+      <div><span class="k">Market：</span><strong>US</strong></div>
+      <div><span class="k">External Source Tag：</span><strong>FINRA</strong></div>
+      <div><span class="k">Source Reference：</span>FINRA-2026-0911-114</div>
+    </div>
+
+    <div class="sub-head">Workflow Info</div>
+    <div class="kv-grid">
+      <div><span class="k">Alert Owner：</span>zhou</div>
+      <div><span class="k">Assign Time：</span>2026-09-11 09:30:00 GMT+8</div>
+      <div></div>
+
+      <div><span class="k">Linked Case Code：</span>--</div>
+      <div><span class="k">Linked Case Name：</span>--</div>
+      <div><span class="k">Linked Case Owner：</span>--</div>
+
+      <div><span class="k">Last Operation Time：</span>2026-09-11 19:16:03 GMT+8</div>
+      <div></div>
+      <div></div>
+    </div>
+    <div style="font-size:12px;margin-top:12px;">
+      <span class="k" style="color:var(--gray);">Description：</span>
+      <div class="desc-box">
+        FINRA notice regarding repeated order placement and cancellation in APPL between 2026-09-08 and
+        2026-09-10, requesting a review of possible spoofing intent. Notice and the day's order export are
+        attached.
+      </div>
+    </div>
+
+    <div class="sub-head">Attachments <span class="sub-head-note">2 files</span></div>
+    <div class="attach-item">
+      <span>&#128206;</span>
+      <span class="ai-name">FINRA_notice_20260911.pdf</span>
+      <span class="ai-meta">Uploaded by zhou · 320 KB · 2026-09-11 09:28</span>
+      <button class="btn-link" style="font-size:12px;">Download</button>
+    </div>
+    <div class="attach-item">
+      <span>&#128206;</span>
+      <span class="ai-name">APPL_orders_20260908_20260910.xlsx</span>
+      <span class="ai-meta">Uploaded by zhou · 88 KB · 2026-09-11 09:28</span>
+      <button class="btn-link" style="font-size:12px;">Download</button>
+    </div>
+
+    </div>
+
+<div id="manual-detail-edit" style="display:none;">
+      <div class="edit-hint">Editing <strong>Alert Detail</strong> only. Other modules on this page are unaffected. Save or cancel below.</div>
+
+      <div class="sub-head">Basic Info</div>
+      <div class="form-grid-3">
+        <div class="fg"><label><span class="req">*</span> Account ID</label><input type="text" value="60015200"></div>
+        <div class="fg"><label><span class="req">*</span> Symbol</label><input type="text" value="APPL"></div>
+        <div class="fg"><label>Client Tag</label><select><option>--</option><option>VIP</option><option>Institutional</option></select></div>
+        <div class="fg"><label>Alert Status</label><input type="text" value="New" disabled></div>
+        <div class="fg"><label>Alert Source</label><input type="text" value="MANUAL" disabled></div>
+        <div class="fg"><label><span class="req">*</span> Rule Category</label><select><option>Spoofing</option><option>Ramping</option><option>Market Dominance at Close</option><option>Possible Wash Trade</option><option>Pump and Dump</option><option>Possible Insider Trading</option><option>Other</option></select></div>
+        <div class="fg"><label>System Hit Time</label><input type="text" value="2026-09-11 00:00:00 GMT+8" disabled></div>
+        <div class="fg"><label><span class="req">*</span> Last Trigger Time</label><input type="text" value="2026-09-10 15:42:08 GMT+8"></div>
+        <div class="fg"><label>Alert Tag</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label>Risk Level</label><select><option>--</option><option>Low</option><option>Medium</option><option>High</option></select></div>
+        <div class="fg"><label>System Risk Score</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label><span class="req">*</span> License</label><select><option>TBNZ</option><option>TBHK</option><option>TBSG</option></select></div>
+        <div class="fg"><label><span class="req">*</span> Market</label><select><option>US</option><option>HK</option><option>SG</option><option>AU</option></select></div>
+        <div class="fg"><label><span class="req">*</span> External Source Tag</label><select><option>FINRA</option><option>Upstream Broker</option><option>Exchange / Regulator</option><option>SFC</option><option>Internal Referral</option></select></div>
+        <div class="fg"><label>Source Reference</label><input type="text" value="FINRA-2026-0911-114"></div>
+      </div>
+
+      <div class="sub-head">Workflow Info</div>
+      <div class="form-grid-3">
+        <div class="fg"><label>Alert Owner</label><input type="text" value="zhou" disabled></div>
+        <div class="fg"><label>Assign Time</label><input type="text" value="2026-09-11 09:30:00 GMT+8" disabled></div>
+        <div class="fg"><label>Last Operation Time</label><input type="text" value="2026-09-11 19:16:03 GMT+8" disabled></div>
+        <div class="fg"><label>Linked Case Code</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label>Linked Case Name</label><input type="text" value="--" disabled></div>
+        <div class="fg"><label>Linked Case Owner</label><input type="text" value="--" disabled></div>
+      </div>
+      
+      <div class="fg" style="margin-top:4px;">
+        <label>Description</label>
+        <textarea>FINRA notice regarding repeated order placement and cancellation in APPL between 2026-09-08 and 2026-09-10, requesting a review of possible spoofing intent. Notice and the day's order export are attached.</textarea>
+      </div>
+
+      <div class="sub-head">Attachments</div>
+      <div class="attach-item"><span>&#128206;</span><span class="ai-name">FINRA_notice_20260911.pdf</span><span class="ai-meta">320 KB</span><button class="btn-link" style="font-size:12px;">Download</button><button class="btn-link" style="font-size:12px;color:#f53f3f;">Delete</button></div>
+      <div class="attach-item"><span>&#128206;</span><span class="ai-name">APPL_orders_20260908_20260910.xlsx</span><span class="ai-meta">88 KB</span><button class="btn-link" style="font-size:12px;">Download</button><button class="btn-link" style="font-size:12px;color:#f53f3f;">Delete</button></div>
+      <div class="attach-drop" style="margin-top:10px;" onclick="alert('File picker — multi-select supported.')">
+        &#128206;<br>Click to upload evidence files
+        <div class="ad-hint">Multi-select · PDF/PNG/JPG/CSV/XLSX · &le;10MB each</div>
+      </div>
+
+      <div class="edit-actions">
+        <button class="btn" onclick="detailEdit('manual',false)">Cancel</button>
+        <button class="btn btn-primary" onclick="detailSave('manual')">Save</button>
+      </div>
+    </div>
+<!-- ============ AI Anomaly Assessment (unavailable) ============ -->
+    <div class="section-title">AI Anomaly Assessment</div>
+    <div class="aa-wrap is-disabled">
+      <div class="aa-head">
+        <span class="aa-badge">AI</span>
+        <span class="aa-title">Anomaly Assessment</span>
+        <span class="aa-help">&#9432;</span>
+        </div>
+      <div class="aa-params">
+        <div><span class="k">Accounts：</span></div>
+        <div><span class="k">Symbol：</span></div>
+        <div><span class="k">From：</span></div>
+        <div><span class="k">To：</span></div>
+        <div><span class="k">Market：</span></div>
+      </div>
+      <div class="empty-state">
+        <svg width="58" height="40" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+          <path d="M6 25 L17 8 H47 L58 25 V35 A3 3 0 0 1 55 38 H9 A3 3 0 0 1 6 35 Z" fill="#FAFBFC" stroke="#E5E6EB" stroke-width="1.6"/>
+          <path d="M6 25 H21 a2 2 0 0 1 2 2 v1 a3 3 0 0 0 3 3 h12 a3 3 0 0 0 3-3 v-1 a2 2 0 0 1 2-2 h15" stroke="#E5E6EB" stroke-width="1.6" fill="none"/>
+        </svg>
+        <div class="es-text" style="max-width:720px;text-align:center;line-height:1.8;">
+          Unavailable for non-rule-based alerts. These alerts do not contain sufficient structured data for
+          AI-generated risk assessment. Please proceed with manual review.
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ Trigger Fields ============ -->
+    <div class="section-title">Trigger Fields</div>
+    <div class="empty-state">
+      <svg width="58" height="40" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+        <path d="M6 25 L17 8 H47 L58 25 V35 A3 3 0 0 1 55 38 H9 A3 3 0 0 1 6 35 Z" fill="#FAFBFC" stroke="#E5E6EB" stroke-width="1.6"/>
+        <path d="M6 25 H21 a2 2 0 0 1 2 2 v1 a3 3 0 0 0 3 3 h12 a3 3 0 0 0 3-3 v-1 a2 2 0 0 1 2-2 h15" stroke="#E5E6EB" stroke-width="1.6" fill="none"/>
+      </svg>
+      <div class="es-text">No Data</div>
+    </div>
+
+    <!-- ============ Alert-related Data ============ -->
+    <div class="section-title">Alert-related Data &#9432;</div>
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);">
+      <span style="padding:6px 16px;font-size:13px;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-2px;cursor:pointer;">Orders</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Trade</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Order Operation Log</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Events</span>
+      <span style="padding:6px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;">Related Accounts</span>
+      <div style="margin-left:auto;font-size:12px;color:var(--info);cursor:pointer;align-self:center;">&#8681; download</div>
+    </div>
+    <div class="tbl-tools"><span>&#9096;</span><span>&#9881;</span><span>&#8942;</span><span>&#10530;</span></div>
+    <div class="empty-box">
+      <div class="eb-head"></div>
+      <div class="empty-state">
+        <svg width="58" height="40" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+          <path d="M6 25 L17 8 H47 L58 25 V35 A3 3 0 0 1 55 38 H9 A3 3 0 0 1 6 35 Z" fill="#FAFBFC" stroke="#E5E6EB" stroke-width="1.6"/>
+          <path d="M6 25 H21 a2 2 0 0 1 2 2 v1 a3 3 0 0 0 3 3 h12 a3 3 0 0 0 3-3 v-1 a2 2 0 0 1 2-2 h15" stroke="#E5E6EB" stroke-width="1.6" fill="none"/>
+        </svg>
+        <div class="es-text">No Data</div>
+      </div>
+    </div>
+
+    <!-- ============ Market Visualizer ============ -->
+    <div class="section-title">Market Visualizer</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+      <input type="text" value="2026-09-10" style="width:120px;height:32px;font-size:12px;">
+      <span style="color:#86909c;">→</span>
+      <input type="text" value="2026-09-10" style="width:120px;height:32px;font-size:12px;">
+    </div>
+    <div class="empty-state">
+      <svg width="58" height="40" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+        <path d="M6 25 L17 8 H47 L58 25 V35 A3 3 0 0 1 55 38 H9 A3 3 0 0 1 6 35 Z" fill="#FAFBFC" stroke="#E5E6EB" stroke-width="1.6"/>
+        <path d="M6 25 H21 a2 2 0 0 1 2 2 v1 a3 3 0 0 0 3 3 h12 a3 3 0 0 0 3-3 v-1 a2 2 0 0 1 2-2 h15" stroke="#E5E6EB" stroke-width="1.6" fill="none"/>
+      </svg>
+      <div class="es-text">No Data</div>
+    </div>
+
+    <!-- ============ Alert Operation Log ============ -->
+    <div class="section-title">Alert Operation Log</div>
+    <table class="data-table" style="font-size:12px;">
+      <thead><tr><th style="width:230px;">Operation Time</th><th style="width:170px;">Operator</th><th style="width:150px;">Operation</th><th>Operation Detail</th></tr></thead>
+      <tbody>
+        <tr><td>2026-09-11 19:16:03 GMT+8</td><td>hanna</td><td>Unlink</td><td></td></tr>
+        <tr><td>2026-09-11 19:15:26 GMT+8</td><td>hanna</td><td>Claim</td><td>Add an existing Case: default2</td></tr>
+        <tr><td>2026-09-11 09:30:00 GMT+8</td><td>zhou</td><td>Create</td><td>Alert Source: MANUAL; Attachments: 2 files</td></tr>
+      </tbody>
+    </table>
+    <div class="pagination"><span>&#8249;</span><span class="current">1</span><span>&#8250;</span><span style="border:none;margin-left:8px;">20 / page</span></div>
+  </div>
+</div>
+
+
+<!-- ==================================================================== -->
+<!-- MODAL: Create Manual Alert (参照线上，含 Attachments)                 -->
+<!-- ==================================================================== -->
+<div class="modal-overlay" id="modal-create-manual-alert">
+  <div class="modal" style="width:820px;">
+    <div class="modal-header">
+      <span>Create Manual Alert</span>
+      <span class="modal-close" onclick="hideModal('modal-create-manual-alert')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label><span class="req">*</span> Account ID</label><input type="text" placeholder="e.g. 3215400"></div>
+        <div class="form-group"><label><span class="req">*</span> License</label><select><option value="">Select license</option><option>TBNZ</option><option>TBHK</option><option>TBSG</option></select></div>
+        <div class="form-group"><label><span class="req">*</span> Symbol</label><input type="text" placeholder="e.g. SPXW 20260406 6615.0 C"></div>
+        <div class="form-group"><label><span class="req">*</span> Market</label><select><option value="">Please select</option><option>HK</option><option>US</option><option>SG</option><option>AU</option></select></div>
+        <div class="form-group"><label>Alert Source</label><input type="text" value="MANUAL" disabled></div>
+        <div class="form-group"><label>Rule Category</label><select><option value="">Select rule category...</option><option>Market Dominance at Close</option><option>Possible Wash Trade</option><option>Pump and Dump</option><option>Possible Insider Trading</option><option>Ramping</option><option>Spoofing</option><option>Other</option></select></div>
+        <div class="form-group"><label><span class="req">*</span> External Source Tag</label><select><option value="">Select external source</option><option>Upstream Broker</option><option>Exchange / Regulator</option><option>FINRA</option><option>SFC</option><option>Internal Referral</option></select></div>
+        <div class="form-group"><label>Source Reference</label><input type="text" placeholder="e.g. FINRA ref #, notice ID, ticket"></div>
+        <div class="form-group"><label><span class="req">*</span> Last Trigger Time</label><input type="text" placeholder="Select date"></div>
+      </div>
+      <div class="form-group">
+        <label><span class="req">*</span> Description / Evidence</label>
+        <textarea placeholder="Describe the suspicious activity and supporting evidence..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Attachments</label>
+        <div id="cma-file-list"></div>
+        <div class="attach-drop" onclick="cmaAddFiles()">
+          &#128206;<br>Click to upload evidence files
+          <div class="ad-hint">支持多选 · Screenshots, order logs, emails · PDF/PNG/JPG/CSV/XLSX · ≤10MB each</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span style="margin-right:auto;font-size:12px;color:var(--gray);">Manual alerts are tagged <strong>MANUAL</strong> and visible in Alert Viewer.</span>
+      <button class="btn" onclick="hideModal('modal-create-manual-alert')">Cancel</button>
+      <button class="btn btn-primary" onclick="hideModal('modal-create-manual-alert')">Create Alert</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================================================================== -->
+<!-- MODAL: Alert Manage (现有逻辑，仅示意)                                -->
+<!-- ==================================================================== -->
+<div class="modal-overlay" id="modal-alert-manage">
+  <div class="modal" style="width:620px;">
+    <div class="modal-header"><span>Manage Alert</span><span class="modal-close" onclick="hideModal('modal-alert-manage')">&times;</span></div>
+    <div class="modal-body">
+      <div style="font-size:15px;font-weight:700;margin-bottom:16px;">Operate</div>
+
+      <div class="form-group">
+        <label><span class="req">*</span> Alert Status</label>
+        <div style="display:flex;gap:26px;margin-top:6px;">
+          <label style="font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;"><input type="radio" name="am-status" checked> Processing</label>
+          <label style="font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;"><input type="radio" name="am-status"> Pending</label>
+          <label style="font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;"><input type="radio" name="am-status"> Closed</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Alert Tag</label>
+        <select><option value="">Please enter</option><option>Regulator Inquiry</option><option>Escalated</option><option>In the Inquiry</option><option>Cleared</option></select>
+      </div>
+
+      <div class="form-group">
+        <label><span class="req">*</span> Assign to</label>
+        <select><option>zhou</option><option>pemela</option><option>yimeng</option><option>hanna</option></select>
+      </div>
+
+      <div class="form-group">
+        <label>Alert Comment</label>
+
+        <div class="tpl-box" id="tpl-box">
+          <div class="tpl-head" onclick="toggleTpl()"><span class="tri">&#9660;</span> Templates</div>
+          <div class="tpl-body">
+            <div class="tpl-group">Summary</div>
+            <label class="tpl-item"><input type="checkbox"> Inquired by Tradeup</label>
+            <label class="tpl-item"><input type="checkbox"> No Further Action Common</label>
+            <label class="tpl-item"><input type="checkbox"> Wash Trade</label>
+            <label class="tpl-item"><input type="checkbox"> Possible Spoofing</label>
+            <label class="tpl-item"><input type="checkbox"> cleared</label>
+            <label class="tpl-item"><input type="checkbox"> pre-arranged trading</label>
+            <label class="tpl-item"><input type="checkbox"> spoofing</label>
+            <label class="tpl-item"><input type="checkbox"> Clear without action</label>
+          </div>
+        </div>
+
+        <div class="tpl-warn">
+          <span class="tw-icon">!</span>
+          <span>Please select a template before editing the content to avoid loss of manually edited content.</span>
+        </div>
+
+        <textarea placeholder="Please enter" style="min-height:92px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-alert-manage')">Cancel</button>
+      <button class="btn btn-primary" onclick="manageConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Manage 二次确认（AUTO_PARSED / MANUAL 改状态时） -->
+<div class="modal-overlay" id="modal-manage-confirm" style="z-index:400;">
+  <div class="modal" style="width:440px;">
+    <div class="modal-header">
+      <span>Confirm status change</span>
+      <span class="modal-close" onclick="hideModal('modal-manage-confirm')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <span style="width:20px;height:20px;border-radius:50%;background:#fa8c16;color:#fff;font-size:12px;
+                     font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px;">!</span>
+        <div style="font-size:13px;line-height:1.85;">
+          Alert Basic Info cannot be modified after the status is changed.
+          Please confirm the information is correct.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-manage-confirm')">Cancel</button>
+      <button class="btn btn-primary" onclick="manageConfirmed()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Link (占位) -->
+<div class="modal-overlay" id="modal-alert-link">
+  <div class="modal" style="width:520px;">
+    <div class="modal-header"><span>Link to Case</span><span class="modal-close" onclick="hideModal('modal-alert-link')">&times;</span></div>
+    <div class="modal-body" style="font-size:13px;color:var(--text-secondary);line-height:1.9;">
+      Link 流程复用 Case Management 需求已定稿逻辑（Link to an existing case / Add a new case + Account&amp;Symbol 校验弹窗），本期不改造。
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="hideModal('modal-alert-link')">Close</button></div>
+  </div>
+</div>
+
+
+<!-- ==================================================================== -->
+<!-- MODAL: 判类依据（点击 AUTO_PARSED 标签）                              -->
+<!-- ==================================================================== -->
+<div class="modal-overlay" id="modal-classify-reason">
+  <div class="modal" style="width:720px;">
+    <div class="modal-header">
+      <span><span class="src-badge src-auto">AUTO_PARSED</span> 判类依据 &middot; Why this alert was created</span>
+      <span class="modal-close" onclick="hideModal('modal-classify-reason')">&times;</span>
+    </div>
+    <div class="modal-body">
+
+      <div class="cr-verdict">
+        <span style="font-size:18px;">&#10003;</span>
+        <div style="flex:1;">
+          <div class="crv">计入 &mdash; 情形 1：内外部发送的调查邮件</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:3px;">
+            置信度 <span class="conf conf-high">high</span> &nbsp;·&nbsp; 人工复核：不需要
+            &nbsp;·&nbsp; 判类时间 2026-08-13 09:24:11 GMT+8
+          </div>
+        </div>
+      </div>
+
+      <div class="cr-sec">命中信号与原文证据</div>
+      <table class="data-table" style="font-size:12px;">
+        <thead><tr><th style="width:80px;">判断来源</th><th style="width:170px;">命中内容</th><th>原文证据（逐字）</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>主题</td><td>明确为交易行为调查请求</td>
+            <td style="white-space:normal;"><code class="cr-ev">[Inquiry] Trading activity review – NTCL – SUB-8841200</code></td>
+          </tr>
+          <tr>
+            <td>发件人</td><td>上手券商合规监察邮箱</td>
+            <td style="white-space:normal;"><code class="cr-ev">surveillance@broker-hk.example.com</code></td>
+          </tr>
+          <tr>
+            <td>正文</td><td>要求我方核查特定客户交易并回复</td>
+            <td style="white-space:normal;"><code class="cr-ev">please assist to investigate the client Sub ID: SUB-8841200 for trading activity in NTCL between 28 Jul 2026 and 08 Aug 2026 … please revert by 20 Aug</code></td>
+          </tr>
+          <tr>
+            <td>附件</td><td>成交明细清单，与正文调查诉求一致</td>
+            <td style="white-space:normal;"><code class="cr-ev">NTCL_trade_list_20260728_20260808.xlsx</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cr-sec">判断说明</div>
+      <div class="cr-note">
+        发件方为上手券商合规监察团队，主题与正文均明确指向对某一客户在特定标的、特定区间内交易行为的核查请求，
+        并要求我方在指定期限前回复，符合<strong>情形 1（内外部发送的调查邮件）</strong>。
+        正文与附件所述客户、标的、时间区间一致，<strong>无冲突</strong>，故未触发人工复核。
+      </div>
+
+      <div class="cr-sec">已排除的不计入情形</div>
+      <ul class="cr-excl">
+        <li>非信息、数据查询或披露类邮件 &mdash; 诉求为"核查并回复"，而非"提供数据"</li>
+        <li>非无关转发或抄送 &mdash; 发件人为直接问询方，非转发链</li>
+        <li>业务主体与业务事项均完整可判断 &mdash; 客户标识、标的、时间区间齐备</li>
+      </ul>
+
+      <div class="cr-sec">来源邮件</div>
+      <div class="attach-item">
+        <span>&#128206;</span>
+        <span class="ai-name">Inquiry_NTCL_SUB-8841200.eml</span>
+        <span class="src-badge src-auto">原文</span>
+        <span class="ai-meta">148 KB · 2026-08-13 09:24</span>
+        <button class="btn-link" style="font-size:12px;">Download</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-classify-reason');showModal('modal-misclassify')">判类有误，反馈</button>
+      <button class="btn btn-primary" onclick="hideModal('modal-classify-reason')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: 判类反馈 -->
+<div class="modal-overlay" id="modal-misclassify">
+  <div class="modal" style="width:460px;">
+    <div class="modal-header"><span>反馈判类有误</span><span class="modal-close" onclick="hideModal('modal-misclassify')">&times;</span></div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.9;margin-bottom:14px;">
+        标记后该 Alert 不会被删除，但会记入判类准确率统计，用于回归 prompt 与关键词规则。
+      </div>
+      <div class="form-group">
+        <label><span class="req">*</span> 实际应属于</label>
+        <select>
+          <option value="">请选择</option>
+          <option>不应计入（信息 / 数据查询或披露类）</option>
+          <option>不应计入（无关转发或抄送）</option>
+          <option>不应计入（内容不完整，无法判断）</option>
+          <option>应计入，但情形归类有误</option>
+        </select>
+      </div>
+      <div class="form-group"><label>补充说明</label><textarea placeholder="Please enter"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="hideModal('modal-misclassify')">Cancel</button>
+      <button class="btn btn-primary" onclick="hideModal('modal-misclassify')">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- DRAWER: AI Extraction JSON（AUTO_PARSED 编辑态的人工复核辅助）        -->
+<!-- ==================================================================== -->
+<div class="json-drawer" id="json-drawer">
+  <div class="jd-head">
+    <span class="src-badge src-auto">AI</span> Extraction JSON
+    <span class="jd-close" onclick="toggleJson(false)">&times;</span>
+  </div>
+  <div class="jd-hint">
+    点击左侧字段的「来源」标记可定位到对应片段；点击此处任一片段也可反向高亮对应字段。<br>
+    <strong>evidence</strong> 为来源邮件逐字原文，用于核对 AI 是否抓错位置。
+  </div>
+  <div class="jd-body" id="jd-body"></div>
+</div>
+
+<script>
+/* ---------------- Mock data ---------------- */
+var CURRENT_USER = 'zhou';
+
+var ALERTS = [
+  { id:'4363712', source:'AUTO_PARSED', sysScore:'--', aiScore:'--',
+    hit:'2026-08-13 09:24:11 GMT+8', account:'60015200', symbol:'NTCL', license:'TBNZ',
+    rule:'--', status:'New', tag:'Regulator Inquiry', owner:'--', caseCode:'--' },
+  { id:'4363711', source:'AUTO_PARSED', sysScore:'--', aiScore:'--',
+    hit:'2026-08-13 08:11:02 GMT+8', account:'60018800', symbol:'BIYA', license:'TBHK',
+    rule:'--', status:'New', tag:'Regulator Inquiry', owner:'--', caseCode:'--' },
+  { id:'4363705', source:'AUTO_PARSED', sysScore:'--', aiScore:'--',
+    hit:'2026-08-12 16:40:55 GMT+8', account:'60032100', symbol:'01247', license:'TBSG',
+    rule:'--', status:'Processing', tag:'In the Inquiry', owner:'pemela', caseCode:'CS-0231' },
+  { id:'4363640', source:'MANUAL', sysScore:'--', aiScore:'--',
+    hit:'2026-09-11 00:00:00 GMT+8', account:'60015200', symbol:'APPL', license:'TBNZ',
+    rule:'--', status:'New', tag:'High Priority', owner:'--', caseCode:'--' },
+  { id:'4363639', source:'RULE_BASED', sysScore:'2.53', aiScore:'8',
+    hit:'2026-09-16 11:20:04 GMT+8', account:'23535100', symbol:'01536', license:'TBNZ',
+    rule:'Possible Insider Trading before Sensitive Announcement', status:'New', tag:'--', owner:'--', caseCode:'--' },
+  { id:'4363638', source:'RULE_BASED', sysScore:'4.81', aiScore:'3',
+    hit:'2026-08-25 00:00:00 GMT+8', account:'60018800', symbol:'NTCL', license:'TBHK',
+    rule:'Possible Wash Trade (A to B)', status:'Processing', tag:'Escalated', owner:'zhou', caseCode:'CS-0228' }
+];
+
+function srcBadge(s) {
+  var cls = s === 'AUTO_PARSED' ? 'src-auto' : (s === 'MANUAL' ? 'src-manual' : 'src-rule');
+  return '<span class="src-badge ' + cls + '">' + s + '</span>';
+}
+
+function scoreCell(v, kind) {
+  if (v === '--') return '<span style="color:#c9cdd4;">--</span>';
+  if (kind === 'ai') return '<span class="score-high">' + v + '</span>';
+  return '<span class="score-ok">' + v + '</span>';
+}
+
+function ownerCell(o) {
+  if (o === '--') return '<span style="color:#c9cdd4;">--</span>';
+  return o;
+}
+
+var STATUSES = [
+  { key:'',           label:'All',        dot:'#c9cdd4' },
+  { key:'New',        label:'New',        dot:'#ff7d00' },
+  { key:'Processing', label:'Processing', dot:'#165dff' },
+  { key:'Pending',    label:'Pending',    dot:'#f7ba1e' },
+  { key:'Closed',     label:'Closed',     dot:'#00b42a' }
+];
+var STATUS_FILTER = '';
+
+function setStatus(k) {
+  STATUS_FILTER = k;
+  renderAlertRows();
+}
+
+function renderStatusUI() {
+  document.getElementById('stat-strip').innerHTML = STATUSES.map(function (st) {
+    var count = st.key
+      ? ALERTS.filter(function (a) { return a.status === st.key; }).length
+      : ALERTS.length;
+    return '<div class="stat-cell' + (STATUS_FILTER === st.key ? ' on' : '') + '"'
+      + ' onclick="setStatus(\'' + st.key + '\')">'
+      + '<div class="sc-k"><span class="sc-dot" style="background:' + st.dot + ';"></span>' + st.label + '</div>'
+      + '<div class="sc-v">' + count + '</div></div>';
+  }).join('');
+}
+
+function renderAlertRows() {
+  var srcFilter = document.getElementById('f-alert-source').value;
+  var ownerFilter = document.getElementById('f-owner').value;
+  var rows = ALERTS.filter(function (a) {
+    if (srcFilter && a.source !== srcFilter) return false;
+    if (ownerFilter && a.owner !== ownerFilter) return false;
+    if (STATUS_FILTER && a.status !== STATUS_FILTER) return false;
+    return true;
+  });
+
+  document.getElementById('alert-tbody').innerHTML = rows.map(function (a) {
+    var isAuto = a.source === 'AUTO_PARSED';
+    var unassigned = a.owner === '--';
+    var detailPage = isAuto ? 'alertdetail-auto'
+                   : (a.source === 'MANUAL' ? 'alertdetail-manual' : 'alertdetail');
+    // New alerts have no owner and are open to anyone; once worked, only the
+    // owner (current user zhou) may keep managing them.
+    var canManage = (a.status === 'New') || (a.owner === CURRENT_USER);
+    var manageBtn = canManage
+      ? ' <button class="btn-link" onclick="openManage(\'' + a.source + '\')">Manage</button>'
+      : '';
+
+    return '<tr' + (unassigned ? ' style="background:#fffdf5;"' : '') + '>'
+      + '<td><input type="checkbox"></td>'
+      + '<td>' + a.id + '</td>'
+      + '<td>' + srcBadge(a.source) + '</td>'
+      + '<td>' + scoreCell(a.sysScore, 'sys') + '</td>'
+      + '<td>' + scoreCell(a.aiScore, 'ai') + '</td>'
+      + '<td>' + a.hit + '</td>'
+      + '<td>' + a.account + '</td>'
+      + '<td>' + a.symbol + '</td>'
+      + '<td>' + a.license + '</td>'
+      + '<td>' + a.rule + '</td>'
+      + '<td><span style="color:' + (a.status === 'New' ? '#ff7d00' : '#165dff') + ';">● ' + a.status + '</span></td>'
+      + '<td>' + a.tag + '</td>'
+      + '<td>' + ownerCell(a.owner) + '</td>'
+      + '<td>' + a.caseCode + '</td>'
+      + '<td><button class="btn-link" onclick="showPage(\'' + detailPage + '\')">Detail</button>'
+      + manageBtn
+      + ' <button class="btn-link" onclick="showModal(\'modal-alert-link\')">Link</button></td>'
+      + '</tr>';
+  }).join('');
+
+  document.getElementById('alert-total').textContent = rows.length;
+  renderStatusUI();
+}
+
+
+/* ---------------- Interactions ---------------- */
+function showPage(pageId) {
+  document.querySelectorAll('.page-container').forEach(function (p) { p.classList.remove('active'); });
+  var page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+  document.querySelectorAll('.dropdown-menu').forEach(function (d) { d.classList.remove('show'); });
+  window.scrollTo(0, 0);
+}
+
+function toggleDropdown(id) {
+  event.stopPropagation();
+  var menu = document.getElementById(id);
+  var isOpen = menu.classList.contains('show');
+  document.querySelectorAll('.dropdown-menu').forEach(function (d) { d.classList.remove('show'); });
+  if (!isOpen) menu.classList.add('show');
+}
+
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('.nav-item')) {
+    document.querySelectorAll('.dropdown-menu').forEach(function (d) { d.classList.remove('show'); });
+  }
+});
+
+
+/* ============ AI Extraction JSON：字段 <-> JSON 双向定位 ============ */
+var AI_JSON = {
+  client_identifiers: [
+    { value: "SUB-8841200", label_in_email: "Sub ID",
+      evidence: "please assist to investigate the client Sub ID: SUB-8841200",
+      confidence: "high" }
+  ],
+  symbols: [
+    { value: "NTCL", label_in_email: "stock",
+      evidence: "trading activity in NTCL between 28 Jul 2026 and 08 Aug 2026",
+      confidence: "high" }
+  ],
+  last_trigger_date: {
+    value: "2026-08-08",
+    evidence: "between 28 Jul 2026 and 08 Aug 2026",
+    confidence: "high",
+    ambiguity_note: null
+  },
+  reply_deadline: {
+    value: "2026-08-20",
+    reply_deadline_raw: "please revert by 20 Aug",
+    evidence: "please revert by 20 Aug",
+    confidence: "high"
+  },
+  description: "上手 TBHK 就客户 SUB-8841200 在 NTCL 2026-07-28 至 08-08 期间的交易发起问询，要求核查是否存在尾盘拉抬，并提供订单与成交明细。",
+  raw_body_excerpt: null,
+  unextracted_fields: [],
+  notes: null
+};
+
+/* JSON key -> 表单字段 的对应关系，用于反向高亮 */
+var JSON_FIELD_MAP = {
+  client_identifiers: 'Account ID',
+  symbols: 'Symbol',
+  last_trigger_date: 'Last Trigger Time',
+  reply_deadline: 'Reply Deadline',
+  description: 'Content'
+};
+
+function jsonEsc(t) {
+  return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/* 按 key 逐块渲染，每块可独立高亮 */
+function renderJsonDrawer() {
+  var out = '';
+  Object.keys(AI_JSON).forEach(function (k) {
+    var body = JSON.stringify(AI_JSON[k], null, 2);
+    // 给 key 和字符串值上色
+    var pretty = jsonEsc(body)
+      .replace(/&quot;([a-z_]+)&quot;:/g, '<span class="jk">"$1"</span>:')
+      .replace(/: &quot;([^&]*)&quot;/g, ': <span class="jv">"$1"</span>')
+      .replace(/\bnull\b/g, '<span class="jn">null</span>');
+    var tag = JSON_FIELD_MAP[k] ? '<span class="jb-tag">&#8594; ' + JSON_FIELD_MAP[k] + '</span>' : '';
+    // 已被人工改动的字段，附上当前值与 AI 原值的对照
+    var ov = '';
+    if (FIELD_STATE[k] && FIELD_STATE[k].edited) {
+      var curEl = document.getElementById('ei-' + k);
+      ov = '\n<span class="jk">"manual_override"</span>: {\n'
+         + '  <span class="jk">"current_value"</span>: <span class="jv">"'
+         + jsonEsc(curEl ? curEl.value : '') + '"</span>,\n'
+         + '  <span class="jk">"ai_original"</span>: <span class="jv">"'
+         + jsonEsc(FIELD_STATE[k].ai) + '"</span>,\n'
+         + '  <span class="jk">"edited_by"</span>: <span class="jv">"zhou"</span>\n}';
+      tag += '<span class="jb-tag" style="background:#fff7e8;color:#c47b00;">人工调整</span>';
+    }
+    out += '<div class="jb" id="jb-' + k + '" onclick="highlightField(\'' + k + '\')">'
+         + '<pre><span class="jk">"' + k + '"</span>: ' + pretty + ov + tag + '</pre></div>';
+  });
+  document.getElementById('jd-body').innerHTML = out;
+}
+
+function toggleJson(force) {
+  var d = document.getElementById('json-drawer');
+  var open = (typeof force === 'boolean') ? force : !d.classList.contains('open');
+  d.classList.toggle('open', open);
+  if (open && !document.getElementById('jd-body').innerHTML) renderJsonDrawer();
+}
+
+function clearJsonHighlight() {
+  document.querySelectorAll('.jb').forEach(function (e) { e.classList.remove('jb-active'); });
+  document.querySelectorAll('.fg').forEach(function (e) { e.classList.remove('fg-active'); });
+}
+
+/* 字段 -> JSON：点「来源」标记 */
+function showSrc(key) {
+  event.stopPropagation();
+  toggleJson(true);
+  renderJsonDrawer();
+  clearJsonHighlight();
+  var blk = document.getElementById('jb-' + key);
+  var fld = document.getElementById('fg-' + key);
+  if (blk) {
+    blk.classList.add('jb-active');
+    blk.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  if (fld) fld.classList.add('fg-active');
+}
+
+/* JSON -> 字段：点 JSON 片段 */
+function highlightField(key) {
+  clearJsonHighlight();
+  var blk = document.getElementById('jb-' + key);
+  if (blk) blk.classList.add('jb-active');
+  var fld = document.getElementById('fg-' + key);
+  if (fld) {
+    fld.classList.add('fg-active');
+    fld.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+}
+
+/* 退出编辑态时收起抽屉 */
+
+/* ============ 字段溯源状态：AI 解析 / 人工调整 ============ */
+/* ai = AI 原值（永久保留，用于回溯）；edited = 是否已被人工改动并保存 */
+var FIELD_STATE = {
+  client_identifiers: { ai: '60015200',                   edited: false },
+  symbols:            { ai: 'NTCL',                       edited: false },
+  last_trigger_date:  { ai: '2026-08-08 15:59:22 GMT+8',  edited: false },
+  reply_deadline:     { ai: '2026-08-20',                 edited: false },
+  description:        { ai: null,                         edited: false }   // 见 initFieldState
+};
+
+function initFieldState() {
+  var d = document.getElementById('ei-description');
+  if (d && FIELD_STATE.description.ai === null) FIELD_STATE.description.ai = d.value;
+}
+
+/* 编辑中实时提示：值一旦偏离 AI 原值就把 confidence 徽标换成「人工调整」 */
+function markDirty(key) {
+  var el = document.getElementById('ei-' + key);
+  var box = document.getElementById('eb-' + key);
+  if (!el || !box) return;
+  var st = FIELD_STATE[key];
+  var changed = (el.value.trim() !== String(st.ai).trim());
+  box.innerHTML = changed
+    ? '<span class="prov-tag prov-edited">人工调整（未保存）</span>'
+    : (st.edited ? '<span class="prov-tag prov-edited">人工调整</span>'
+                 : '<span class="prov-tag prov-ai">PARSED</span>');
+}
+
+/* 保存时落定状态：更新只读页的值与标签，并写入 Operation Log */
+function commitFieldState() {
+  var changedKeys = [];
+  Object.keys(FIELD_STATE).forEach(function (key) {
+    var el = document.getElementById('ei-' + key);
+    if (!el) return;
+    var st = FIELD_STATE[key];
+    var cur = el.value.trim();
+    if (cur !== String(st.ai).trim()) { st.edited = true; changedKeys.push(key); }
+
+    // 同步只读页取值
+    var vv = document.getElementById('vv-' + key);
+    if (vv) vv.textContent = el.value;
+
+    // 同步编辑态徽标（只读页不展示溯源标签）
+    var box = document.getElementById('eb-' + key);
+    if (box) {
+      box.innerHTML = st.edited
+        ? '<span class="prov-tag prov-edited">人工调整</span>'
+        : '<span class="prov-tag prov-ai">PARSED</span>';
+      box.title = st.edited ? 'AI 原值：' + st.ai + '（已保留用于回溯）' : '';
+    }
+  });
+  return changedKeys;
+}
+
+/* 保存后追加一条 Operation Log */
+function logFieldEdits(keys) {
+  var tb = document.getElementById('auto-oplog');
+  if (!tb || !keys.length) return;
+  var label = { client_identifiers:'Account ID', symbols:'Symbol',
+                last_trigger_date:'Last Trigger Time', reply_deadline:'Reply Deadline',
+                description:'Content' };
+  var lines = keys.map(function (k) {
+    var cur = document.getElementById('ei-' + k).value;
+    return 'Edit field: ' + label[k] + '（AI 原值：' + FIELD_STATE[k].ai + ' → ' + cur + '）';
+  }).join('<br>');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td>2026-08-13 15:40:22 GMT+8</td><td>zhou</td><td>Edit</td>'
+    + '<td style="white-space:normal;line-height:1.8;">' + lines + '</td>';
+  tb.insertBefore(tr, tb.firstChild);
+}
+
+/* Alert Detail 就地编辑：只切换该模块，页面其余部分不受影响 */
+function detailEdit(key, on) {
+  document.getElementById(key + '-detail-view').style.display = on ? 'none' : '';
+  document.getElementById(key + '-detail-edit').style.display = on ? '' : 'none';
+  var btn = document.getElementById(key + '-edit-btn');
+  if (btn) btn.style.visibility = on ? 'hidden' : 'visible';
+  if (on && key === 'auto') {
+    initFieldState();
+    Object.keys(FIELD_STATE).forEach(markDirty);
+  }
+  if (!on) { toggleJson(false); clearJsonHighlight(); }
+}
+
+function openDetailInEdit(page) {
+  showPage(page);
+  detailEdit(page === 'alertdetail-auto' ? 'auto' : 'manual', true);
+}
+
+function detailSave(key) {
+  var changed = [];
+  if (key === 'auto') {
+    changed = commitFieldState();
+    logFieldEdits(changed);
+  }
+  detailEdit(key, false);
+  var extra = changed.length
+    ? '\n\n' + changed.length + ' 个 AI 解析字段被人工调整，标签已更新为「人工调整」，AI 原值已保留用于回溯。'
+    : '';
+  alert('Alert Detail saved. Changes are written to the Alert Operation Log; other modules on this page are unaffected.' + extra);
+}
+
+/* Manage：AUTO_PARSED / MANUAL 改状态需二次确认 */
+var MANAGE_SRC = '';
+
+function openManage(src) {
+  MANAGE_SRC = src || '';
+  showModal('modal-alert-manage');
+}
+
+function manageConfirm() {
+  if (MANAGE_SRC === 'AUTO_PARSED' || MANAGE_SRC === 'MANUAL') {
+    showModal('modal-manage-confirm');
+    return;
+  }
+  hideModal('modal-alert-manage');
+}
+
+function manageConfirmed() {
+  hideModal('modal-manage-confirm');
+  hideModal('modal-alert-manage');
+}
+
+function toggleTpl() {
+  document.getElementById('tpl-box').classList.toggle('closed');
+}
+
+function toggleAA(id) {
+  document.getElementById(id || 'aa-collapse').classList.toggle('closed');
+}
+
+/* Create Manual Alert：多文件上传示意 */
+var CMA_FILES = [];
+var CMA_SAMPLE = [
+  ['FINRA_notice_20260911.pdf', '320 KB'],
+  ['APPL_orders_20260908_20260910.xlsx', '88 KB'],
+  ['盘口截图_0910.png', '204 KB'],
+  ['客户邮件往来.eml', '61 KB']
+];
+
+function cmaAddFiles() {
+  // 每次点击模拟一次多选：一次带进来 2 个文件
+  var added = 0;
+  for (var i = 0; i < CMA_SAMPLE.length && added < 2; i++) {
+    var f = CMA_SAMPLE[i];
+    if (CMA_FILES.indexOf(f[0]) === -1) { CMA_FILES.push(f[0]); added++; }
+  }
+  if (!added) { alert('示例文件已全部添加。实际为系统文件选择器，支持一次多选。'); return; }
+  cmaRender();
+}
+
+function cmaRemove(name) {
+  CMA_FILES = CMA_FILES.filter(function (n) { return n !== name; });
+  cmaRender();
+}
+
+function cmaRender() {
+  var box = document.getElementById('cma-file-list');
+  if (!CMA_FILES.length) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div style="font-size:11px;color:var(--gray);margin-bottom:6px;">已选 '
+    + CMA_FILES.length + ' 个文件</div>'
+    + CMA_FILES.map(function (n) {
+        var size = (CMA_SAMPLE.filter(function (s) { return s[0] === n; })[0] || ['', ''])[1];
+        return '<div class="attach-item">'
+          + '<span>&#128206;</span>'
+          + '<span class="ai-name">' + n + '</span>'
+          + '<span class="ai-meta">' + size + '</span>'
+          + '<button class="btn-link" style="font-size:12px;color:#f53f3f;" '
+          + 'onclick="event.stopPropagation();cmaRemove(\'' + n + '\')">Remove</button>'
+          + '</div>';
+      }).join('');
+}
+
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+
+document.querySelectorAll('.modal-overlay').forEach(function (o) {
+  o.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('show'); });
+});
+
+
+renderAlertRows();
+</script>
+</body>
+</html>
