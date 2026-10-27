@@ -77,6 +77,8 @@ input[type="text"] { width: 240px; }
 .btn-link { border: none; background: none; color: var(--info); padding: 0 4px; height: auto; font-size: 13px; cursor: pointer; }
 .btn-link:hover { color: #4080ff; }
 .btn-link:disabled { color: #c9cdd4; cursor: not-allowed; }
+.btn-danger { background: #f53f3f; border-color: #f53f3f; color: #fff; font-weight: 500; }
+.btn-danger:hover { background: #cb2634; border-color: #cb2634; }
 
 /* Tables */
 .data-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); table-layout: fixed; }
@@ -145,10 +147,7 @@ input[type="text"] { width: 240px; }
 .badge-clickable { cursor:pointer; }
 .badge-clickable:hover { background:#e9d5ff; }
 
-/* 判类依据弹窗 */
-.cr-verdict { display:flex; align-items:center; gap:10px; background:#f6ffed; border:1px solid #b7eb8f;
-              border-radius:6px; padding:12px 14px; margin-bottom:16px; }
-.cr-verdict .crv { font-size:15px; font-weight:700; color:#00b42a; }
+/* 判断说明弹窗 */
 .cr-sec { font-size:13px; font-weight:600; margin:18px 0 8px; }
 .cr-sec:first-of-type { margin-top:0; }
 .cr-ev { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; line-height:1.7;
@@ -158,6 +157,16 @@ input[type="text"] { width: 240px; }
 .cr-excl li { margin-left:18px; }
 .cr-note { background:#fafbfc; border:1px solid var(--border); border-radius:6px;
            padding:11px 13px; font-size:12px; line-height:1.9; }
+/* 判断说明弹窗顶部：Prompt 名称与版本 */
+.cr-prompt { display:flex; align-items:center; gap:10px; background:#faf7ff; border:1px solid #e3d2fa;
+             border-radius:6px; padding:10px 13px; margin-bottom:14px; }
+.cr-pname { font-size:13px; font-weight:600; color:#1d2129; }
+.cr-pver  { display:inline-block; margin-left:6px; padding:1px 6px; border-radius:3px;
+            background:#f5f0ff; color:var(--ai); font-size:11px; font-weight:700; vertical-align:1px; }
+/* 删除二次确认 */
+.del-warn { background:#ffece8; border:1px solid #fbaca3; border-radius:6px; padding:12px 14px;
+            display:flex; gap:10px; align-items:flex-start; font-size:12px; line-height:1.9;
+            color:#1d2129; margin-bottom:14px; }
 
 /* AI 解析来源：字段标记 + JSON 抽屉 */
 .src-bar { display:flex; align-items:center; gap:12px; background:#faf7ff; border:1px solid #e3d2fa;
@@ -181,16 +190,32 @@ input[type="text"] { width: 240px; }
 .jd-close { margin-left:auto; cursor:pointer; color:var(--gray); font-size:18px; }
 .jd-hint { padding:9px 16px; background:#faf7ff; border-bottom:1px solid #e3d2fa;
            font-size:11px; color:var(--ai); line-height:1.7; }
-.jd-body { flex:1; overflow-y:auto; padding:12px 14px 40px; }
-.jb { border:1px solid transparent; border-radius:5px; padding:6px 8px; margin-bottom:2px; cursor:pointer; }
-.jb:hover { background:#fafbfc; }
-.jb.jb-active { background:#faf7ff; border-color:#d3adf7; }
-.jb pre { margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px;
-          line-height:1.75; white-space:pre-wrap; word-break:break-word; color:#1d2129; }
-.jb .jk { color:#722ed1; font-weight:600; }
-.jb .jv { color:#0b7285; }
-.jb .jn { color:#c9cdd4; }
-.jb-tag { display:inline-block; margin-left:6px; padding:0 5px; border-radius:3px; background:#f2f3f5;
+.jd-body { flex:1; overflow-y:auto; padding:12px 14px 40px; background:#f7f8fa; }
+
+/* 解析结果卡片：一个 JSON 顶层 key 一张卡，子字段逐行展示 */
+.jb { background:#fff; border:1px solid var(--border); border-radius:8px; padding:11px 12px;
+      margin-bottom:10px; cursor:pointer; transition:box-shadow .15s, border-color .15s; }
+.jb:hover { border-color:#d3adf7; box-shadow:0 2px 8px rgba(114,46,209,.08); }
+.jb.jb-active { border-color:var(--ai); box-shadow:0 0 0 2px #e9d5ff; }
+.jc-head { display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+           padding-bottom:8px; border-bottom:1px solid #eef0f3; margin-bottom:8px; }
+.jc-field { font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+            font-size:12px; font-weight:700; color:var(--ai); }
+.jc-item { padding:2px 0; }
+.jc-item + .jc-item { margin-top:7px; padding-top:7px; border-top:1px dashed #eef0f3; }
+.jc-idx { font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+          font-size:10px; color:#c9cdd4; margin-bottom:3px; }
+.jc-row { display:flex; gap:10px; font-size:12px; line-height:1.8; padding:1px 0; }
+.jc-rk { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px;
+         color:var(--gray); min-width:112px; flex:none; }
+.jc-rv { flex:1; color:#1d2129; word-break:break-word; white-space:pre-wrap; }
+.jc-null { color:#c9cdd4; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; }
+.jc-empty { font-size:12px; color:#c9cdd4;
+            font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+.jc-diff { background:#fffbe6; border:1px solid #ffe58f; border-radius:5px;
+           padding:7px 9px; margin-top:8px; }
+.jc-diff .jc-rk { color:#c47b00; }
+.jb-tag { display:inline-block; padding:0 5px; border-radius:3px; background:#f2f3f5;
           color:var(--gray); font-size:10px; font-weight:600; }
 
 /* Market Visualizer */
@@ -461,7 +486,7 @@ input[type="text"] { width: 240px; }
       <div style="display:flex;align-items:center;gap:10px;">
         <span style="font-size:17px;font-weight:700;">4363712</span>
         <span class="src-badge src-auto badge-clickable" onclick="showModal('modal-classify-reason')"
-              title="查看判类依据：为什么这封邮件被并入问询 Alert">AUTO_PARSED &#9432;</span>
+              title="查看判断说明：为什么这封邮件被并入问询 Alert">AUTO_PARSED &#9432;</span>
       </div>
       <button class="btn" id="auto-edit-btn" style="height:30px;font-size:13px;" onclick="detailEdit('auto',true)">Edit</button>
     </div>
@@ -1269,44 +1294,17 @@ input[type="text"] { width: 240px; }
 <div class="modal-overlay" id="modal-classify-reason">
   <div class="modal" style="width:720px;">
     <div class="modal-header">
-      <span><span class="src-badge src-auto">AUTO_PARSED</span> 判类依据 &middot; Why this alert was created</span>
+      <span><span class="src-badge src-auto">AUTO_PARSED</span> 判断说明 &middot; Why this alert was created</span>
       <span class="modal-close" onclick="hideModal('modal-classify-reason')">&times;</span>
     </div>
     <div class="modal-body">
 
-      <div class="cr-verdict">
-        <span style="font-size:18px;">&#10003;</span>
-        <div style="flex:1;">
-          <div class="crv">计入 &mdash; 情形 1：内外部发送的调查邮件</div>
-          <div style="font-size:12px;color:var(--text-secondary);margin-top:3px;">
-            置信度 <span class="conf conf-high">high</span> &nbsp;·&nbsp; 人工复核：不需要
-            &nbsp;·&nbsp; 判类时间 2026-08-13 09:24:11 GMT+8
-          </div>
+      <div class="cr-prompt">
+        <span class="src-badge src-auto">AI</span>
+        <div class="cr-pname">Prompt：问询邮件判类 / inquiry_email_classifier
+          <span class="cr-pver">v3.2</span>
         </div>
       </div>
-
-      <div class="cr-sec">命中信号与原文证据</div>
-      <table class="data-table" style="font-size:12px;">
-        <thead><tr><th style="width:80px;">判断来源</th><th style="width:170px;">命中内容</th><th>原文证据（逐字）</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>主题</td><td>明确为交易行为调查请求</td>
-            <td style="white-space:normal;"><code class="cr-ev">[Inquiry] Trading activity review – NTCL – SUB-8841200</code></td>
-          </tr>
-          <tr>
-            <td>发件人</td><td>上手券商合规监察邮箱</td>
-            <td style="white-space:normal;"><code class="cr-ev">surveillance@broker-hk.example.com</code></td>
-          </tr>
-          <tr>
-            <td>正文</td><td>要求我方核查特定客户交易并回复</td>
-            <td style="white-space:normal;"><code class="cr-ev">please assist to investigate the client Sub ID: SUB-8841200 for trading activity in NTCL between 28 Jul 2026 and 08 Aug 2026 … please revert by 20 Aug</code></td>
-          </tr>
-          <tr>
-            <td>附件</td><td>成交明细清单，与正文调查诉求一致</td>
-            <td style="white-space:normal;"><code class="cr-ev">NTCL_trade_list_20260728_20260808.xlsx</code></td>
-          </tr>
-        </tbody>
-      </table>
 
       <div class="cr-sec">判断说明</div>
       <div class="cr-note">
@@ -1314,13 +1312,6 @@ input[type="text"] { width: 240px; }
         并要求我方在指定期限前回复，符合<strong>情形 1（内外部发送的调查邮件）</strong>。
         正文与附件所述客户、标的、时间区间一致，<strong>无冲突</strong>，故未触发人工复核。
       </div>
-
-      <div class="cr-sec">已排除的不计入情形</div>
-      <ul class="cr-excl">
-        <li>非信息、数据查询或披露类邮件 &mdash; 诉求为"核查并回复"，而非"提供数据"</li>
-        <li>非无关转发或抄送 &mdash; 发件人为直接问询方，非转发链</li>
-        <li>业务主体与业务事项均完整可判断 &mdash; 客户标识、标的、时间区间齐备</li>
-      </ul>
 
       <div class="cr-sec">来源邮件</div>
       <div class="attach-item">
@@ -1332,35 +1323,37 @@ input[type="text"] { width: 240px; }
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="hideModal('modal-classify-reason');showModal('modal-misclassify')">判类有误，反馈</button>
+      <button class="btn btn-danger" onclick="hideModal('modal-classify-reason');showModal('modal-misclassify')">判断有误，删除</button>
       <button class="btn btn-primary" onclick="hideModal('modal-classify-reason')">Close</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: 判类反馈 -->
+<!-- MODAL: 判断有误 —— 删除二次确认 -->
 <div class="modal-overlay" id="modal-misclassify">
   <div class="modal" style="width:460px;">
-    <div class="modal-header"><span>反馈判类有误</span><span class="modal-close" onclick="hideModal('modal-misclassify')">&times;</span></div>
+    <div class="modal-header"><span>确认删除该 Alert？</span><span class="modal-close" onclick="hideModal('modal-misclassify')">&times;</span></div>
     <div class="modal-body">
-      <div style="font-size:12px;color:var(--text-secondary);line-height:1.9;margin-bottom:14px;">
-        标记后该 Alert 不会被删除，但会记入判类准确率统计，用于回归 prompt 与关键词规则。
+      <div class="del-warn">
+        <span style="font-size:16px;line-height:1.2;">&#9888;</span>
+        <div>
+          删除后，该 Alert 将从 Alert Viewer 中移除，
+          其解析结果、关联附件与操作记录一并失效，<strong>操作不可撤销</strong>
+        </div>
       </div>
       <div class="form-group">
-        <label><span class="req">*</span> 实际应属于</label>
+        <label><span class="req">*</span> 误判原因</label>
         <select>
           <option value="">请选择</option>
-          <option>不应计入（信息 / 数据查询或披露类）</option>
           <option>不应计入（无关转发或抄送）</option>
           <option>不应计入（内容不完整，无法判断）</option>
-          <option>应计入，但情形归类有误</option>
         </select>
       </div>
       <div class="form-group"><label>补充说明</label><textarea placeholder="Please enter"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="hideModal('modal-misclassify')">Cancel</button>
-      <button class="btn btn-primary" onclick="hideModal('modal-misclassify')">Submit</button>
+      <button class="btn btn-danger" onclick="confirmDeleteAlert('4363712')">确认删除</button>
     </div>
   </div>
 </div>
@@ -1562,31 +1555,63 @@ function jsonEsc(t) {
   return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/* 按 key 逐块渲染，每块可独立高亮 */
+/* 一个 JSON 子字段 -> 一行「key : value」 */
+function renderRow(k, v) {
+  var val = (v === null || v === undefined || v === '')
+    ? '<span class="jc-null">null</span>'
+    : jsonEsc(v);
+  return '<div class="jc-row"><span class="jc-rk">' + jsonEsc(k) + '</span>'
+       + '<span class="jc-rv">' + val + '</span></div>';
+}
+
+/* 对象 -> 逐行；数组多条时每条之间加分隔 */
+function renderObj(o) {
+  return Object.keys(o).map(function (k) { return renderRow(k, o[k]); }).join('');
+}
+
+/* 按 JSON 顶层 key 逐张卡片渲染，字段与取值保持 JSON 原样 */
 function renderJsonDrawer() {
   var out = '';
   Object.keys(AI_JSON).forEach(function (k) {
-    var body = JSON.stringify(AI_JSON[k], null, 2);
-    // 给 key 和字符串值上色
-    var pretty = jsonEsc(body)
-      .replace(/&quot;([a-z_]+)&quot;:/g, '<span class="jk">"$1"</span>:')
-      .replace(/: &quot;([^&]*)&quot;/g, ': <span class="jv">"$1"</span>')
-      .replace(/\bnull\b/g, '<span class="jn">null</span>');
-    var tag = JSON_FIELD_MAP[k] ? '<span class="jb-tag">&#8594; ' + JSON_FIELD_MAP[k] + '</span>' : '';
-    // 已被人工改动的字段，附上当前值与 AI 原值的对照
-    var ov = '';
-    if (FIELD_STATE[k] && FIELD_STATE[k].edited) {
-      var curEl = document.getElementById('ei-' + k);
-      ov = '\n<span class="jk">"manual_override"</span>: {\n'
-         + '  <span class="jk">"current_value"</span>: <span class="jv">"'
-         + jsonEsc(curEl ? curEl.value : '') + '"</span>,\n'
-         + '  <span class="jk">"ai_original"</span>: <span class="jv">"'
-         + jsonEsc(FIELD_STATE[k].ai) + '"</span>,\n'
-         + '  <span class="jk">"edited_by"</span>: <span class="jv">"zhou"</span>\n}';
-      tag += '<span class="jb-tag" style="background:#fff7e8;color:#c47b00;">人工调整</span>';
+    var v = AI_JSON[k];
+    var edited = FIELD_STATE[k] && FIELD_STATE[k].edited;
+
+    /* 卡头：JSON 原 key + 对应表单字段 + 人工调整标 */
+    var head = '<div class="jc-head">'
+      + '<span class="jc-field">' + k + '</span>'
+      + (JSON_FIELD_MAP[k] ? '<span class="jb-tag">&#8594; ' + JSON_FIELD_MAP[k] + '</span>' : '')
+      + (edited ? '<span class="jb-tag" style="margin-left:auto;background:#fff7e8;color:#c47b00;">人工调整</span>' : '')
+      + '</div>';
+
+    /* 卡体：对象逐行；数组逐条分组；标量单行 */
+    var body;
+    if (Array.isArray(v)) {
+      body = v.length
+        ? v.map(function (it, i) {
+            var label = v.length > 1 ? '<div class="jc-idx">[' + i + ']</div>' : '';
+            return '<div class="jc-item">' + label
+                 + (it && typeof it === 'object' ? renderObj(it) : renderRow('value', it))
+                 + '</div>';
+          }).join('')
+        : '<div class="jc-empty">[ ] &mdash; 空数组</div>';
+    } else if (v && typeof v === 'object') {
+      body = '<div class="jc-item">' + renderObj(v) + '</div>';
+    } else {
+      body = '<div class="jc-item">' + renderRow('value', v) + '</div>';
     }
+
+    /* 已被人工改动的字段，附 AI 原值 -> 当前值 的对照 */
+    if (edited) {
+      var curEl = document.getElementById('ei-' + k);
+      body += '<div class="jc-item jc-diff">'
+            + renderRow('ai_original', FIELD_STATE[k].ai)
+            + renderRow('current_value', curEl ? curEl.value : '')
+            + renderRow('edited_by', 'zhou')
+            + '</div>';
+    }
+
     out += '<div class="jb" id="jb-' + k + '" onclick="highlightField(\'' + k + '\')">'
-         + '<pre><span class="jk">"' + k + '"</span>: ' + pretty + ov + tag + '</pre></div>';
+         + head + body + '</div>';
   });
   document.getElementById('jd-body').innerHTML = out;
 }
@@ -1812,6 +1837,14 @@ document.querySelectorAll('.modal-overlay').forEach(function (o) {
   o.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('show'); });
 });
 
+/* 判断有误 → 整条 Alert 删除：从列表移除并退回 Alert Viewer */
+function confirmDeleteAlert(id) {
+  ALERTS = ALERTS.filter(function (a) { return a.id !== id; });
+  hideModal('modal-misclassify');
+  renderAlertRows();
+  showPage('alertmgmt');
+  alert('Alert ' + id + ' 已删除。删除记录已写入 Alert Operation Log，并计入判类准确率统计用于回归 Prompt。');
+}
 
 renderAlertRows();
 </script>
