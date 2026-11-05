@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TM Alerts - Compliance Monitoring</title>
+<style>
+:root {
+  --accent: #FFC107;
+  --accent-hover: #e6ad00;
+  --bg: #ffffff;
+  --text: #1d2129;
+  --text-secondary: #4e5969;
+  --text-tertiary: #86909c;
+  --border: #e5e6eb;
+  --border-light: #f2f3f5;
+  --header-bg: #f7f8fa;
+  --row-hover: #fafbfc;
+  --success: #00b42a;
+  --warning: #ff7d00;
+  --danger: #f53f3f;
+  --info: #165dff;
+  --gray: #86909c;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  min-width: 1400px;
+}
+
+/* ===== Chrome ===== */
+.top-nav {
+  height: 48px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 4px;
+}
+.nav-logo { font-weight: 700; font-size: 14px; margin-right: 24px; }
+.nav-item { padding: 6px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+.nav-item:hover { background: var(--header-bg); }
+.nav-item.active { background: var(--accent); font-weight: 500; }
+
+.nav-dropdown { position: relative; }
+.nav-caret { font-size: 9px; margin-left: 3px; opacity: .7; }
+.dropdown-menu {
+  position: absolute; top: calc(100% + 4px); left: 0;
+  min-width: 210px; background: #fff; border: 1px solid var(--border);
+  border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.12);
+  padding: 6px 0; z-index: 250; display: none;
+}
+.dropdown-menu.show { display: block; }
+.dropdown-item {
+  padding: 9px 18px; font-size: 13px; color: var(--text);
+  cursor: pointer; white-space: nowrap;
+}
+.dropdown-item:hover { background: var(--header-bg); }
+.dropdown-item.active { background: #fffbe8; color: #b8860b; font-weight: 500; }
+
+.tab-bar {
+  height: 36px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 16px;
+  gap: 2px;
+}
+.tab-item {
+  padding: 6px 16px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  margin-bottom: -1px;
+}
+.tab-item.active { color: var(--text); font-weight: 500; border-bottom: 2px solid #fff; z-index: 2; }
+
+.breadcrumb {
+  padding: 12px 24px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border);
+}
+.breadcrumb b { color: var(--text); font-weight: 500; }
+
+.page-body { padding: 20px 24px 32px; }
+
+/* ===== Tabs ===== */
+.domain-tabs {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.domain-tab {
+  padding: 9px 4px;
+  margin-right: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.domain-tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--accent); }
+.domain-tab-link {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--info);
+  text-decoration: none;
+  padding-bottom: 10px;
+}
+.domain-tab-link:hover { text-decoration: underline; }
+
+/* ===== Filters ===== */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 20px;
+  margin-bottom: 14px;
+}
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.field select,
+.field input[type="text"] {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  font-family: inherit;
+}
+.field select:focus, .field input:focus { border-color: var(--accent); }
+.field textarea {
+  width: 100%;
+  height: 32px;
+  resize: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  color: var(--text);
+  line-height: 1.4;
+}
+.field textarea::placeholder { color: #c9cdd4; }
+.status-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.chip {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #fff;
+  white-space: nowrap;
+  user-select: none;
+}
+.chip:hover { border-color: var(--accent); }
+.chip.active { border-color: var(--accent); background: #fffdf5; font-weight: 500; }
+
+.btn {
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #fff;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); font-weight: 500; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-sm { height: 28px; padding: 0 12px; }
+.btn-icon {
+  height: 32px; width: 32px; padding: 0;
+  border: 1px solid var(--border); border-radius: 4px; background: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-secondary); font-size: 14px;
+}
+.btn-icon:hover { border-color: var(--accent); color: var(--text); }
+.btn-link {
+  border: none; background: none; color: var(--info);
+  padding: 0 4px; height: auto; font-size: 12px; cursor: pointer; font-family: inherit;
+}
+.btn-link:hover { color: #4080ff; }
+.btn-link.danger { color: var(--danger); }
+
+.actions-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.actions-row .divider-v {
+  width: 1px; height: 22px; background: var(--border); margin: 0 6px; align-self: center;
+}
+
+/* ===== Toggle ===== */
+.switch { position: relative; display: inline-block; width: 40px; height: 22px; vertical-align: middle; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #c9cdd4; border-radius: 22px; transition: .2s;
+}
+.slider:before {
+  content: ""; position: absolute; height: 18px; width: 18px;
+  left: 2px; bottom: 2px; background: #fff; border-radius: 50%; transition: .2s;
+}
+.switch input:checked + .slider { background: var(--accent); }
+.switch input:checked + .slider:before { transform: translateX(18px); }
+
+/* ===== Results bar ===== */
+.results-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0 12px;
+}
+.results-count { font-size: 13px; color: var(--text-secondary); }
+.results-count b { color: var(--text); font-weight: 600; }
+.results-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.groupby {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-secondary);
+  padding-right: 14px; margin-right: 4px;
+  border-right: 1px solid var(--border); height: 24px;
+}
+
+/* ===== Table ===== */
+.table-wrap { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.data-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.data-table th {
+  background: var(--header-bg);
+  padding: 9px 10px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+}
+.data-table th.sortable { cursor: pointer; padding-right: 22px; transition: background .12s, color .12s; }
+.data-table th:has(.th-tip) { overflow: visible; }
+.data-table th.sortable:hover { background: #eef0f3; color: var(--text); }
+.data-table th.sortable .sort-ind {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font-size: 9px; line-height: 1; color: #c9cdd4; transition: color .12s;
+}
+.data-table th.sortable:hover .sort-ind { color: #86909c; }
+.data-table th.sortable.sorted { color: var(--text); background: #fffdf5; }
+.data-table th.sortable.sorted .sort-ind { color: #b8860b; font-size: 10px; }
+.data-table th.nosort { cursor: default; }
+
+.data-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 12px;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.data-table tbody tr:hover td { background: var(--row-hover); }
+.data-table tr:last-child td { border-bottom: none; }
+
+.group-header {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  user-select: none;
+}
+.group-header:first-child { border-top: none; }
+.group-header:hover { background: var(--row-hover); }
+.group-header .caret {
+  width: 18px; height: 18px;
+  border: 1px solid #c9cdd4; border-radius: 3px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--text-tertiary); background: #fff;
+  flex-shrink: 0;
+}
+.group-header .acct { font-weight: 600; }
+.group-header .acct.flag-red { color: var(--danger); }
+.group-header .count { font-size: 12px; color: var(--text-tertiary); font-weight: 400; }
+.group-header .spacer { margin-left: auto; }
+.group-body.collapsed { display: none; }
+
+/* ===== Tags ===== */
+.dot-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; white-space: nowrap; }
+.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.dot.new { background: var(--danger); }
+.dot.processing { background: var(--info); }
+.dot.pending { background: var(--warning); }
+.dot.closed { background: var(--gray); }
+
+.badge {
+  display: inline-block; font-size: 10px; padding: 1px 6px;
+  border-radius: 3px; vertical-align: 1px; white-space: nowrap;
+}
+.badge-case { background: #e8f3ff; color: var(--info); }
+.tag-gray { background: #f2f3f5; color: var(--text-secondary); padding: 2px 8px; border-radius: 3px; font-size: 11px; }
+.tag-plain { font-size: 12px; color: var(--text-secondary); }
+
+/* Case list: new-alert indicator */
+.new-count-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-left: 6px; padding: 1px 4px 1px 7px;
+  background: var(--info); color: #fff; font-size: 10px; font-weight: 600;
+  border-radius: 9px; line-height: 15px;
+  vertical-align: 1px; white-space: nowrap;
+}
+.new-count-badge .ncb-x {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: rgba(255,255,255,.22); color: #fff;
+  font-size: 10px; line-height: 1; cursor: pointer;
+  transition: background .12s;
+}
+.new-count-badge .ncb-x:hover { background: rgba(255,255,255,.45); }
+.new-count-badge .ncb-x.is-locked {
+  background: rgba(255,255,255,.12); cursor: not-allowed; color: rgba(255,255,255,.6);
+}
+.new-count-badge .ncb-x.is-locked:hover { background: rgba(255,255,255,.12); }
+/* Header hint: explains the new-alert badge */
+.th-info {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; margin-left: 4px;
+  border-radius: 50%; background: #c9cdd4; color: #fff;
+  font-size: 10px; font-weight: 700; font-style: normal;
+  cursor: help; vertical-align: 1px; line-height: 1;
+}
+.data-table th:hover .th-info { background: var(--info); }
+.th-tip {
+  position: absolute; top: calc(100% + 6px); left: 0;
+  width: 280px; padding: 10px 12px;
+  background: #1d2129; color: #fff; font-size: 11px; font-weight: 400;
+  line-height: 1.7; border-radius: 4px; z-index: 60;
+  box-shadow: 0 6px 18px rgba(0,0,0,.2);
+  opacity: 0; visibility: hidden; transition: opacity .12s;
+  white-space: normal; text-align: left; text-transform: none;
+}
+.th-tip::before {
+  content: ""; position: absolute; top: -4px; left: 14px;
+  width: 8px; height: 8px; background: #1d2129; transform: rotate(45deg);
+}
+.th-tip b { color: #fff; font-weight: 600; }
+th:hover .th-tip { opacity: 1; visibility: visible; }
+
+.upd-note {
+  display: inline-block; margin-left: 6px; padding: 0 5px;
+  font-size: 10px; color: var(--info); background: #e8f3ff;
+  border-radius: 3px; line-height: 15px; vertical-align: 1px;
+}
+
+
+/* ===== Collapsible: closed alerts ===== */
+.history-toggle {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; margin-top: 10px;
+  background: var(--header-bg);
+  border: 1px solid var(--border); border-radius: 4px;
+  font-size: 12px; color: var(--text-secondary);
+  cursor: pointer; user-select: none;
+}
+.history-toggle:hover { background: #f2f3f5; }
+.history-toggle .caret {
+  width: 16px; height: 16px; flex-shrink: 0;
+  border: 1px solid #c9cdd4; border-radius: 3px; background: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--text-tertiary); line-height: 1;
+}
+.history-body { display: none; }
+.history-body.open { display: block; }
+.history-body .alert-card,
+.history-body .data-table tbody tr { opacity: .72; }
+
+/* ===== Newly-merged banner ===== */
+.new-banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; margin-bottom: 14px;
+  background: #f2f7ff; border: 1px solid #cfe0ff;
+  border-left: 3px solid var(--info); border-radius: 4px;
+  font-size: 12px; color: var(--text-secondary);
+}
+.new-banner .nb-icon {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  background: var(--info); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.new-banner b { color: var(--text); font-weight: 600; }
+.new-banner .nb-time { color: var(--text-tertiary); }
+.new-banner .nb-action { margin-left: auto; white-space: nowrap; }
+
+.pagination {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 14px 0; gap: 8px; font-size: 12px; color: var(--text-tertiary);
+}
+.pagination span {
+  padding: 4px 8px; border: 1px solid var(--border); border-radius: 3px; cursor: pointer;
+}
+.pagination span.current {
+  background: var(--accent); border-color: var(--accent); color: #1d2129; font-weight: 500;
+}
+
+/* ===== Modal ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  z-index: 300; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .15s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 8px; width: 560px;
+  max-height: 86vh; overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  transform: translateY(8px); transition: transform .15s;
+}
+.modal-overlay.show .modal { transform: translateY(0); }
+.modal.wide { width: 820px; }
+.modal-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 15px; font-weight: 600;
+}
+.modal-close { cursor: pointer; color: var(--text-tertiary); font-size: 18px; line-height: 1; }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 20px; }
+.modal-footer {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+
+.form-group { margin-bottom: 18px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-group > label {
+  display: block; font-size: 13px; color: var(--text);
+  font-weight: 500; margin-bottom: 8px;
+}
+.form-group .hint {
+  font-size: 11px; color: var(--text-tertiary); margin-top: 6px; line-height: 1.6;
+}
+.form-group select,
+.form-group input[type="text"] {
+  width: 100%; height: 36px; padding: 0 12px;
+  border: 1px solid var(--border); border-radius: 4px;
+  font-size: 13px; font-family: inherit; outline: none; background: #fff;
+}
+.form-group select:focus,
+.form-group input:focus { border-color: var(--accent); }
+
+.switch-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: 4px;
+}
+.switch-row .label { font-size: 13px; font-weight: 500; }
+.switch-row .desc { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+.switch-row .switch { margin-left: auto; }
+
+/* Window option cards — pick the outcome, not the number */
+.win-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.win-card {
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 8px 6px; background: #fff; cursor: pointer;
+  transition: border-color .12s, background .12s, color .12s;
+  font-family: inherit; text-align: center;
+  font-size: 13px; color: var(--text);
+}
+.win-card:hover { border-color: #c9cdd4; }
+.win-card.active {
+  border-color: var(--accent); background: #fffdf5;
+  color: #b8860b; font-weight: 600;
+}
+
+.seg-row { display: flex; gap: 8px; }
+.seg-row select {
+  height: 32px; padding: 0 10px; border: 1px solid var(--border);
+  border-radius: 4px; font-size: 12px; font-family: inherit;
+  background: #fff; color: var(--text); outline: none; cursor: pointer;
+}
+.seg-row select:focus { border-color: var(--accent); }
+.seg-row select:disabled { background: #f7f8fa; color: var(--text-tertiary); cursor: not-allowed; }
+
+.opt-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+.opt-line input { cursor: pointer; }
+.opt-line label { cursor: pointer; }
+
+.radio-line { display: flex; gap: 8px; }
+.radio-pill {
+  padding: 6px 16px; border: 1px solid var(--border); border-radius: 4px;
+  font-size: 12px; cursor: pointer; background: #fff; color: var(--text-secondary);
+  user-select: none; transition: border-color .12s, background .12s, color .12s;
+}
+.radio-pill:hover { border-color: #c9cdd4; }
+.radio-pill.active {
+  border-color: var(--accent); background: #fffdf5;
+  color: #b8860b; font-weight: 600;
+}
+
+/* Case Status radio group */
+.status-radio { display: flex; flex-wrap: wrap; gap: 6px 18px; padding-top: 7px; }
+.status-radio label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--text); cursor: pointer; white-space: nowrap;
+}
+.status-radio input[type="radio"] {
+  appearance: none; width: 15px; height: 15px; border: 1px solid #c9cdd4;
+  border-radius: 50%; background: #fff; cursor: pointer; position: relative; flex-shrink: 0;
+}
+.status-radio input[type="radio"]:checked { border-color: #f0c419; border-width: 1.5px; }
+.status-radio input[type="radio"]:checked::after {
+  content: ""; position: absolute; inset: 2px; border-radius: 50%; background: #f0c419;
+}
+
+.sub-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+
+.result-box {
+  margin-top: 14px; padding: 10px 12px;
+  background: var(--header-bg); border-radius: 4px;
+  font-size: 12px; color: var(--text-secondary);
+  line-height: 1.8; font-variant-numeric: tabular-nums;
+}
+.result-box b { color: var(--text); font-weight: 600; }
+.result-box .thin { color: var(--text-tertiary); }
+
+.rule-line {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin-top: 14px; font-size: 12px; color: var(--text-secondary);
+  line-height: 1.7;
+}
+.rule-line .k {
+  width: 15px; height: 15px; line-height: 15px; flex-shrink: 0;
+  text-align: center; border-radius: 50%;
+  background: var(--info); color: #fff; font-size: 10px; margin-top: 2px;
+}
+.rule-line b { color: var(--text); font-weight: 600; }
+
+/* Link modal */
+.link-type-row {
+  display: flex; gap: 20px; padding-bottom: 14px; margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.link-type-row label {
+  display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;
+}
+.link-search { margin-bottom: 10px; }
+.link-search input { width: 100%; height: 34px; padding: 0 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; font-family: inherit; outline: none; }
+.link-search input:focus { border-color: var(--accent); }
+.link-list { border: 1px solid var(--border); border-radius: 4px; max-height: 320px; overflow-y: auto; }
+.link-list table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.link-list th {
+  position: sticky; top: 0; background: var(--header-bg); z-index: 1;
+  padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 500;
+  color: var(--text-secondary); border-bottom: 1px solid var(--border);
+}
+.link-list td { padding: 9px 10px; font-size: 12px; border-bottom: 1px solid var(--border-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-list tr:last-child td { border-bottom: none; }
+.link-list tbody tr:hover td { background: var(--row-hover); }
+.link-list tbody tr.selected td { background: #fffdf5; }
+
+.checkbox-line {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 12px; cursor: pointer; line-height: 1.6;
+  padding: 10px 12px; background: var(--header-bg); border-radius: 4px;
+}
+.checkbox-line input { margin-top: 2px; cursor: pointer; }
+.checkbox-line .sub { display: block; color: var(--text-tertiary); font-size: 11px; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="nav-logo">TBNZ</div>
+  <div class="nav-item">合规管理</div>
+  <div class="nav-item active nav-dropdown" id="nav-monitoring">
+    Compliance Monitoring <span class="nav-caret">▾</span>
+    <div class="dropdown-menu" id="monitoring-menu">
+      <div class="dropdown-item" onclick="showAccountMgmt()">Account Management</div>
+      <div class="dropdown-item active" onclick="showAlertList()">Alert Viewer</div>
+      <div class="dropdown-item" onclick="showCase()">Case Management</div>
+    </div>
+  </div>
+  <div class="nav-item">Compliance Policy</div>
+  <div class="nav-item">Compliance Reporting</div>
+</div>
+
+<div class="tab-bar" id="tab-bar">
+  <div class="tab-item active" id="tab-alert">⭐ Alert Viewer</div>
+</div>
+
+<div class="breadcrumb">合规管理 &nbsp;&gt;&nbsp; Compliance Monitoring &nbsp;&gt;&nbsp; <b>Alert Viewer</b></div>
+
+<div class="page-body" id="alert-page">
+
+  <div class="domain-tabs">
+    <div class="domain-tab">TS Alerts</div>
+    <div class="domain-tab active">TM Alerts</div>
+    <a class="domain-tab-link" style="cursor:pointer;" onclick="showCase()">
+      Go to Case Management to review cases →
+    </a>
+  </div>
+
+  <div class="filter-grid">
+    <div class="field">
+      <label>Status</label>
+      <div class="status-chips">
+        <span class="chip">All</span>
+        <span class="chip active">New</span>
+        <span class="chip">Processing</span>
+        <span class="chip">Pending</span>
+        <span class="chip">Closed</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>ID</label>
+      <textarea placeholder='Bulk queries are separated by line breaks or "," , up to 100'></textarea>
+    </div>
+    <div class="field">
+      <label>Account ID</label>
+      <textarea placeholder='Bulk queries are separated by line breaks or "," , up to 100'></textarea>
+    </div>
+    <div class="field">
+      <label>Rule Name</label>
+      <select><option>Please select</option><option>HK_Withdraw-003</option><option>HK_Withdraw-007</option><option>HK_Deposit-002</option></select>
+    </div>
+    <div class="field">
+      <label>System Hit Time</label>
+      <input type="text" placeholder="Start Date  →  End Date">
+    </div>
+    <div class="field">
+      <label>Alert Tag</label>
+      <select><option>Please select</option><option>Investigating</option><option>In the Inquiry</option></select>
+    </div>
+    <div class="field">
+      <label>Client Tag</label>
+      <select><option>Please select</option></select>
+    </div>
+    <div class="field">
+      <label>Alert Owner</label>
+      <select><option>Please select</option><option>zhou</option><option>wuyi</option></select>
+    </div>
+  </div>
+
+  <div class="filter-grid" style="grid-template-columns: 1fr;">
+    <div class="field">
+      <label>Risk Level</label>
+      <select style="max-width:267px;"><option>Please select</option></select>
+    </div>
+  </div>
+
+  <div class="actions-row">
+    <button class="btn btn-primary">🔍 查询</button>
+    <button class="btn">重 置</button>
+    <button class="btn">Export</button>
+    <span class="divider-v"></span>
+    <button class="btn" onclick="openModal('aggregation-modal')">⚙ Aggregation Settings</button>
+  </div>
+
+  <div class="results-bar">
+    <span class="results-count"><b>0</b> Accounts selected, <b>109</b> Accounts in total</span>
+    <div class="results-actions">
+      <div class="groupby">
+        <span>Group by account:</span>
+        <span style="color:var(--warning);font-weight:600;font-size:12px;" class="groupby-state">Open</span>
+        <label class="switch"><input type="checkbox" id="groupToggle" checked onchange="toggleGroupBy(this)"><span class="slider"></span></label>
+      </div>
+      <select class="btn btn-sm" style="min-width:150px;">
+        <option>Bulk Manage Alerts</option>
+        <option>Bulk Link Cases</option>
+      </select>
+      <button class="btn btn-sm">Execute</button>
+    </div>
+  </div>
+
+  <div class="table-wrap" id="alert-table-wrap">
+
+    <!-- Group 1: linked to a case -->
+    <div class="group-header" onclick="toggleGroup(this)">
+      <span class="caret">−</span>
+      <input type="checkbox" onclick="event.stopPropagation()">
+      <span class="acct flag-red">Account: 14131200</span>
+      <span class="count">3 alerts</span>
+      <span class="spacer"></span>
+    </div>
+    <div class="group-body">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="nosort" style="width:34px;"></th>
+            <th class="sortable" data-type="num" style="width:74px;">ID<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="date" style="width:140px;">System Hit Time<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="num" style="width:106px;">Account Id<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:144px;">Rule Name<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:102px;">Alert Status<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:88px;">Internal Acct<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:82px;">Risk Level<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:106px;">Alert Tag<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:94px;">Alert Owner<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:96px;">Linked Case<span class="sort-ind">⇅</span></th>
+            <th class="nosort" style="width:148px;">Operation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>754612</td>
+            <td>2026-11-05 08:15:22</td>
+            <td>14131200</td>
+            <td>HK_Deposit-002</td>
+            <td><span class="dot-tag"><i class="dot processing"></i>Processing</span></td>
+            <td>N</td>
+            <td>--</td>
+            <td><span class="tag-gray">In the Inquiry</span></td>
+            <td>zhou</td>
+            <td>3045</td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>754574</td>
+            <td>2026-11-03 13:00:10</td>
+            <td>14131200</td>
+            <td>HK_Withdraw-003</td>
+            <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+            <td>N</td>
+            <td>--</td>
+            <td><span class="tag-gray">Investigating</span></td>
+            <td>zhou</td>
+            <td>3045</td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>754580</td>
+            <td>2026-11-03 09:12:44</td>
+            <td>14131200</td>
+            <td>HK_Withdraw-003</td>
+            <td><span class="dot-tag"><i class="dot pending"></i>Pending</span></td>
+            <td>N</td>
+            <td>--</td>
+            <td><span class="tag-gray">In the Inquiry</span></td>
+            <td>zhou</td>
+            <td>3045</td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Group 2 -->
+    <div class="group-header" onclick="toggleGroup(this)">
+      <span class="caret">+</span>
+      <input type="checkbox" onclick="event.stopPropagation()">
+      <span class="acct">Account: 77203100</span>
+      <span class="count">2 alerts</span>
+      <span class="spacer"></span>
+    </div>
+    <div class="group-body collapsed">
+      <table class="data-table">
+        <tbody>
+          <tr>
+            <td style="width:34px;"><input type="checkbox"></td>
+            <td style="width:74px;">754601</td>
+            <td style="width:140px;">2026-11-03 10:22:41</td>
+            <td style="width:106px;">77203100</td>
+            <td style="width:144px;">HK_Deposit-002</td>
+            <td style="width:102px;"><span class="dot-tag"><i class="dot new"></i>New</span></td>
+            <td style="width:88px;">N</td>
+            <td style="width:82px;">--</td>
+            <td style="width:106px;">--</td>
+            <td style="width:94px;">wuyi</td>
+            <td style="width:96px;">--</td>
+            <td style="width:148px;">
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link" onclick="openModal('link-modal')">Link</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>754605</td>
+            <td>2026-11-03 10:24:19</td>
+            <td>77203100</td>
+            <td>HK_Deposit-002</td>
+            <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+            <td>N</td>
+            <td>--</td>
+            <td>--</td>
+            <td>wuyi</td>
+            <td>--</td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link" onclick="openModal('link-modal')">Link</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Group 3 -->
+    <div class="group-header" onclick="toggleGroup(this)">
+      <span class="caret">+</span>
+      <input type="checkbox" onclick="event.stopPropagation()">
+      <span class="acct">Account: 11606400</span>
+      <span class="count">1 alert</span>
+      <span class="spacer"></span>
+    </div>
+    <div class="group-body collapsed">
+      <table class="data-table">
+        <tbody>
+          <tr>
+            <td style="width:34px;"><input type="checkbox"></td>
+            <td style="width:74px;">754582</td>
+            <td style="width:140px;">2026-11-03 13:00:10</td>
+            <td style="width:106px;">11606400</td>
+            <td style="width:144px;">HK_Withdraw-003</td>
+            <td style="width:102px;"><span class="dot-tag"><i class="dot new"></i>New</span></td>
+            <td style="width:88px;">N</td>
+            <td style="width:82px;">--</td>
+            <td style="width:106px;">--</td>
+            <td style="width:94px;">wuyi</td>
+            <td style="width:96px;">--</td>
+            <td style="width:148px;">
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link" onclick="openModal('link-modal')">Link</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Group 4 -->
+    <div class="group-header" onclick="toggleGroup(this)">
+      <span class="caret">+</span>
+      <input type="checkbox" onclick="event.stopPropagation()">
+      <span class="acct flag-red">Account: 66029100</span>
+      <span class="count">5 alerts</span>
+      <span class="spacer"></span>
+    </div>
+    <div class="group-body collapsed">
+      <table class="data-table">
+        <tbody>
+          <tr>
+            <td style="width:34px;"><input type="checkbox"></td>
+            <td style="width:74px;">754620</td>
+            <td style="width:140px;">2026-11-04 16:02:11</td>
+            <td style="width:106px;">66029100</td>
+            <td style="width:144px;">HK_Withdraw-007</td>
+            <td style="width:102px;"><span class="dot-tag"><i class="dot processing"></i>Processing</span></td>
+            <td style="width:88px;">N</td>
+            <td style="width:82px;">--</td>
+            <td style="width:106px;">--</td>
+            <td style="width:94px;">zhou</td>
+            <td style="width:96px;">--</td>
+            <td style="width:148px;">
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link" onclick="openModal('link-modal')">Link</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>754611</td>
+            <td>2026-11-05 09:41:03</td>
+            <td>66029100</td>
+            <td>HK_Withdraw-003</td>
+            <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+            <td>N</td>
+            <td>--</td>
+            <td>--</td>
+            <td>zhou</td>
+            <td>--</td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link" onclick="openModal('link-modal')">Link</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>754599</td>
+            <td>2026-11-02 14:30:58</td>
+            <td>66029100</td>
+            <td>HK_Deposit-002</td>
+            <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+            <td>N</td>
+            <td>--</td>
+            <td>--</td>
+            <td>wuyi</td>
+            <td>--</td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link" onclick="openModal('link-modal')">Link</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>754588</td>
+            <td>2026-11-01 11:12:07</td>
+            <td>66029100</td>
+            <td>HK_Withdraw-003</td>
+            <td><span class="dot-tag"><i class="dot pending"></i>Pending</span></td>
+            <td>N</td>
+            <td>--</td>
+            <td>--</td>
+            <td>wuyi</td>
+            <td>--</td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link" onclick="openModal('link-modal')">Link</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>752110</td>
+            <td>2026-08-14 11:03:59</td>
+            <td>66029100</td>
+            <td>HK_Withdraw-003</td>
+            <td><span class="dot-tag"><i class="dot closed"></i>Closed</span></td>
+            <td>N</td>
+            <td>--</td>
+            <td>--</td>
+            <td>wuyi</td>
+            <td>--</td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link" onclick="openModal('link-modal')">Link</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="pagination">
+    <span>‹</span>
+    <span class="current">1</span>
+    <span>2</span>
+    <span>3</span>
+    <span>›</span>
+    <span style="border:none;cursor:default;margin-left:8px;">Total 109 accounts</span>
+  </div>
+
+</div><!-- /alert list page -->
+
+<!-- ============ Case List Page ============ -->
+<div class="page-body" id="case-list-page" style="display:none;">
+
+  <div class="domain-tabs">
+    <div class="domain-tab">TS Case</div>
+    <div class="domain-tab active">TM Case</div>
+    <a class="domain-tab-link" style="cursor:pointer;" onclick="showAlertList()">
+      Go to Alert Viewer to link alerts →
+    </a>
+  </div>
+
+  <div class="filter-grid">
+    <div class="field">
+      <label>Case Status</label>
+      <select><option>All</option><option>New</option><option>Processing</option><option>Pending</option><option>Escalated</option><option>Closed</option></select>
+    </div>
+    <div class="field">
+      <label>Case Name</label>
+      <input type="text" placeholder="Fuzzy search">
+    </div>
+    <div class="field">
+      <label>Account ID</label>
+      <input type="text" placeholder="Match any account">
+    </div>
+    <div class="field">
+      <label>Case Owner</label>
+      <select><option>All</option><option selected>zhou (me)</option><option>wuyi</option><option>yimeng</option></select>
+    </div>
+    <div class="field">
+      <label>Case Tag</label>
+      <select><option>All</option><option>Further Action</option><option>No Further Action</option></select>
+    </div>
+  </div>
+
+  <div class="actions-row">
+    <button class="btn btn-primary">🔍 查询</button>
+    <button class="btn">重 置</button>
+    <button class="btn" style="margin-left:auto;" onclick="showAlertList()">Add New Case</button>
+  </div>
+
+  <div class="results-bar">
+    <span class="results-count"><b>24</b> Cases in total</span>
+    <span style="font-size:11px;color:var(--text-tertiary);margin-left:8px;">
+      · Sorted by Update Time (newest first). Linking a new alert counts as an update.
+    </span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+      <span id="add-total" style="font-size:11px;color:var(--text-tertiary);">3 add badges in this view</span>
+      <button class="btn btn-sm" id="clear-all-btn" onclick="clearAllBadges()" title="Clears the add badges on cases you own">
+        Clear all add badges
+      </button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-type="text" style="width:150px;">
+            Case Code
+            <span class="th-info" onclick="event.stopPropagation()">!</span>
+            <div class="th-tip">
+              Shown as <b>N add</b>: the number of alerts added to this case.
+              The count keeps accumulating until the <b>case owner</b> clicks <b>×</b> — only then does it reset to zero and start counting again.
+            </div>
+            <span class="sort-ind">⇅</span>
+          </th>
+          <th class="sortable" data-type="text" style="width:200px;">Case Name<span class="sort-ind">⇅</span></th>
+          <th class="sortable" data-type="num" style="width:112px;">Account ID<span class="sort-ind">⇅</span></th>
+          <th class="sortable" data-type="text" style="width:110px;">Case Status<span class="sort-ind">⇅</span></th>
+          <th class="sortable" data-type="text" style="width:120px;">Case Tag<span class="sort-ind">⇅</span></th>
+          <th class="sortable" data-type="num" style="width:76px;">Alerts<span class="sort-ind">⇅</span></th>
+          <th class="sortable" data-type="text" style="width:100px;">Case Owner<span class="sort-ind">⇅</span></th>
+          <th class="sortable" data-type="date" style="width:150px;">Update Time<span class="sort-ind">⇅</span></th>
+          <th class="nosort" style="width:130px;">Operation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-case="TM_3045" data-new="2">
+          <td>
+            TM_3045
+            <span class="new-count-badge" data-can-clear="1" title="2 alerts added since you last cleared this badge">
+              <span class="ncb-num">2 add</span><span class="ncb-x" onclick="clearNewBadge(this)" title="Clear">×</span>
+            </span>
+          </td>
+          <td>14131200 — Account level review</td>
+          <td>14131200</td>
+          <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+          <td>--</td>
+          <td>5</td>
+          <td>zhou</td>
+          <td>2026-09-28 14:25:40<span class="upd-note">linked</span></td>
+          <td>
+            <button class="btn-link" onclick="showCaseDetail('detail')">Detail</button>
+            <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
+          </td>
+        </tr>
+        <tr data-case="TM_3044" data-new="14">
+          <td>
+            TM_3044
+            <span class="new-count-badge" data-can-clear="1" title="14 alerts added since you last cleared this badge">
+              <span class="ncb-num">9+ add</span><span class="ncb-x" onclick="clearNewBadge(this)" title="Clear">×</span>
+            </span>
+          </td>
+          <td>66029100 — Account level review</td>
+          <td>66029100</td>
+          <td><span class="dot-tag"><i class="dot escalated"></i>Escalated</span></td>
+          <td>Further Action</td>
+          <td>7</td>
+          <td>zhou</td>
+          <td>2026-09-21 10:05:36</td>
+          <td>
+            <button class="btn-link" onclick="showCaseDetail('detail')">Detail</button>
+            <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
+          </td>
+        </tr>
+        <tr data-case="TM_3042" data-new="0">
+          <td>TM_3042</td>
+          <td>77203100 — Account level review</td>
+          <td>77203100</td>
+          <td><span class="dot-tag"><i class="dot closed"></i>Closed</span></td>
+          <td>No Further Action</td>
+          <td>2</td>
+          <td>wuyi</td>
+          <td>2026-07-02 17:40:11</td>
+          <td>
+            <button class="btn-link" onclick="showCaseDetail('detail')">Detail</button>
+            <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
+          </td>
+        </tr>
+        <tr data-case="TM_3041" data-new="1">
+          <td>
+            TM_3041
+            <span class="new-count-badge" data-can-clear="0" title="1 alert added · only the case owner (yimeng) can clear this">
+              <span class="ncb-num">1 add</span><span class="ncb-x is-locked" data-owner="yimeng" onclick="clearNewBadge(this)" title="Only the case owner can clear this">×</span>
+            </span>
+          </td>
+          <td>11606400 — Account level review</td>
+          <td>11606400</td>
+          <td><span class="dot-tag"><i class="dot processing"></i>Processing</span></td>
+          <td>--</td>
+          <td>4</td>
+          <td>yimeng</td>
+          <td>2026-10-02 08:15:22<span class="upd-note">linked</span></td>
+          <td>
+            <button class="btn-link" onclick="showCaseDetail('detail')">Detail</button>
+            <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
+          </td>
+        </tr>
+        <tr data-case="TM_3038" data-new="0">
+          <td>TM_3038</td>
+          <td>55382100 — Account level review</td>
+          <td>55382100</td>
+          <td><span class="dot-tag"><i class="dot closed"></i>Closed</span></td>
+          <td>No Further Action</td>
+          <td>3</td>
+          <td>wuyi</td>
+          <td>2026-04-03 15:28:09</td>
+          <td>
+            <button class="btn-link" onclick="showCaseDetail('detail')">Detail</button>
+            <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <span>‹</span>
+    <span class="current">1</span>
+    <span>2</span>
+    <span>3</span>
+    <span>›</span>
+    <span style="border:none;cursor:default;margin-left:8px;">Total 24 cases</span>
+  </div>
+
+</div><!-- /case list page -->
+
+<!-- ============ Case Detail Page ============ -->
+<div class="page-body" id="case-page" style="display:none;">
+
+  <div style="display:flex;align-items:center;margin-bottom:16px;">
+    <a class="back-link" onclick="showCase()" style="margin:0;">&#8592; Back to Case List</a>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+      <span id="case-readonly-note" style="font-size:11px;color:var(--text-tertiary);">Read-only — click Manage to edit this case.</span>
+      <button class="btn btn-primary" id="case-manage-btn" onclick="enterManage()">Manage</button>
+    </div>
+  </div>
+
+  <!-- ===== Case Overview ===== -->
+  <div style="margin-bottom:24px;" id="cd-overview-section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--accent);">
+      <span style="font-size:15px;font-weight:600;">Case Overview</span>
+    </div>
+
+    <!-- Edit form (only in Manage mode) -->
+    <div id="cd-ov-edit" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px 24px;">
+        <div class="form-group" style="margin:0;">
+          <label><span style="color:var(--danger);">*</span> Case Name</label>
+          <input id="cd-edit-name" type="text" style="width:100%;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:13px;outline:none;">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label><span style="color:var(--danger);">*</span> Case Owner</label>
+          <select id="cd-edit-owner" style="width:100%;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:13px;outline:none;">
+            <option>zhou</option><option>wuyi</option><option>yimeng</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label><span style="color:var(--danger);">*</span> Account ID</label>
+          <div style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;min-height:36px;display:flex;align-items:center;gap:6px;">
+            <span style="background:#e8f3ff;color:var(--text);border-radius:3px;padding:3px 8px;font-size:12px;">14131200 <span style="color:var(--text-tertiary);margin-left:4px;cursor:default;">×</span></span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin:0;">
+          <label><span style="color:var(--danger);">*</span> Case Status</label>
+          <div class="status-radio" id="cd-status-radio">
+            <label><input type="radio" name="case-status" value="New" onchange="onStatusChange(this)"> New</label>
+            <label><input type="radio" name="case-status" value="Processing" onchange="onStatusChange(this)"> Processing</label>
+            <label><input type="radio" name="case-status" value="Pending" onchange="onStatusChange(this)"> Pending</label>
+            <label><input type="radio" name="case-status" value="Escalated" onchange="onStatusChange(this)"> Escalated</label>
+            <label><input type="radio" name="case-status" value="Closed" onchange="onStatusChange(this)"> Closed</label>
+          </div>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Case Tag</label>
+          <select id="cd-edit-tag" style="width:100%;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:13px;outline:none;">
+            <option value="">Please select Case Tag</option><option>Further Action</option><option>No Further Action</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Data Period</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="date" id="cd-edit-period-from" value="2026-07-01" style="flex:1;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:12px;outline:none;">
+            <span style="color:var(--text-tertiary);">→</span>
+            <input type="date" id="cd-edit-period-to" value="2026-09-30" style="flex:1;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:12px;outline:none;">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin:0;grid-column:1 / -1;">
+          <label>Comment</label>
+          <textarea id="cd-edit-comment" placeholder="Please enter Comment" style="width:100%;height:76px;padding:10px 12px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:13px;outline:none;resize:vertical;"></textarea>
+          <div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Saving overwrites Last Comment.</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
+        <button class="btn" onclick="cancelEdit()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEdit()">Save</button>
+      </div>
+    </div>
+
+    <!-- View grid -->
+    <div id="cd-ov-view">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 30px;font-size:12px;line-height:2.2;">
+      <div><span style="color:#86909c;">Case Name:</span> <strong id="cd-name">14131200 — Account level review</strong></div>
+      <div><span style="color:#86909c;">Case Code:</span> <strong>TM_3045</strong></div>
+      <div><span style="color:#86909c;">Case Owner:</span> <strong id="cd-owner">zhou</strong></div>
+      <div><span style="color:#86909c;">Account ID:</span> <strong>14131200</strong></div>
+      <div><span style="color:#86909c;">Number of alerts:</span> <strong>5</strong></div>
+      <div><span style="color:#86909c;">Case Status:</span> <strong id="cd-status"><span class="dot-tag"><i class="dot new"></i>New</span></strong></div>
+      <div><span style="color:#86909c;">Case Source:</span> <strong>Auto-merged (TM Alerts)</strong></div>
+      <div><span style="color:#86909c;">Merge Window:</span> <strong>Jul 2026 → Oct 2026</strong></div>
+      <div><span style="color:#86909c;">Created Time:</span> <strong>2026-07-01 00:05:12 GMT+8</strong></div>
+      <div><span style="color:#86909c;">Data Period:</span> <strong id="cd-period">2026-07-01 ~ 2026-09-30 GMT+8</strong></div>
+      <div><span style="color:#86909c;">Last Alert Added:</span> <strong>2026-09-28 14:22:07 GMT+8</strong></div>
+    </div>
+    <div style="margin-top:14px;">
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Last Comment</div>
+      <div id="cd-comment" style="font-size:12px;line-height:1.8;background:#f7f8fa;border-radius:4px;padding:12px;min-height:40px;color:var(--text-secondary);">
+        Reviewing withdrawal activity for this account across the current window.
+      </div>
+    </div>
+    </div><!-- /cd-ov-view -->
+  </div>
+
+  <!-- ===== Newly merged alerts banner ===== -->
+  <div class="new-banner">
+    <span class="nb-icon">↑</span>
+    <div>
+      <b>2 new alerts merged into this case</b>
+      <span class="nb-time">&nbsp;·&nbsp;since 2026-09-28 00:00</span>
+      <div style="margin-top:2px;color:var(--text-tertiary);font-size:11px;">
+        Refreshed daily. Alerts merged while the case had no handling are marked New.
+      </div>
+    </div>
+    <span class="nb-action"><button class="btn-link" onclick="jumpToNew()">View →</button></span>
+  </div>
+
+  <!-- ===== Associated Records ===== -->
+  <div style="margin-bottom:24px;">
+    <div style="font-size:15px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);">Associated Records</div>
+
+    <div style="display:flex;align-items:center;margin-bottom:12px;">
+      <span style="font-size:12px;color:#86909c;">5 Alerts linked to this case</span>
+      <span style="margin-left:auto;font-size:11px;color:#86909c;">
+        Alert status is tracked independently of the Case status.
+      </span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-type="num" style="width:96px;">ID<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="date" style="width:142px;">System Hit Time<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="date" style="width:142px;">Linked Time<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="num" style="width:106px;">Account Id<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:150px;">Rule Name<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:106px;">Alert Status<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:110px;">Alert Tag<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:96px;">Alert Owner<span class="sort-ind">⇅</span></th>
+            <th class="sortable" data-type="text" style="width:112px;">Linked<span class="sort-ind">⇅</span></th>
+            <th class="nosort" style="width:150px;">Operation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>754821 <span class="badge badge-case" style="margin-left:4px;">New</span></td>
+            <td>2026-09-28 14:22:07</td>
+            <td>2026-09-28 14:25:40</td>
+            <td>14131200</td>
+            <td>HK_Withdraw-007</td>
+            <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+            <td><span class="tag-gray">Investigating</span></td>
+            <td>zhou</td>
+            <td><span class="tag-plain">Auto</span></td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+            </td>
+          </tr>
+          <tr>
+            <td>754760 <span class="badge badge-case" style="margin-left:4px;">New</span></td>
+            <td>2026-09-12 09:05:33</td>
+            <td>2026-09-12 09:06:02</td>
+            <td>14131200</td>
+            <td>HK_Deposit-002</td>
+            <td><span class="dot-tag"><i class="dot processing"></i>Processing</span></td>
+            <td><span class="tag-gray">In the Inquiry</span></td>
+            <td>zhou</td>
+            <td><span class="tag-plain">Auto</span></td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+            </td>
+          </tr>
+          <tr>
+            <td>754612</td>
+            <td>2026-08-20 16:41:18</td>
+            <td>2026-08-20 16:41:18</td>
+            <td>14131200</td>
+            <td>HK_Withdraw-003</td>
+            <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+            <td><span class="tag-gray">Investigating</span></td>
+            <td>wuyi</td>
+            <td><span class="tag-plain">Auto</span></td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+            </td>
+          </tr>
+          <tr>
+            <td>754420</td>
+            <td>2026-07-14 11:52:40</td>
+            <td>2026-07-14 11:52:40</td>
+            <td>14131200</td>
+            <td>HK_Withdraw-003</td>
+            <td><span class="dot-tag"><i class="dot pending"></i>Pending</span></td>
+            <td><span class="tag-gray">In the Inquiry</span></td>
+            <td>wuyi</td>
+            <td><span class="tag-plain">Created case</span></td>
+            <td>
+              <button class="btn-link">Detail</button>
+              <button class="btn-link">Manage</button>
+              <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Closed alerts: collapsed by default -->
+    <div class="history-toggle" onclick="toggleHistory(this)">
+      <span class="caret">+</span>
+      Closed alerts（4）— click to expand
+    </div>
+    <div class="history-body">
+      <div class="table-wrap" style="margin-top:8px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:96px;">ID</th>
+              <th style="width:142px;">System Hit Time</th>
+              <th style="width:142px;">Linked Time</th>
+              <th style="width:106px;">Account Id</th>
+              <th style="width:150px;">Rule Name</th>
+              <th style="width:106px;">Alert Status</th>
+              <th style="width:110px;">Alert Tag</th>
+              <th style="width:96px;">Alert Owner</th>
+              <th style="width:112px;">Linked</th>
+              <th style="width:150px;">Operation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>751902</td>
+              <td>2026-07-03 10:18:55</td>
+              <td>2026-07-03 10:18:55</td>
+              <td>14131200</td>
+              <td>HK_Withdraw-003</td>
+              <td><span class="dot-tag"><i class="dot closed"></i>Closed</span></td>
+              <td><span class="tag-gray">Cleared</span></td>
+              <td>wuyi</td>
+              <td><span class="tag-plain">Auto</span></td>
+              <td>
+                <button class="btn-link">Detail</button>
+                <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+              </td>
+            </tr>
+            <tr>
+              <td>751884</td>
+              <td>2026-07-02 16:44:20</td>
+              <td>2026-07-02 16:44:20</td>
+              <td>14131200</td>
+              <td>HK_Deposit-002</td>
+              <td><span class="dot-tag"><i class="dot closed"></i>Closed</span></td>
+              <td><span class="tag-gray">Cleared</span></td>
+              <td>wuyi</td>
+              <td><span class="tag-plain">Auto</span></td>
+              <td>
+                <button class="btn-link">Detail</button>
+                <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+              </td>
+            </tr>
+            <tr>
+              <td>751760</td>
+              <td>2026-07-02 09:31:08</td>
+              <td>2026-07-02 09:31:08</td>
+              <td>14131200</td>
+              <td>HK_Withdraw-007</td>
+              <td><span class="dot-tag"><i class="dot closed"></i>Closed</span></td>
+              <td><span class="tag-gray">Cleared</span></td>
+              <td>zhou</td>
+              <td><span class="tag-plain">Auto</span></td>
+              <td>
+                <button class="btn-link">Detail</button>
+                <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+              </td>
+            </tr>
+            <tr>
+              <td>751615</td>
+              <td>2026-07-01 14:07:52</td>
+              <td>2026-07-01 14:07:52</td>
+              <td>14131200</td>
+              <td>HK_Deposit-002</td>
+              <td><span class="dot-tag"><i class="dot closed"></i>Closed</span></td>
+              <td><span class="tag-gray">False Positive</span></td>
+              <td>zhou</td>
+              <td><span class="tag-plain">Auto</span></td>
+              <td>
+                <button class="btn-link">Detail</button>
+                <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Operation Log ===== -->
+  <div style="margin-bottom:20px;">
+    <div style="font-size:15px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);">Operation Log</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-type="text" style="width:190px;">Operation Time<span class="sort-ind">⇅</span></th>
+          <th class="sortable" data-type="text" style="width:110px;">Operator<span class="sort-ind">⇅</span></th>
+          <th class="sortable" data-type="text" style="width:150px;">Operation<span class="sort-ind">⇅</span></th>
+          <th class="nosort">Operation Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>2026-09-28 14:22:07 GMT+8</td><td>system</td><td>Auto Link</td><td>Alert #754821 merged into this case by the aggregation rule.</td></tr>
+        <tr><td>2026-09-12 09:05:33 GMT+8</td><td>system</td><td>Auto Link</td><td>Alert #754760 merged into this case by the aggregation rule.</td></tr>
+        <tr><td>2026-08-20 16:41:18 GMT+8</td><td>system</td><td>Auto Link</td><td>Alert #754612 merged into this case by the aggregation rule.</td></tr>
+        <tr><td>2026-07-14 11:52:40 GMT+8</td><td>system</td><td>Create Case</td><td>Case created for account 14131200 in window Jul 2026 → Oct 2026. Initial alert #754420.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /case page -->
+
+
+<!-- ============ Modal: Close Case ============ -->
+<div class="modal-overlay" id="close-modal">
+  <div class="modal" style="width:520px;">
+    <div class="modal-header">
+      <span>Close Case</span>
+      <span class="modal-close" onclick="closeModal('close-modal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Close reason</label>
+        <select style="width:100%;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-family:inherit;outline:none;">
+          <option>Please select</option>
+          <option>No Further Action</option>
+          <option>Further Action</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Remark</label>
+        <textarea style="width:100%;height:64px;padding:9px 12px;border:1px solid var(--border);border-radius:4px;font-family:inherit;outline:none;resize:vertical;"></textarea>
+      </div>
+
+      <label class="checkbox-line">
+        <input type="checkbox" id="close-with-alerts" checked onchange="updateCloseHint()">
+        <span>
+          Also close all linked alerts（4 open alerts）
+          <span class="sub" id="close-alert-hint">
+            One-off action. Alert status stays independent of Case status — this will not stay in sync afterwards.
+          </span>
+        </span>
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="cancelClose()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmCloseCase()">Confirm Close</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="aggregation-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span>Aggregation Settings</span>
+      <span class="modal-close" onclick="closeModal('aggregation-modal')">×</span>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-group">
+        <div class="switch-row">
+          <div>
+            <div class="label">Auto-merge alerts into Case</div>
+            <div class="desc">Only alerts triggered after switching this on will be merged. Historical alerts are not back-filled.</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="autoMerge" checked onchange="toggleAutoMerge(this)"><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="form-group" id="window-group">
+        <label>Merge window</label>
+
+        <div class="radio-line">
+          <label class="radio-pill active" id="limit-on" onclick="setLimit(true)">
+            <input type="radio" name="limit" checked style="display:none;"> Limit window
+          </label>
+          <label class="radio-pill" id="limit-off" onclick="setLimit(false)">
+            <input type="radio" name="limit" style="display:none;"> No limit
+          </label>
+        </div>
+
+        <div id="interval-row" style="margin-top:14px;display:flex;align-items:center;gap:8px;">
+          <input type="number" id="interval-input" value="3" min="1" max="12"
+                 style="width:88px;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;font-family:inherit;outline:none;"
+                 oninput="renderResult()">
+          <span style="font-size:13px;color:var(--text-secondary);">months per window</span>
+        </div>
+
+        <div class="result-box" id="result-box"></div>
+
+        <div class="rule-line">
+          <span class="k">i</span>
+          <div>
+            Alerts from the <b>same account</b> within a window may be merged into one Case according to the merge rules. An alert falling into a <b>later window</b> starts a <b>new Case</b> and is not evaluated against earlier ones.
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('aggregation-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Link to Case ============ -->
+<div class="modal-overlay" id="link-modal">
+  <div class="modal wide">
+    <div class="modal-header">
+      <span>Link</span>
+      <span class="modal-close" onclick="closeModal('link-modal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="link-type-row">
+        <label><input type="radio" name="link-type" checked onchange="switchLinkPanel('existing')"> Link to an existing case</label>
+        <label><input type="radio" name="link-type" onchange="switchLinkPanel('new')"> Add a new case</label>
+      </div>
+
+      <div id="link-existing-panel">
+        <div class="link-search">
+          <input type="text" id="link-search-input" placeholder="Search by Case ID, Case Name, or Account ID..." oninput="filterCases(this.value)">
+        </div>
+        <div class="link-list">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:30px;"></th>
+                <th style="width:70px;">Case ID</th>
+                <th>Case Name</th>
+                <th style="width:110px;">Account</th>
+                <th style="width:90px;">Owner</th>
+                <th style="width:80px;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="link-case-body">
+              <tr data-search="3045 14131200 account level review zhou">
+                <td><input type="radio" name="link-select-case"></td>
+                <td>3045</td><td>14131200 — Account level review</td><td>14131200</td><td>zhou</td>
+                <td><span class="dot-tag"><i class="dot processing"></i>Processing</span></td>
+              </tr>
+              <tr data-search="3043 4667800 possible quote stuffing yimeng">
+                <td><input type="radio" name="link-select-case"></td>
+                <td>3043</td><td>4667800 — Possible quote stuffing</td><td>4667800</td><td>yimeng</td>
+                <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+              </tr>
+              <tr data-search="3026 9793000 possible spoofing yimeng">
+                <td><input type="radio" name="link-select-case"></td>
+                <td>3026</td><td>9793000 — Possible Spoofing</td><td>9793000</td><td>yimeng</td>
+                <td><span class="dot-tag"><i class="dot pending"></i>Pending</span></td>
+              </tr>
+              <tr data-search="3018 666900 pre arranged trading option yimeng">
+                <td><input type="radio" name="link-select-case"></td>
+                <td>3018</td><td>666900 — Possible Pre-arranged Trading</td><td>666900</td><td>yimeng</td>
+                <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
+              </tr>
+              <tr data-search="1453 63780800 troo wash trade zhou">
+                <td><input type="radio" name="link-select-case"></td>
+                <td>1453</td><td>TROO wash trade</td><td>63780800</td><td>zhou</td>
+                <td><span class="dot-tag"><i class="dot closed"></i>Closed</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="hint" style="font-size:11px;color:var(--text-tertiary);margin-top:8px;">
+          Select a case above, then confirm to link this alert.
+        </div>
+      </div>
+
+      <div id="link-new-panel" style="display:none;">
+        <div class="form-group">
+          <label><span style="color:var(--danger);">*</span> Case Name</label>
+          <input type="text" placeholder="Please enter Case Name" style="width:100%;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:4px;font-family:inherit;outline:none;">
+        </div>
+        <div class="form-group">
+          <label>Account ID</label>
+          <input type="text" value="77203100" disabled style="width:100%;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:4px;background:#f7f8fa;color:var(--text-secondary);font-family:inherit;">
+        </div>
+        <div class="form-group">
+          <label><span style="color:var(--danger);">*</span> Case Owner</label>
+          <select style="width:100%;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:4px;font-family:inherit;outline:none;">
+            <option>zhou</option><option>wuyi</option><option>yimeng</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('link-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('link-modal')">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Delink ============ -->
+<div class="modal-overlay" id="delink-modal">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <span>Delink Alert</span>
+      <span class="modal-close" onclick="closeModal('delink-modal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;line-height:1.8;margin-bottom:14px;">
+        Remove this alert from the case. Its own status will not change.
+      </div>
+      <label class="checkbox-line">
+        <input type="checkbox" checked>
+        <span>
+          Exclude from auto-merge
+          <span class="sub">Otherwise the next aggregation run may link it back</span>
+        </span>
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('delink-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('delink-modal')">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Modal ---------- */
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(function (o) {
+  o.addEventListener('click', function (e) { if (e.target === o) o.classList.remove('show'); });
+});
+
+/* ---------- Filters / group toggle ---------- */
+document.querySelectorAll('.status-chips .chip').forEach(function (c) {
+  c.addEventListener('click', function () {
+    c.parentElement.querySelectorAll('.chip').forEach(function (x) { x.classList.remove('active'); });
+    c.classList.add('active');
+  });
+});
+
+function toggleGroup(h) {
+  var body = h.nextElementSibling;
+  var caret = h.querySelector('.caret');
+  body.classList.toggle('collapsed');
+  caret.textContent = body.classList.contains('collapsed') ? '+' : '−';
+}
+
+function toggleHistory(el) {
+  var body = el.nextElementSibling;
+  var caret = el.querySelector('.caret');
+  var open = body.classList.toggle('open');
+  caret.textContent = open ? '−' : '+';
+}
+
+/* Scroll to the first newly-merged alert row */
+function jumpToNew() {
+  var rows = document.querySelectorAll('#case-page .data-table tbody tr');
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i].querySelector('.badge-case')) {
+      rows[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      rows[i].style.transition = 'background .3s';
+      rows[i].style.background = '#f2f7ff';
+      setTimeout(function (r) { r.style.background = ''; }, 1500, rows[i]);
+      return;
+    }
+  }
+}
+
+/* ---------- Case list: clearing the "new alerts" badge ----------
+   The badge counts newly added alerts and accumulates over time.
+   Nothing clears it automatically — only an explicit × click does. */
+var CURRENT_USER = 'zhou';   // logged-in user
+
+function clearNewBadge(x) {
+  // Manual only, and only the case owner may clear it.
+  if (x.closest('.new-count-badge').dataset.canClear !== '1') {
+    var owner = x.getAttribute('data-owner') || 'the case owner';
+    alert('Only the case owner (' + owner + ') can clear this badge.');
+    event.stopPropagation();
+    return;
+  }
+  var badge = x.closest('.new-count-badge');
+  var row = badge ? badge.closest('tr') : null;
+  if (badge) badge.remove();
+  if (row) row.dataset.new = '0';
+  refreshAddTotal();
+  event.stopPropagation();
+}
+
+/* Badge label: cap the number so a long-ignored counter stays readable */
+function badgeLabel(n) {
+  return (n > 9 ? '9+' : n) + ' add';
+}
+
+/* Permission model for the badge:
+   - Case owner: full
+   - Anyone else: read-only
+   Badges the current user may clear carry data-can-clear="1". */
+
+/* Clear every "N add" badge on cases the current user owns.
+   Badges on cases owned by someone else stay put and are reported. */
+function clearAllBadges() {
+  var own = 0, locked = 0;
+  document.querySelectorAll('#case-list-page .new-count-badge').forEach(function (b) {
+    var row = b.closest('tr');
+    if (b.dataset.canClear !== '1') { locked++; return; }
+    b.remove();
+    if (row) row.dataset.new = '0';
+    own++;
+  });
+  refreshAddTotal();
+  if (locked) {
+    alert('Cleared ' + own + ' badge(s). ' + locked + ' badge(s) belong to other owners and were kept.');
+  }
+}
+
+function refreshAddTotal() {
+  var n = document.querySelectorAll('#case-list-page .new-count-badge').length;
+  var el = document.getElementById('add-total');
+  if (el) el.textContent = n === 0 ? 'No add badges in this view' : n + ' add badge' + (n > 1 ? 's' : '') + ' in this view';
+  var btn = document.getElementById('clear-all-btn');
+  if (btn) {
+    btn.disabled = !document.querySelector('#case-list-page .new-count-badge[data-can-clear="1"]');
+    btn.style.opacity = btn.disabled ? '.45' : '1';
+    btn.style.cursor = btn.disabled ? 'not-allowed' : 'pointer';
+  }
+}
+
+/* ---------- Page routing ---------- */
+function setActiveMenu(name) {
+  document.querySelectorAll('#monitoring-menu .dropdown-item').forEach(function (d) {
+    d.classList.toggle('active', d.textContent.trim() === name);
+  });
+}
+
+function setActiveTab(name, icon) {
+  var bar = document.getElementById('tab-bar');
+  bar.innerHTML = '';
+  var t = document.createElement('div');
+  t.className = 'tab-item active';
+  t.textContent = icon + ' ' + name;
+  bar.appendChild(t);
+}
+
+function setBreadcrumb(parts) {
+  document.querySelector('.breadcrumb').innerHTML = parts.join(' &nbsp;&gt;&nbsp; ');
+}
+
+function showCase() {
+  document.querySelectorAll('.page-body').forEach(function (p) { p.style.display = 'none'; });
+  document.getElementById('case-list-page').style.display = 'block';
+  setActiveMenu('Case Management');
+  setActiveTab('Case Management', '🏷');
+  setBreadcrumb(['合规管理', 'Compliance Monitoring', '<b>Case Management</b>']);
+  toggleNavMenu(false);
+  window.scrollTo(0, 0);
+}
+
+function showCaseDetail(mode) {
+  document.querySelectorAll('.page-body').forEach(function (p) { p.style.display = 'none'; });
+  document.getElementById('case-page').style.display = 'block';
+  setActiveMenu('Case Management');
+  setActiveTab('Case Management', '🏷');
+  setBreadcrumb(['合规管理', 'Compliance Monitoring', 'Case Management', '<b>TM_3045</b>']);
+  toggleNavMenu(false);
+  if (mode === 'manage') { enterManage(); } else { setReadOnly(); }
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Detail (read-only) vs Manage (editable) ---------- */
+var manageMode = false;
+
+function setReadOnly() {
+  manageMode = false;
+  document.getElementById('cd-ov-view').style.display = '';
+  document.getElementById('cd-ov-edit').style.display = 'none';
+  document.getElementById('case-manage-btn').style.display = '';
+  document.getElementById('case-readonly-note').style.display = '';
+  document.querySelectorAll('#case-page .btn-link.danger').forEach(function (b) { b.style.display = 'none'; });
+}
+
+function enterManage() {
+  manageMode = true;
+  document.getElementById('cd-ov-view').style.display = 'none';
+  document.getElementById('cd-ov-edit').style.display = 'block';
+  document.getElementById('case-manage-btn').style.display = 'none';
+  document.getElementById('case-readonly-note').style.display = 'none';
+  document.querySelectorAll('#case-page .btn-link.danger').forEach(function (b) { b.style.display = ''; });
+
+  // Seed the form from the current view
+  document.getElementById('cd-edit-name').value = document.getElementById('cd-name').textContent.trim();
+  document.getElementById('cd-edit-owner').value = document.getElementById('cd-owner').textContent.trim();
+  var status = document.getElementById('cd-status').textContent.replace(/[●\s]+/g, '').trim();
+  setStatusRadio(status === 'Closed' ? 'New' : status, false);
+  document.getElementById('cd-edit-comment').value = document.getElementById('cd-comment').textContent.trim();
+}
+
+function setStatusRadio(value, fireModal) {
+  document.querySelectorAll('#cd-status-radio input').forEach(function (r) {
+    r.checked = (r.value === value);
+  });
+  if (fireModal && value === 'Closed') openModal('close-modal');
+}
+
+function getStatusRadio() {
+  var checked = document.querySelector('#cd-status-radio input:checked');
+  return checked ? checked.value : 'New';
+}
+
+function cancelEdit() {
+  document.getElementById('cd-ov-view').style.display = '';
+  document.getElementById('cd-ov-edit').style.display = 'none';
+}
+
+function saveEdit() {
+  var name = document.getElementById('cd-edit-name').value.trim();
+  if (!name) { alert('Case Name is required.'); return; }
+  var owner = document.getElementById('cd-edit-owner').value;
+  var status = getStatusRadio();
+  var comment = document.getElementById('cd-edit-comment').value.trim();
+
+  document.getElementById('cd-name').textContent = name;
+  document.getElementById('cd-owner').textContent = owner;
+  var cls = { New: 'new', Processing: 'processing', Pending: 'pending', Escalated: 'escalated', Closed: 'closed' }[status] || 'new';
+  document.getElementById('cd-status').innerHTML =
+    '<span class="dot-tag"><i class="dot ' + cls + '"></i>' + status + '</span>';
+  if (comment) document.getElementById('cd-comment').textContent = comment;
+  document.getElementById('cd-period').textContent =
+    document.getElementById('cd-edit-period-from').value + ' ~ ' +
+    document.getElementById('cd-edit-period-to').value + ' GMT+8';
+
+  document.getElementById('cd-ov-view').style.display = '';
+  document.getElementById('cd-ov-edit').style.display = 'none';
+}
+
+/* Selecting Closed in Case Status opens the close confirmation.
+   Cancelling it rolls the radio back to the previous status. */
+var prevStatus = 'New';
+
+function onStatusChange(el) {
+  if (el.value === 'Closed') {
+    openModal('close-modal');
+  } else {
+    prevStatus = el.value;
+  }
+}
+
+/* ---------- Close Case ---------- */
+function updateCloseHint() {
+  var on = document.getElementById('close-with-alerts').checked;
+  document.getElementById('close-alert-hint').style.display = on ? 'block' : 'none';
+}
+
+function confirmCloseCase() {
+  closeModal('close-modal');
+  prevStatus = 'Closed';
+  // Commit the Closed status straight to the case
+  document.getElementById('cd-status').innerHTML =
+    '<span class="dot-tag"><i class="dot closed"></i>Closed</span>';
+  if (document.getElementById('close-with-alerts').checked) {
+    document.querySelectorAll('#case-page .data-table tbody tr').forEach(function (tr) {
+      var tag = tr.querySelector('.dot-tag');
+      if (tag && !tag.querySelector('.dot.closed')) {
+        tag.innerHTML = '<i class="dot closed"></i>Closed';
+      }
+    });
+  }
+}
+
+function cancelClose() {
+  closeModal('close-modal');
+  setStatusRadio(prevStatus, false);
+}
+
+function showAlertList() {
+  document.querySelectorAll('.page-body').forEach(function (p) { p.style.display = 'none'; });
+  document.getElementById('alert-page').style.display = 'block';
+  setActiveMenu('Alert Viewer');
+  setActiveTab('Alert Viewer', '⭐');
+  setBreadcrumb(['合规管理', 'Compliance Monitoring', '<b>Alert Viewer</b>']);
+  toggleNavMenu(false);
+  window.scrollTo(0, 0);
+}
+
+function showAccountMgmt() {
+  document.querySelectorAll('.page-body').forEach(function (p) { p.style.display = 'none'; });
+  document.getElementById('alert-page').style.display = 'block';
+  setActiveMenu('Account Management');
+  setActiveTab('Account Management', '⭐');
+  setBreadcrumb(['合规管理', 'Compliance Monitoring', '<b>Account Management</b>']);
+  toggleNavMenu(false);
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Top nav dropdown ---------- */
+function toggleNavMenu(force) {
+  var m = document.getElementById('monitoring-menu');
+  var open = typeof force === 'boolean' ? force : !m.classList.contains('show');
+  m.classList.toggle('show', open);
+}
+document.getElementById('nav-monitoring').addEventListener('click', function (e) {
+  e.stopPropagation();
+  toggleNavMenu();
+});
+document.addEventListener('click', function () { toggleNavMenu(false); });
+document.getElementById('monitoring-menu').addEventListener('click', function (e) {
+  e.stopPropagation();
+});
+
+function toggleGroupBy(el) {
+  var label = document.querySelector('.groupby-state');
+  label.textContent = el.checked ? 'Open' : 'Close';
+  label.style.color = el.checked ? 'var(--warning)' : 'var(--text-tertiary)';
+}
+
+/* ---------- Merging window ---------- */
+var TODAY = new Date(2026, 10, 5);   // 2026-11-05
+var currentLen = 3;
+var limitOn = true;
+
+function addMonths(d, n) {
+  return new Date(d.getFullYear(), d.getMonth() + n, 1);
+}
+
+/* Windows are fixed calendar blocks of N months, anchored on January 1
+   of the current year and stepping forward from there. */
+function windowStart(len, offset) {
+  var yearStart = new Date(TODAY.getFullYear(), 0, 1);
+  var idx = Math.floor(TODAY.getMonth() / len);
+  return addMonths(yearStart, (idx - offset) * len);
+}
+
+function setLimit(on) {
+  limitOn = on;
+  document.getElementById('limit-on').classList.toggle('active', on);
+  document.getElementById('limit-off').classList.toggle('active', !on);
+  document.getElementById('interval-row').style.display = on ? 'flex' : 'none';
+  document.getElementById('interval-row').style.opacity = on ? '1' : '.4';
+  renderResult();
+}
+
+/* Live preview of the resulting window chain */
+function renderResult() {
+  var box = document.getElementById('result-box');
+
+  if (!limitOn) {
+    box.innerHTML = '<b>Single window</b> <span class="thin">·</span> no month boundary — alerts from the same account keep merging into one case.';
+    return;
+  }
+
+  var len = parseInt(document.getElementById('interval-input').value, 10);
+  if (!len || len < 1) { box.innerHTML = 'Enter a number of months.'; return; }
+  if (len > 12) { box.innerHTML = 'Maximum 12 months per window.'; return; }
+  currentLen = len;
+
+  box.innerHTML = 'Every <b>' + len + ' month' + (len > 1 ? 's' : '') +
+    '</b>, starting from January of each year.';
+}
+
+function toggleAutoMerge(el) {
+  var group = document.getElementById('window-group');
+  group.style.opacity = el.checked ? '1' : '.45';
+  group.style.pointerEvents = el.checked ? 'auto' : 'none';
+}
+
+function saveSettings() {
+  closeModal('aggregation-modal');
+}
+
+/* ---------- Link modal ---------- */
+function switchLinkPanel(type) {
+  document.getElementById('link-existing-panel').style.display = type === 'existing' ? 'block' : 'none';
+  document.getElementById('link-new-panel').style.display = type === 'new' ? 'block' : 'none';
+}
+
+function filterCases(q) {
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('#link-case-body tr').forEach(function (tr) {
+    tr.style.display = !q || tr.dataset.search.indexOf(q) !== -1 ? '' : 'none';
+  });
+}
+
+document.querySelectorAll('#link-case-body input[type="radio"]').forEach(function (r) {
+  r.addEventListener('change', function () {
+    document.querySelectorAll('#link-case-body tr').forEach(function (tr) { tr.classList.remove('selected'); });
+    r.closest('tr').classList.add('selected');
+  });
+});
+
+/* ---------- Sortable headers ---------- */
+function cellValue(row, idx, type) {
+  var cell = row.cells[idx];
+  if (!cell) return '';
+  var txt = (cell.textContent || '').trim().replace(/^[●\s]+/, '');
+  if (type === 'num') {
+    var n = parseFloat(txt.replace(/[^0-9.\-]/g, ''));
+    return isNaN(n) ? -Infinity : n;
+  }
+  if (type === 'date') {
+    var t = Date.parse(txt.replace(/\s+/g, ' '));
+    return isNaN(t) ? -Infinity : t;
+  }
+  return txt.toLowerCase();
+}
+
+document.querySelectorAll('.data-table th.sortable').forEach(function (th) {
+  th.addEventListener('click', function () {
+    var table = th.closest('table');
+    var tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    var heads = Array.prototype.slice.call(table.querySelectorAll('thead th'));
+    var idx = heads.indexOf(th);
+    var type = th.dataset.type || 'text';
+    var asc = th.dataset.dir !== 'asc';
+
+    heads.forEach(function (h) {
+      h.classList.remove('sorted');
+      delete h.dataset.dir;
+      var ind = h.querySelector('.sort-ind');
+      if (ind) ind.textContent = '⇅';
+    });
+    th.classList.add('sorted');
+    th.dataset.dir = asc ? 'asc' : 'desc';
+    var own = th.querySelector('.sort-ind');
+    if (own) own.textContent = asc ? '↑' : '↓';
+
+    var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+    rows.sort(function (a, b) {
+      var va = cellValue(a, idx, type);
+      var vb = cellValue(b, idx, type);
+      if (va < vb) return asc ? -1 : 1;
+      if (va > vb) return asc ? 1 : -1;
+      return 0;
+    });
+    rows.forEach(function (r) { tbody.appendChild(r); });
+  });
+});
+
+/* Init */
+/* Init */
+renderResult();
+refreshAddTotal();
+</script>
+
+</body>
+</html>
