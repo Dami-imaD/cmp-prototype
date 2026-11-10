@@ -267,7 +267,7 @@ body {
   user-select: none;
 }
 .data-table th.sortable { cursor: pointer; padding-right: 22px; transition: background .12s, color .12s; }
-.data-table th:has(.th-tip) { overflow: visible; }
+.data-table th:has(.th-tools) { overflow: visible; }
 .data-table th.sortable:hover { background: #eef0f3; color: var(--text); }
 .data-table th.sortable .sort-ind {
   position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
@@ -353,30 +353,59 @@ body {
   background: rgba(255,255,255,.12); cursor: not-allowed; color: rgba(255,255,255,.6);
 }
 .new-count-badge .ncb-x.is-locked:hover { background: rgba(255,255,255,.12); }
-/* Header hint: explains the new-alert badge */
-.th-info {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 14px; height: 14px; margin-left: 4px;
-  border-radius: 50%; background: #c9cdd4; color: #fff;
-  font-size: 10px; font-weight: 700; font-style: normal;
-  cursor: help; vertical-align: 1px; line-height: 1;
+/* ----- Header tools: one icon row, each icon owns its own tooltip ----- */
+.th-label { vertical-align: middle; }
+.th-tools {
+  display: inline-flex; align-items: center; gap: 2px;
+  margin-left: 6px; vertical-align: middle;
 }
-.data-table th:hover .th-info { background: var(--info); }
-.th-tip {
-  position: absolute; top: calc(100% + 6px); left: 0;
-  width: 280px; padding: 10px 12px;
+.th-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  position: relative; cursor: pointer; line-height: 1;
+  transition: background .12s, opacity .12s, color .12s, border-color .12s;
+}
+
+/* "!" hint — solid circle so it stays legible on the grey header */
+.th-info {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: #86909c; color: #fff;
+  font-size: 10px; font-weight: 700; font-style: normal;
+  cursor: help;
+}
+.th-info:hover { background: var(--info); }
+
+/* Broom */
+.th-broom {
+  width: 22px; height: 20px; border-radius: 3px;
+  font-size: 12px; opacity: .55;
+}
+.th-broom:hover { opacity: 1; background: #e4e6eb; }
+.th-broom.is-disabled { opacity: .2; cursor: not-allowed; }
+.th-broom.is-disabled:hover { background: transparent; }
+
+/* Shared tooltip — only the hovered icon shows one */
+.tip {
+  position: absolute; top: calc(100% + 8px);
+  width: 250px; padding: 9px 12px;
   background: #1d2129; color: #fff; font-size: 11px; font-weight: 400;
-  line-height: 1.7; border-radius: 4px; z-index: 60;
-  box-shadow: 0 6px 18px rgba(0,0,0,.2);
+  line-height: 1.7; border-radius: 4px; z-index: 80;
+  box-shadow: 0 6px 18px rgba(0,0,0,.22);
   opacity: 0; visibility: hidden; transition: opacity .12s;
   white-space: normal; text-align: left; text-transform: none;
+  pointer-events: none;
 }
-.th-tip::before {
-  content: ""; position: absolute; top: -4px; left: 14px;
+.tip b { color: #fff; font-weight: 600; }
+.tip::before {
+  content: ""; position: absolute; top: -4px;
   width: 8px; height: 8px; background: #1d2129; transform: rotate(45deg);
 }
-.th-tip b { color: #fff; font-weight: 600; }
-th:hover .th-tip { opacity: 1; visibility: visible; }
+/* Anchor each tooltip so neither runs off the column */
+.tip-left  { left: -8px; }
+.tip-left::before  { left: 14px; }
+.tip-right { left: -46px; width: 118px; text-align: center; }
+.tip-right::before { left: 52px; }
+
+.th-icon:hover .tip { opacity: 1; visibility: visible; }
 
 .upd-note {
   display: inline-block; margin-left: 6px; padding: 0 5px;
@@ -1039,28 +1068,25 @@ th:hover .th-tip { opacity: 1; visibility: visible; }
 
   <div class="results-bar">
     <span class="results-count"><b>24</b> Cases in total</span>
-    <span style="font-size:11px;color:var(--text-tertiary);margin-left:8px;">
-      · Sorted by Update Time (newest first). Linking a new alert counts as an update.
-    </span>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-      <span id="add-total" style="font-size:11px;color:var(--text-tertiary);">3 add badges in this view</span>
-      <button class="btn btn-sm" id="clear-all-btn" onclick="clearAllBadges()" title="Clears the add badges on cases you own">
-        Clear all add badges
-      </button>
-    </div>
   </div>
 
   <div class="table-wrap">
     <table class="data-table">
       <thead>
         <tr>
-          <th class="sortable" data-type="text" style="width:150px;">
-            Case Code
-            <span class="th-info" onclick="event.stopPropagation()">!</span>
-            <div class="th-tip">
-              Shown as <b>N add</b>: the number of alerts added to this case.
-              The count keeps accumulating until the <b>case owner</b> clicks <b>×</b> — only then does it reset to zero and start counting again.
-            </div>
+          <th class="sortable" data-type="text" style="width:176px;">
+            <span class="th-label">Case Code</span>
+            <span class="th-tools" onclick="event.stopPropagation()">
+              <span class="th-icon th-info">!
+                <span class="tip tip-left">
+                  Shown as <b>N add</b>: the number of alerts added to this case.
+                  The count keeps accumulating until the <b>case owner</b> clicks <b>×</b> — only then does it reset to zero and start counting again.
+                </span>
+              </span>
+              <span class="th-icon th-broom" id="clear-all-btn" onclick="openClearAllModal()">&#129529;
+                <span class="tip tip-right">Clear add badges</span>
+              </span>
+            </span>
             <span class="sort-ind">⇅</span>
           </th>
           <th class="sortable" data-type="text" style="width:200px;">Case Name<span class="sort-ind">⇅</span></th>
@@ -1494,6 +1520,32 @@ th:hover .th-tip { opacity: 1; visibility: visible; }
 </div><!-- /case page -->
 
 
+<!-- ============ Modal: Clear all add badges ============ -->
+<div class="modal-overlay" id="clear-all-modal">
+  <div class="modal" style="width:460px;">
+    <div class="modal-header">
+      <span>Clear add badges</span>
+      <span class="modal-close" onclick="closeModal('clear-all-modal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;line-height:1.8;margin-bottom:14px;">
+        Clear the <b>add</b> badges on the cases you own.
+      </div>
+      <div style="background:var(--header-bg);border-radius:4px;padding:11px 13px;font-size:12px;line-height:1.9;color:var(--text-secondary);">
+        <div><b id="ca-own-count" style="color:var(--text);">2</b> badge(s) on your cases will be cleared.</div>
+        <div><b id="ca-locked-count" style="color:var(--text);">1</b> badge(s) owned by others will be kept.</div>
+      </div>
+      <div style="font-size:11px;color:var(--text-tertiary);margin-top:10px;line-height:1.7;">
+        Each cleared counter resets to zero and starts counting again from the next alert merged into that case.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('clear-all-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmClearAll()">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ Modal: Close Case ============ -->
 <div class="modal-overlay" id="close-modal">
   <div class="modal" style="width:520px;">
@@ -1778,31 +1830,35 @@ function badgeLabel(n) {
 
 /* Clear every "N add" badge on cases the current user owns.
    Badges on cases owned by someone else stay put and are reported. */
-function clearAllBadges() {
+function openClearAllModal() {
+  var broom = document.getElementById('clear-all-btn');
+  if (broom && broom.classList.contains('is-disabled')) return;
+
   var own = 0, locked = 0;
   document.querySelectorAll('#case-list-page .new-count-badge').forEach(function (b) {
+    if (b.dataset.canClear === '1') own++; else locked++;
+  });
+  document.getElementById('ca-own-count').textContent = own;
+  document.getElementById('ca-locked-count').textContent = locked;
+  openModal('clear-all-modal');
+}
+
+function confirmClearAll() {
+  document.querySelectorAll('#case-list-page .new-count-badge').forEach(function (b) {
+    if (b.dataset.canClear !== '1') return;
     var row = b.closest('tr');
-    if (b.dataset.canClear !== '1') { locked++; return; }
     b.remove();
     if (row) row.dataset.new = '0';
-    own++;
   });
   refreshAddTotal();
-  if (locked) {
-    alert('Cleared ' + own + ' badge(s). ' + locked + ' badge(s) belong to other owners and were kept.');
-  }
+  closeModal('clear-all-modal');
 }
 
 function refreshAddTotal() {
-  var n = document.querySelectorAll('#case-list-page .new-count-badge').length;
-  var el = document.getElementById('add-total');
-  if (el) el.textContent = n === 0 ? 'No add badges in this view' : n + ' add badge' + (n > 1 ? 's' : '') + ' in this view';
-  var btn = document.getElementById('clear-all-btn');
-  if (btn) {
-    btn.disabled = !document.querySelector('#case-list-page .new-count-badge[data-can-clear="1"]');
-    btn.style.opacity = btn.disabled ? '.45' : '1';
-    btn.style.cursor = btn.disabled ? 'not-allowed' : 'pointer';
-  }
+  var broom = document.getElementById('clear-all-btn');
+  if (!broom) return;
+  var clearable = document.querySelector('#case-list-page .new-count-badge[data-can-clear="1"]');
+  broom.classList.toggle('is-disabled', !clearable);
 }
 
 /* ---------- Page routing ---------- */
