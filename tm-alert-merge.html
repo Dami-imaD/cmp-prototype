@@ -435,24 +435,6 @@ body {
 .history-body .alert-card,
 .history-body .data-table tbody tr { opacity: .72; }
 
-/* ===== Newly-merged banner ===== */
-.new-banner {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px; margin-bottom: 14px;
-  background: #f2f7ff; border: 1px solid #cfe0ff;
-  border-left: 3px solid var(--info); border-radius: 4px;
-  font-size: 12px; color: var(--text-secondary);
-}
-.new-banner .nb-icon {
-  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
-  background: var(--info); color: #fff;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700;
-}
-.new-banner b { color: var(--text); font-weight: 600; }
-.new-banner .nb-time { color: var(--text-tertiary); }
-.new-banner .nb-action { margin-left: auto; white-space: nowrap; }
-
 .pagination {
   display: flex; align-items: center; justify-content: flex-end;
   padding: 14px 0; gap: 8px; font-size: 12px; color: var(--text-tertiary);
@@ -630,6 +612,69 @@ body {
 }
 .checkbox-line input { margin-top: 2px; cursor: pointer; }
 .checkbox-line .sub { display: block; color: var(--text-tertiary); font-size: 11px; margin-top: 2px; }
+
+/* ===== Case Comment + Templates ===== */
+.dot.escalated { background: #7b61ff; }
+
+.cmt-box {
+  border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #fff;
+}
+.cmt-tpl-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; background: #fafbfc;
+  font-size: 12px; font-weight: 600; color: var(--text);
+  cursor: pointer; user-select: none;
+}
+.cmt-tpl-bar:hover { background: #f2f3f5; }
+.cmt-tpl-bar .caret {
+  width: 12px; font-size: 9px; color: var(--text-tertiary);
+  display: inline-flex; justify-content: center; transition: transform .15s;
+}
+.cmt-tpl-bar.collapsed .caret { transform: rotate(-90deg); }
+.cmt-tpl-count {
+  margin-left: auto; font-size: 11px; font-weight: 400; color: var(--text-tertiary);
+}
+.cmt-tpl-panel {
+  max-height: 260px; overflow-y: auto;
+  border-top: 1px solid var(--border-light);
+  padding-bottom: 6px;
+}
+.cmt-tpl-panel.collapsed { display: none; }
+.tpl-sec {
+  padding: 10px 12px 4px; font-size: 11px; font-weight: 700;
+  color: var(--text-secondary); letter-spacing: .02em;
+}
+.tpl-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 5px 12px; font-size: 12px; line-height: 1.55;
+  cursor: pointer; user-select: none;
+}
+.tpl-item:hover { background: #fffdf5; }
+.tpl-item input { margin-top: 2px; flex-shrink: 0; cursor: pointer; }
+.tpl-item span { color: var(--text); }
+
+.cmt-textarea {
+  width: 100%; min-height: 92px; padding: 10px 12px;
+  border: none; border-top: 1px solid var(--border);
+  font-family: inherit; font-size: 13px; line-height: 1.7;
+  color: var(--text); outline: none; resize: vertical; display: block;
+  overflow-y: hidden;
+}
+.cmt-textarea::placeholder { color: #c9cdd4; }
+
+/* Status inline warnings */
+.field-note {
+  font-size: 11px; color: var(--text-tertiary);
+  margin-top: 6px; line-height: 1.6;
+}
+.field-note b { color: var(--text-secondary); font-weight: 500; }
+
+/* Alert owner follows case owner */
+.tpl-follow {
+  display: inline-block; margin-left: 4px; font-size: 10px;
+  color: var(--info); cursor: help; vertical-align: 1px; opacity: .8;
+}
+.tpl-follow:hover { opacity: 1; }
 </style>
 </head>
 <body>
@@ -1100,7 +1145,7 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr data-case="TM_3045" data-new="2">
+        <tr data-case="TM_3045" data-new="2" data-can-clear="1">
           <td>
             TM_3045
             <span class="new-count-badge" data-can-clear="1" title="2 alerts added since you last cleared this badge">
@@ -1119,7 +1164,7 @@ body {
             <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
           </td>
         </tr>
-        <tr data-case="TM_3044" data-new="14">
+        <tr data-case="TM_3044" data-new="14" data-can-clear="1">
           <td>
             TM_3044
             <span class="new-count-badge" data-can-clear="1" title="14 alerts added since you last cleared this badge">
@@ -1138,7 +1183,7 @@ body {
             <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
           </td>
         </tr>
-        <tr data-case="TM_3042" data-new="0">
+        <tr data-case="TM_3042" data-new="0" data-can-clear="1">
           <td>TM_3042</td>
           <td>77203100 — Account level review</td>
           <td>77203100</td>
@@ -1152,7 +1197,7 @@ body {
             <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
           </td>
         </tr>
-        <tr data-case="TM_3041" data-new="1">
+        <tr data-case="TM_3041" data-new="1" data-can-clear="0" data-owner="yimeng">
           <td>
             TM_3041
             <span class="new-count-badge" data-can-clear="0" title="1 alert added · only the case owner (yimeng) can clear this">
@@ -1171,7 +1216,7 @@ body {
             <button class="btn-link" onclick="showCaseDetail('manage')">Manage</button>
           </td>
         </tr>
-        <tr data-case="TM_3038" data-new="0">
+        <tr data-case="TM_3038" data-new="0" data-can-clear="1">
           <td>TM_3038</td>
           <td>55382100 — Account level review</td>
           <td>55382100</td>
@@ -1229,6 +1274,7 @@ body {
           <select id="cd-edit-owner" style="width:100%;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:13px;outline:none;">
             <option>zhou</option><option>wuyi</option><option>yimeng</option>
           </select>
+          <div class="field-note">Changing the owner also reassigns <b>all linked alerts</b> to the new owner.</div>
         </div>
         <div class="form-group" style="margin:0;">
           <label><span style="color:var(--danger);">*</span> Account ID</label>
@@ -1264,8 +1310,34 @@ body {
 
         <div class="form-group" style="margin:0;grid-column:1 / -1;">
           <label>Comment</label>
-          <textarea id="cd-edit-comment" placeholder="Please enter Comment" style="width:100%;height:76px;padding:10px 12px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:13px;outline:none;resize:vertical;"></textarea>
-          <div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Saving overwrites Last Comment.</div>
+          <div class="cmt-box">
+            <div class="cmt-tpl-bar" id="cmt-tpl-bar" onclick="toggleTplPanel()">
+              <span class="caret">▼</span>
+              <span>Templates</span>
+              <span class="cmt-tpl-count" id="cmt-tpl-count">0 selected</span>
+            </div>
+            <div class="cmt-tpl-panel" id="cmt-tpl-panel">
+              <div class="tpl-sec">Summary</div>
+              <label class="tpl-item"><input type="checkbox" data-sec="summary" onchange="applyTemplates()"><span>Client profile</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="summary" onchange="applyTemplates()"><span>Deposit for the month</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="summary" onchange="applyTemplates()"><span>Withdrawal for the month</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="summary" onchange="applyTemplates()"><span>Max NLV</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="summary" onchange="applyTemplates()"><span>Total deposit and withdrawal</span></label>
+
+              <div class="tpl-sec">Reason</div>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>The client trades stocks and options; the deposit amount is reasonable given the client's stated financial background.</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>Public records show the client holds interests in multiple companies and owns high-value residential property, with no adverse news identified.</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>The client has made multiple foreign currency exchanges; the purpose requires further clarification.</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>Trading history shows regular investments and the deposits are consistent with the client profile.</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>Funds deposited have not been withdrawn; to be monitored further.</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>Deposit and withdrawal were made through the same bank account.</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>The client deposited and then requested a withdrawal without performing any trades.</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>Orders were cancelled after price targets were not met, followed by a withdrawal request.</span></label>
+              <label class="tpl-item"><input type="checkbox" data-sec="reason" onchange="applyTemplates()"><span>The transaction amount significantly exceeds the client's declared profile; further clarification is required.</span></label>
+            </div>
+            <textarea id="cd-edit-comment" class="cmt-textarea" placeholder="Please enter Comment"></textarea>
+          </div>
+          <div class="field-note">Saving overwrites the <b>Last Comment</b>. Selected templates are appended to the box above and can still be edited by hand.</div>
         </div>
       </div>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
@@ -1298,27 +1370,17 @@ body {
     </div><!-- /cd-ov-view -->
   </div>
 
-  <!-- ===== Newly merged alerts banner ===== -->
-  <div class="new-banner">
-    <span class="nb-icon">↑</span>
-    <div>
-      <b>2 new alerts merged into this case</b>
-      <span class="nb-time">&nbsp;·&nbsp;since 2026-09-28 00:00</span>
-      <div style="margin-top:2px;color:var(--text-tertiary);font-size:11px;">
-        Refreshed daily. Alerts merged while the case had no handling are marked New.
-      </div>
-    </div>
-    <span class="nb-action"><button class="btn-link" onclick="jumpToNew()">View →</button></span>
-  </div>
-
   <!-- ===== Associated Records ===== -->
   <div style="margin-bottom:24px;">
     <div style="font-size:15px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);">Associated Records</div>
 
     <div style="display:flex;align-items:center;margin-bottom:12px;">
       <span style="font-size:12px;color:#86909c;">5 Alerts linked to this case</span>
+      <span id="cd-new-wrap" style="margin-left:8px;font-size:12px;color:var(--info);display:none;">
+        · <b id="cd-new-count">0</b> merged since you last cleared the badge
+      </span>
       <span style="margin-left:auto;font-size:11px;color:#86909c;">
-        Alert status is tracked independently of the Case status.
+        Alert Owner follows the Case Owner. Alert status is tracked independently of the Case status.
       </span>
     </div>
 
@@ -1339,15 +1401,15 @@ body {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>754821 <span class="badge badge-case" style="margin-left:4px;">New</span></td>
+          <tr data-alert-id="754821">
+            <td>754821<span class="new-slot"></span></td>
             <td>2026-09-28 14:22:07</td>
             <td>2026-09-28 14:25:40</td>
             <td>14131200</td>
             <td>HK_Withdraw-007</td>
             <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
             <td><span class="tag-gray">Investigating</span></td>
-            <td>zhou</td>
+            <td class="alert-owner">zhou<span class="tpl-follow" title="Reassigned automatically to follow the Case Owner">↺</span></td>
             <td><span class="tag-plain">Auto</span></td>
             <td>
               <button class="btn-link">Detail</button>
@@ -1355,15 +1417,15 @@ body {
               <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
             </td>
           </tr>
-          <tr>
-            <td>754760 <span class="badge badge-case" style="margin-left:4px;">New</span></td>
+          <tr data-alert-id="754760">
+            <td>754760<span class="new-slot"></span></td>
             <td>2026-09-12 09:05:33</td>
             <td>2026-09-12 09:06:02</td>
             <td>14131200</td>
             <td>HK_Deposit-002</td>
             <td><span class="dot-tag"><i class="dot processing"></i>Processing</span></td>
             <td><span class="tag-gray">In the Inquiry</span></td>
-            <td>zhou</td>
+            <td class="alert-owner">zhou<span class="tpl-follow" title="Reassigned automatically to follow the Case Owner">↺</span></td>
             <td><span class="tag-plain">Auto</span></td>
             <td>
               <button class="btn-link">Detail</button>
@@ -1371,15 +1433,15 @@ body {
               <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
             </td>
           </tr>
-          <tr>
-            <td>754612</td>
+          <tr data-alert-id="754612">
+            <td>754612<span class="new-slot"></span></td>
             <td>2026-08-20 16:41:18</td>
             <td>2026-08-20 16:41:18</td>
             <td>14131200</td>
             <td>HK_Withdraw-003</td>
             <td><span class="dot-tag"><i class="dot new"></i>New</span></td>
             <td><span class="tag-gray">Investigating</span></td>
-            <td>wuyi</td>
+            <td class="alert-owner">zhou<span class="tpl-follow" title="Reassigned automatically to follow the Case Owner">↺</span></td>
             <td><span class="tag-plain">Auto</span></td>
             <td>
               <button class="btn-link">Detail</button>
@@ -1387,15 +1449,15 @@ body {
               <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
             </td>
           </tr>
-          <tr>
-            <td>754420</td>
+          <tr data-alert-id="754420">
+            <td>754420<span class="new-slot"></span></td>
             <td>2026-07-14 11:52:40</td>
             <td>2026-07-14 11:52:40</td>
             <td>14131200</td>
             <td>HK_Withdraw-003</td>
             <td><span class="dot-tag"><i class="dot pending"></i>Pending</span></td>
             <td><span class="tag-gray">In the Inquiry</span></td>
-            <td>wuyi</td>
+            <td class="alert-owner">zhou<span class="tpl-follow" title="Reassigned automatically to follow the Case Owner">↺</span></td>
             <td><span class="tag-plain">Created case</span></td>
             <td>
               <button class="btn-link">Detail</button>
@@ -1430,8 +1492,8 @@ body {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>751902</td>
+            <tr data-alert-id="751902">
+              <td>751902<span class="new-slot"></span></td>
               <td>2026-07-03 10:18:55</td>
               <td>2026-07-03 10:18:55</td>
               <td>14131200</td>
@@ -1445,8 +1507,8 @@ body {
                 <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
               </td>
             </tr>
-            <tr>
-              <td>751884</td>
+            <tr data-alert-id="751884">
+              <td>751884<span class="new-slot"></span></td>
               <td>2026-07-02 16:44:20</td>
               <td>2026-07-02 16:44:20</td>
               <td>14131200</td>
@@ -1460,8 +1522,8 @@ body {
                 <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
               </td>
             </tr>
-            <tr>
-              <td>751760</td>
+            <tr data-alert-id="751760">
+              <td>751760<span class="new-slot"></span></td>
               <td>2026-07-02 09:31:08</td>
               <td>2026-07-02 09:31:08</td>
               <td>14131200</td>
@@ -1475,8 +1537,8 @@ body {
                 <button class="btn-link danger" onclick="openModal('delink-modal')">Delink</button>
               </td>
             </tr>
-            <tr>
-              <td>751615</td>
+            <tr data-alert-id="751615">
+              <td>751615<span class="new-slot"></span></td>
               <td>2026-07-01 14:07:52</td>
               <td>2026-07-01 14:07:52</td>
               <td>14131200</td>
@@ -1546,40 +1608,36 @@ body {
   </div>
 </div>
 
-<!-- ============ Modal: Close Case ============ -->
-<div class="modal-overlay" id="close-modal">
+<!-- ============ Modal: Case status confirmation ============
+     Raised from Save whenever the case status changes. One layout for every
+     status — Close included. Two shapes:
+       match    — the license has an alert status of this name → offer to
+                  apply it to the linked alerts as well (checkbox, default on)
+       nomatch  — it does not → plain notice, the alerts are left untouched
+     Cancel aborts the whole save.
+-->
+<div class="modal-overlay" id="status-modal">
   <div class="modal" style="width:520px;">
     <div class="modal-header">
-      <span>Close Case</span>
-      <span class="modal-close" onclick="closeModal('close-modal')">×</span>
+      <span>Update Case Status</span>
+      <span class="modal-close" onclick="cancelStatusUpdate()">×</span>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label>Close reason</label>
-        <select style="width:100%;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:4px;font-family:inherit;outline:none;">
-          <option>Please select</option>
-          <option>No Further Action</option>
-          <option>Further Action</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Remark</label>
-        <textarea style="width:100%;height:64px;padding:9px 12px;border:1px solid var(--border);border-radius:4px;font-family:inherit;outline:none;resize:vertical;"></textarea>
-      </div>
-
-      <label class="checkbox-line">
-        <input type="checkbox" id="close-with-alerts" checked onchange="updateCloseHint()">
-        <span>
-          Also close all linked alerts（4 open alerts）
-          <span class="sub" id="close-alert-hint">
-            One-off action. Alert status stays independent of Case status — this will not stay in sync afterwards.
-          </span>
-        </span>
+      <label class="checkbox-line" id="status-sync-row">
+        <input type="checkbox" id="status-with-alerts" checked>
+        <span>Also update all linked alerts to <b id="status-target">Processing</b></span>
       </label>
+      <div style="background:var(--header-bg);border-radius:4px;padding:11px 13px;margin-top:10px;font-size:12px;line-height:1.9;color:var(--text-secondary);" id="status-scope">
+        <div id="status-sync-label"></div>
+        <div id="status-sync-hint"></div>
+      </div>
+      <div id="status-no-sync-note" style="display:none;font-size:13px;line-height:1.8;">
+        This status is not configured for Alerts. Updating the Case status will not affect linked Alerts.
+      </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="cancelClose()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmCloseCase()">Confirm Close</button>
+      <button class="btn" onclick="cancelStatusUpdate()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmStatusUpdate()">Confirm</button>
     </div>
   </div>
 </div>
@@ -1736,7 +1794,10 @@ body {
     </div>
     <div class="modal-body">
       <div style="font-size:13px;line-height:1.8;margin-bottom:14px;">
-        Remove this alert from the case. Its own status will not change.
+        Remove this alert from the case. Its own status and owner will not change.
+      </div>
+      <div style="font-size:11px;color:var(--text-tertiary);line-height:1.7;margin-bottom:12px;">
+        The alert keeps the owner it inherited from the case — delinking does not reassign it back.
       </div>
       <label class="checkbox-line">
         <input type="checkbox" checked>
@@ -1783,19 +1844,84 @@ function toggleHistory(el) {
   caret.textContent = open ? '−' : '+';
 }
 
-/* Scroll to the first newly-merged alert row */
-function jumpToNew() {
-  var rows = document.querySelectorAll('#case-page .data-table tbody tr');
-  for (var i = 0; i < rows.length; i++) {
-    if (rows[i].querySelector('.badge-case')) {
-      rows[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      rows[i].style.transition = 'background .3s';
-      rows[i].style.background = '#f2f7ff';
-      setTimeout(function (r) { r.style.background = ''; }, 1500, rows[i]);
-      return;
-    }
+/* ---------- New-alert tracking: list badge <-> detail New tags ----------
+   One source of truth per case: NEW_ALERTS[caseCode] holds the alert ids that
+   were merged in since the badge was last cleared.
+     · The case list shows the count (capped at 9+).
+     · The case detail marks exactly those alerts with a New tag.
+     · Clearing the badge on the list empties the list, so the tags disappear.
+     · A new merge appends ids, so the count and the tags both grow together. */
+var NEW_ALERTS = {
+  TM_3045: ['754821', '754760'],
+  TM_3044: ['754900', '754901', '754902', '754903', '754904',
+            '754905', '754906', '754907', '754908', '754909',
+            '754910', '754911', '754912', '754913'],
+  TM_3042: [],
+  TM_3041: ['754700'],
+  TM_3038: []
+};
+
+var CURRENT_CASE = 'TM_3045';   // case currently open in the detail page
+
+/* Re-render the list badge for one case from NEW_ALERTS. */
+function renderCaseBadge(caseCode) {
+  var row = document.querySelector('#case-list-page tr[data-case="' + caseCode + '"]');
+  if (!row) return;
+
+  var codeCell = row.cells[0];
+  var old = codeCell.querySelector('.new-count-badge');
+  if (old) old.remove();
+
+  var n = (NEW_ALERTS[caseCode] || []).length;
+  row.dataset.new = String(n);
+  if (!n) return;
+
+  var canClear = row.dataset.canClear === '1';
+  var badge = document.createElement('span');
+  badge.className = 'new-count-badge';
+  badge.dataset.canClear = canClear ? '1' : '0';
+  badge.title = n + ' alert' + (n > 1 ? 's' : '') + ' added since this badge was last cleared';
+  badge.appendChild(Object.assign(document.createElement('span'),
+    { className: 'ncb-num', textContent: badgeLabel(n) }));
+
+  var x = document.createElement('span');
+  x.className = 'ncb-x' + (canClear ? '' : ' is-locked');
+  x.textContent = '×';
+  x.title = canClear ? 'Clear' : 'Only the case owner can clear this';
+  x.setAttribute('onclick', 'clearNewBadge(this)');
+  if (!canClear && row.dataset.owner) x.dataset.owner = row.dataset.owner;
+  badge.appendChild(x);
+
+  codeCell.appendChild(badge);
+}
+
+/* Re-render every case badge — used on load and after a bulk clear. */
+function renderAllCaseBadges() {
+  Object.keys(NEW_ALERTS).forEach(renderCaseBadge);
+}
+
+/* Paint the New tags on the detail page from NEW_ALERTS[CURRENT_CASE]. */
+function renderDetailNewTags() {
+  var ids = NEW_ALERTS[CURRENT_CASE] || [];
+  var shown = 0;
+
+  document.querySelectorAll('#case-page tr[data-alert-id]').forEach(function (tr) {
+    var slot = tr.querySelector('.new-slot');
+    if (!slot) return;
+    var isNew = ids.indexOf(tr.dataset.alertId) !== -1;
+    slot.innerHTML = isNew
+      ? '<span class="badge badge-case" style="margin-left:4px;">New</span>'
+      : '';
+    if (isNew) shown++;
+  });
+
+  var count = document.getElementById('cd-new-count');
+  if (count) {
+    count.textContent = shown;
+    document.getElementById('cd-new-wrap').style.display = shown ? '' : 'none';
   }
 }
+
 
 /* ---------- Case list: clearing the "new alerts" badge ----------
    The badge counts newly added alerts and accumulates over time.
@@ -1810,10 +1936,15 @@ function clearNewBadge(x) {
     event.stopPropagation();
     return;
   }
+
   var badge = x.closest('.new-count-badge');
   var row = badge ? badge.closest('tr') : null;
-  if (badge) badge.remove();
-  if (row) row.dataset.new = '0';
+  if (!row) { event.stopPropagation(); return; }
+
+  var caseCode = row.dataset.case;
+  NEW_ALERTS[caseCode] = [];        // clearing the badge clears the New tags
+  renderCaseBadge(caseCode);
+  if (caseCode === CURRENT_CASE) renderDetailNewTags();
   refreshAddTotal();
   event.stopPropagation();
 }
@@ -1844,12 +1975,13 @@ function openClearAllModal() {
 }
 
 function confirmClearAll() {
-  document.querySelectorAll('#case-list-page .new-count-badge').forEach(function (b) {
-    if (b.dataset.canClear !== '1') return;
-    var row = b.closest('tr');
-    b.remove();
-    if (row) row.dataset.new = '0';
+  document.querySelectorAll('#case-list-page tr[data-case]').forEach(function (row) {
+    var badge = row.querySelector('.new-count-badge');
+    if (!badge || badge.dataset.canClear !== '1') return;
+    NEW_ALERTS[row.dataset.case] = [];
+    renderCaseBadge(row.dataset.case);
   });
+  if (NEW_ALERTS[CURRENT_CASE]) renderDetailNewTags();
   refreshAddTotal();
   closeModal('clear-all-modal');
 }
@@ -1902,8 +2034,53 @@ function showCaseDetail(mode) {
   window.scrollTo(0, 0);
 }
 
-/* ---------- Detail (read-only) vs Manage (editable) ---------- */
+/* ---------- Case Comment templates ----------
+   Case-level templates. Picking items appends them to the comment box;
+   the box stays freely editable afterwards, and saving still overwrites
+   the single "Last Comment" that the case exposes. */
+var TPL_LABELS = {
+  summary: 'Client profile',
+};
+
+function toggleTplPanel() {
+  var bar = document.getElementById('cmt-tpl-bar');
+  var panel = document.getElementById('cmt-tpl-panel');
+  panel.classList.toggle('collapsed');
+  bar.classList.toggle('collapsed');
+}
+
+/* Rebuild the whole comment from the checked items, keeping any text the
+   user typed outside of template output. Simplest readable behaviour:
+   template lines are regenerated, manual lines are preserved. */
+function applyTemplates() {
+  var checks = document.querySelectorAll('#cmt-tpl-panel input[type="checkbox"]');
+  var picked = Array.prototype.filter.call(checks, function (c) { return c.checked; });
+  document.getElementById('cmt-tpl-count').textContent = picked.length + ' selected';
+
+  var box = document.getElementById('cd-edit-comment');
+
+  // Strip previously generated template lines (marked with a leading "•")
+  var manual = box.value.split('\n').filter(function (l) { return l.indexOf('• ') !== 0; });
+
+  var tplLines = picked.map(function (c) {
+    return '• ' + c.parentElement.querySelector('span').textContent.trim();
+  });
+
+  var out = tplLines.concat(manual.filter(function (l) { return l.trim() !== ''; }));
+  box.value = out.join('\n');
+  autoGrowComment(box);
+}
+
+/* Grow the comment box with its content so template output is never clipped */
+function autoGrowComment(el) {
+  if (!el) el = document.getElementById('cd-edit-comment');
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = Math.max(92, el.scrollHeight + 2) + 'px';
+}
+
 var manageMode = false;
+var origOwner = 'zhou';
 
 function setReadOnly() {
   manageMode = false;
@@ -1925,16 +2102,30 @@ function enterManage() {
   // Seed the form from the current view
   document.getElementById('cd-edit-name').value = document.getElementById('cd-name').textContent.trim();
   document.getElementById('cd-edit-owner').value = document.getElementById('cd-owner').textContent.trim();
+  origOwner = document.getElementById('cd-owner').textContent.trim();
   var status = document.getElementById('cd-status').textContent.replace(/[●\s]+/g, '').trim();
   setStatusRadio(status === 'Closed' ? 'New' : status, false);
+  caseStatus = status;
+  prevStatus = status;
+  pendingSave = null;
   document.getElementById('cd-edit-comment').value = document.getElementById('cd-comment').textContent.trim();
+
+  // Template panel starts collapsed with nothing selected
+  document.getElementById('cmt-tpl-panel').classList.add('collapsed');
+  document.getElementById('cmt-tpl-bar').classList.add('collapsed');
+  document.querySelectorAll('#cmt-tpl-panel input[type="checkbox"]').forEach(function (c) { c.checked = false; });
+  document.getElementById('cmt-tpl-count').textContent = '0 selected';
+
+  var box = document.getElementById('cd-edit-comment');
+  box.oninput = function () { autoGrowComment(box); };
+  autoGrowComment(box);
 }
 
 function setStatusRadio(value, fireModal) {
   document.querySelectorAll('#cd-status-radio input').forEach(function (r) {
     r.checked = (r.value === value);
   });
-  if (fireModal && value === 'Closed') openModal('close-modal');
+  if (fireModal) onStatusChange({ value: value });
 }
 
 function getStatusRadio() {
@@ -1947,64 +2138,173 @@ function cancelEdit() {
   document.getElementById('cd-ov-edit').style.display = 'none';
 }
 
+/* Save is the single commit point. When the case status changes we always
+   raise the same confirmation dialog — Close included. If the license also
+   defines an alert status of that name, the dialog offers to update the
+   linked alerts too; otherwise it just states that alerts are unaffected. */
 function saveEdit() {
   var name = document.getElementById('cd-edit-name').value.trim();
   if (!name) { alert('Case Name is required.'); return; }
-  var owner = document.getElementById('cd-edit-owner').value;
-  var status = getStatusRadio();
-  var comment = document.getElementById('cd-edit-comment').value.trim();
 
-  document.getElementById('cd-name').textContent = name;
-  document.getElementById('cd-owner').textContent = owner;
-  var cls = { New: 'new', Processing: 'processing', Pending: 'pending', Escalated: 'escalated', Closed: 'closed' }[status] || 'new';
+  var status = getStatusRadio();
+
+  pendingSave = {
+    name: name,
+    owner: document.getElementById('cd-edit-owner').value,
+    status: status,
+    comment: document.getElementById('cd-edit-comment').value.trim(),
+    from: document.getElementById('cd-edit-period-from').value,
+    to: document.getElementById('cd-edit-period-to').value
+  };
+
+  if (status !== caseStatus) {
+    var supported = ALERT_STATUSES[CURRENT_LICENSE] || [];
+    openStatusModal(status, supported.indexOf(status) !== -1);
+    return;
+  }
+
+  commitSave();
+}
+
+/* Writes the pending payload onto the case page and returns to read-only. */
+function commitSave() {
+  if (!pendingSave) return;
+  var p = pendingSave;
+
+  document.getElementById('cd-name').textContent = p.name;
+  document.getElementById('cd-owner').textContent = p.owner;
+  var cls = { New: 'new', Processing: 'processing', Pending: 'pending', Escalated: 'escalated', Closed: 'closed' }[p.status] || 'new';
   document.getElementById('cd-status').innerHTML =
-    '<span class="dot-tag"><i class="dot ' + cls + '"></i>' + status + '</span>';
-  if (comment) document.getElementById('cd-comment').textContent = comment;
-  document.getElementById('cd-period').textContent =
-    document.getElementById('cd-edit-period-from').value + ' ~ ' +
-    document.getElementById('cd-edit-period-to').value + ' GMT+8';
+    '<span class="dot-tag"><i class="dot ' + cls + '"></i>' + p.status + '</span>';
+  if (p.comment) document.getElementById('cd-comment').textContent = p.comment;
+  document.getElementById('cd-period').textContent = p.from + ' ~ ' + p.to + ' GMT+8';
+
+  // Alert owner follows the case owner
+  if (p.owner !== origOwner) applyOwnerToAlerts(p.owner);
+  origOwner = p.owner;
+
+  caseStatus = p.status;
+  prevStatus = p.status;
+  pendingSave = null;
 
   document.getElementById('cd-ov-view').style.display = '';
   document.getElementById('cd-ov-edit').style.display = 'none';
 }
 
-/* Selecting Closed in Case Status opens the close confirmation.
-   Cancelling it rolls the radio back to the previous status. */
-var prevStatus = 'New';
+/* ---------- Alert owner follows Case owner ----------
+   Meeting decision: an alert merged into a case takes the case owner.
+   Delinking does NOT roll the owner back — it stays with whoever had it. */
+function applyOwnerToAlerts(owner) {
+  document.querySelectorAll('#case-page .alert-owner').forEach(function (td) {
+    td.innerHTML = owner + '<span class="tpl-follow" title="Reassigned automatically to follow the Case Owner">↺</span>';
+  });
+  // Alert Viewer: rows already linked to this case show the same owner
+  document.querySelectorAll('#alert-table-wrap tbody tr').forEach(function (tr) {
+    var cells = tr.querySelectorAll('td');
+    if (cells.length < 12) return;
+    if (cells[10].textContent.trim() === '3045') {
+      cells[9].innerHTML = owner;
+    }
+  });
+}
 
-function onStatusChange(el) {
-  if (el.value === 'Closed') {
-    openModal('close-modal');
+/* ---------- Case status -> Alert status sync ----------
+   Alert statuses are configured per license, so they are not 1:1 with
+   case statuses. Selecting a status changes nothing and shows nothing —
+   the prompt only appears on Save, and it comes in two shapes:
+     · license HAS an alert status of this name → ask whether the alerts
+       should follow the case status (one-off apply)
+     · license does NOT → tell the user this status does not apply to
+       alerts, and the alerts keep their current status                      */
+var ALERT_STATUSES = { 'TM_HK': ['New', 'Processing', 'Pending', 'Closed'] };
+var CURRENT_LICENSE = 'TM_HK';
+
+var prevStatus = 'New';          // status the case currently has (not yet saved)
+var caseStatus = 'New';          // status committed on the case
+var pendingSave = null;          // save payload waiting on a confirmation
+
+function onStatusChange() {
+  // Deliberately silent: nothing is evaluated or shown until Save.
+}
+
+/* Count the linked alerts by whether they are still open. Closed is a
+   terminal state — those alerts are never touched again, whatever the case
+   status becomes. */
+function countLinkedAlerts() {
+  var open = 0, closed = 0;
+
+  document.querySelectorAll('#case-page tr[data-alert-id]').forEach(function (tr) {
+    var tag = tr.querySelector('.dot-tag');
+    if (!tag) return;
+    if (tag.textContent.replace(/[●\s]+/g, '').trim() === 'Closed') closed++;
+    else open++;
+  });
+
+  return { open: open, closed: closed };
+}
+
+function openStatusModal(status, hasMatch) {
+  var scope = document.getElementById('status-scope');
+  var note = document.getElementById('status-no-sync-note');
+  var row = document.getElementById('status-sync-row');
+  var box = document.getElementById('status-with-alerts');
+
+  if (hasMatch) {
+    // The license defines an alert status of this name — offer to apply it.
+    var c = countLinkedAlerts();
+
+    document.getElementById('status-target').textContent = status;
+    document.getElementById('status-sync-label').innerHTML =
+      '<b>' + c.open + '</b> alert' + (c.open === 1 ? '' : 's') + ' will change to <b>' + status + '</b>.';
+    document.getElementById('status-sync-hint').innerHTML = c.closed
+      ? '<b>' + c.closed + '</b> alert' + (c.closed === 1 ? '' : 's') + ' already <b>Closed</b> will not change — Closed is final.'
+      : '';
+
+    // Nothing to sync when every linked alert is already Closed.
+    row.style.display = c.open > 0 ? '' : 'none';
+    box.checked = c.open > 0;
+    scope.style.display = c.open > 0 ? '' : 'none';
+    note.style.display = c.open > 0 ? 'none' : '';
   } else {
-    prevStatus = el.value;
+    // No matching alert status — plain notice, alerts stay untouched.
+    row.style.display = 'none';
+    box.checked = false;
+    scope.style.display = 'none';
+    note.style.display = '';
   }
+
+  openModal('status-modal');
 }
 
-/* ---------- Close Case ---------- */
-function updateCloseHint() {
-  var on = document.getElementById('close-with-alerts').checked;
-  document.getElementById('close-alert-hint').style.display = on ? 'block' : 'none';
+/* Applies the target status to the linked alerts. Closed alerts are never
+   reopened, and alerts already in the target status are left as they are. */
+function applyStatusToAlerts(status) {
+  var cls = { New: 'new', Processing: 'processing', Pending: 'pending', Closed: 'closed' }[status] || 'new';
+
+  document.querySelectorAll('#case-page .data-table tbody tr').forEach(function (tr) {
+    var tag = tr.querySelector('.dot-tag');
+    if (!tag) return;
+    var name = tag.textContent.replace(/[●\s]+/g, '').trim();
+    if (name === 'Closed') return;   // never reopen a closed alert
+    tag.innerHTML = '<i class="dot ' + cls + '"></i>' + status;
+  });
 }
 
-function confirmCloseCase() {
-  closeModal('close-modal');
-  prevStatus = 'Closed';
-  // Commit the Closed status straight to the case
-  document.getElementById('cd-status').innerHTML =
-    '<span class="dot-tag"><i class="dot closed"></i>Closed</span>';
-  if (document.getElementById('close-with-alerts').checked) {
-    document.querySelectorAll('#case-page .data-table tbody tr').forEach(function (tr) {
-      var tag = tr.querySelector('.dot-tag');
-      if (tag && !tag.querySelector('.dot.closed')) {
-        tag.innerHTML = '<i class="dot closed"></i>Closed';
-      }
-    });
-  }
+function confirmStatusUpdate() {
+  var status = pendingSave ? pendingSave.status : prevStatus;
+  var rowVisible = document.getElementById('status-sync-row').style.display !== 'none';
+  var withAlerts = rowVisible && document.getElementById('status-with-alerts').checked;
+
+  closeModal('status-modal');
+  if (withAlerts) applyStatusToAlerts(status);
+  commitSave();
 }
 
-function cancelClose() {
-  closeModal('close-modal');
-  setStatusRadio(prevStatus, false);
+/* Cancel aborts the whole save — the case keeps its previous status. */
+function cancelStatusUpdate() {
+  closeModal('status-modal');
+  pendingSave = null;
+  setStatusRadio(caseStatus, false);
 }
 
 function showAlertList() {
@@ -2173,8 +2473,9 @@ document.querySelectorAll('.data-table th.sortable').forEach(function (th) {
 });
 
 /* Init */
-/* Init */
 renderResult();
+renderAllCaseBadges();
+renderDetailNewTags();
 refreshAddTotal();
 </script>
 
